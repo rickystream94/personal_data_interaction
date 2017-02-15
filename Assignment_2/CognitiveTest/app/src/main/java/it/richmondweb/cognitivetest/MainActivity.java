@@ -1,5 +1,8 @@
 package it.richmondweb.cognitivetest;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -26,8 +29,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int testDuration = 10;
 
     private Random random = new Random();
-    private String arrowsDirection;
+    private String arrowsHead;
     private String centralArrowDirection;
+    private String centralArrowHead;
     private TableLayout arrowsGridLayout;
     private Typeface iconFont;
     private TextView timerCounter;
@@ -85,16 +89,15 @@ public class MainActivity extends AppCompatActivity {
                 String text = getRandomArrow();
                 if (i == GRID_ROWS / 2 && j == GRID_COLUMNS / 2) {
                     arrow.setVisibility(View.VISIBLE);
-                    arrow.setTextColor(Color.BLUE);
                     if (text.equals(getString(R.string.fa_arrow_left)) || text.equals(getString(R.string
                             .fa_arrow_right)))
                         centralArrowDirection = "HORIZONTAL";
                     else
                         centralArrowDirection = "VERTICAL";
                 } else {
-                    arrow.setTextColor(Color.BLACK);
                     arrow.setVisibility(View.INVISIBLE);
                 }
+                arrow.setTextColor(Color.BLACK);
                 arrow.setText(text);
 
                 row.addView(arrow, j);
@@ -110,20 +113,22 @@ public class MainActivity extends AppCompatActivity {
             arrowsGridLayout.setColumnStretchable(i, true);
 
         //Display the other arrows according to the attribute centralArrowDirection
-        setArrowsDirection(centralArrowDirection);
+        setArrowsHead(centralArrowDirection);
         fillTable();
     }
 
     private void completeTest() {
         new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Test Completed!")
-                .setMessage("Contratulations, your result: XXX")
+                .setMessage("Contratulations, your result:\nCorrect Answers: " +
+                        ""+correctAnswers+"\nWrong Answers: "+wrongAnswers)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_info)
+                .setCancelable(false)
                 .show();
     }
 
@@ -132,17 +137,17 @@ public class MainActivity extends AppCompatActivity {
         return arrowValues[random.nextInt(arrowValues.length)];
     }
 
-    public void setArrowsDirection(String centralArrowDirection) {
+    public void setArrowsHead(String centralArrowDirection) {
         String[] leftRight = new String[]{"LEFT", "RIGHT"};
         String[] upDown = new String[]{"UP", "DOWN"};
-        arrowsDirection = (centralArrowDirection.equals("HORIZONTAL") ? leftRight[random.nextInt
+        arrowsHead = (centralArrowDirection.equals("HORIZONTAL") ? leftRight[random.nextInt
                 (leftRight.length)] : upDown[random.nextInt(upDown.length)]);
     }
 
-    //It will make all the other arrows visible and with arrowsDirection value
+    //It will make all the other arrows visible and with arrowsHead value
     private void fillTable() {
         String text;
-        switch (arrowsDirection) {
+        switch (arrowsHead) {
             case "LEFT":
                 text = getString(R.string.fa_arrow_left);
                 break;
@@ -168,18 +173,24 @@ public class MainActivity extends AppCompatActivity {
                 //Central cell
                 if (i == GRID_ROWS / 2 && j == GRID_COLUMNS / 2) {
                     textView.setBackground(getDrawable(R.drawable.back));
-                    if (centralArrowDirection.equals("HORIZONTAL"))
-                        textView.setText(random.nextFloat() < .5 ? getString(R.string
-                                .fa_arrow_right) :
-                                getString(R
-                                        .string
-                                        .fa_arrow_left));
-                    else
-                        textView.setText(random.nextFloat() < .5 ? getString(R.string
-                                .fa_arrow_up) :
-                                getString(R
-                                        .string
-                                        .fa_arrow_down));
+                    if (centralArrowDirection.equals("HORIZONTAL")) {
+                        if(random.nextFloat()<.5) {
+                            textView.setText(getString(R.string.fa_arrow_right));
+                            centralArrowHead = "RIGHT";
+                        } else {
+                            textView.setText(getString(R.string.fa_arrow_left));
+                            centralArrowHead = "LEFT";
+                        }
+                    }
+                    else {
+                        if(random.nextFloat()<.5) {
+                            textView.setText(getString(R.string.fa_arrow_down));
+                            centralArrowHead = "DOWN";
+                        } else {
+                            textView.setText(getString(R.string.fa_arrow_up));
+                            centralArrowHead = "UP";
+                        }
+                    }
                 }
                 if (centralArrowDirection.equals("HORIZONTAL") && i == GRID_ROWS / 2) {
                     //Edges of the screen
@@ -204,8 +215,11 @@ public class MainActivity extends AppCompatActivity {
             public void handleMessage(Message message) {
                 int seconds = message.getData().getInt("seconds");
                 timerCounter.setText("" + seconds);
-                if(seconds<=0)
+                //If the timer is over
+                if(seconds<=0) {
+                    GameState.stopPlaying();
                     completeTest();
+                }
             }
         };
         timerCounter = (TextView) findViewById(R.id.timerCounter);
@@ -224,12 +238,34 @@ public class MainActivity extends AppCompatActivity {
                     message.setData(bundle);
                     message.setTarget(handler);
                     message.sendToTarget();
-                    Log.d("test",""+currentSeconds);
                     currentSeconds++;
                 }
             }
         };
         new Thread(runnable).start();
+    }
+
+    public void userButtonChoice(View view) {
+        if(!GameState.isPlayMode())
+            return;
+        TextView textView = (TextView)view;
+        int transitionColor;
+        if(textView.getContentDescription().toString().equals(centralArrowHead)) {
+            correctAnswers++;
+            transitionColor = Color.GREEN;
+        }
+        else {
+            wrongAnswers++;
+            transitionColor = Color.RED;
+        }
+        ValueAnimator animator = ObjectAnimator.ofInt(textView,"textColor",transitionColor,getColor(R.color
+                .panelButtons));
+        animator.setDuration(300);
+        animator.setEvaluator(new ArgbEvaluator());
+        animator.start();
+
+        //Refreshes the grid
+        drawGrid(null);
     }
 
     //Might be used for menu button to restart the test

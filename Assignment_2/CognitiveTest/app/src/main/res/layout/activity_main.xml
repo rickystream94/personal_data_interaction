@@ -43,7 +43,8 @@
                     style="@style/controlPanelText"
                     android:layout_weight="1"
                     android:text="@string/fa_arrow_up"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:contentDescription="UP"/>
 
                 <TextView
                     android:layout_weight="1"
@@ -58,7 +59,8 @@
                     style="@style/controlPanelText"
                     android:layout_weight="1"
                     android:text="@string/fa_arrow_left"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:contentDescription="LEFT"/>
 
                 <TextView
                     android:layout_weight="1"
@@ -69,7 +71,8 @@
                     style="@style/controlPanelText"
                     android:layout_weight="1"
                     android:text="@string/fa_arrow_right"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:contentDescription="RIGHT"/>
             </TableRow>
 
             <TableRow
@@ -86,7 +89,8 @@
                     style="@style/controlPanelText"
                     android:layout_weight="1"
                     android:text="@string/fa_arrow_down"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:contentDescription="DOWN"/>
 
                 <TextView
                     android:layout_weight="1"
