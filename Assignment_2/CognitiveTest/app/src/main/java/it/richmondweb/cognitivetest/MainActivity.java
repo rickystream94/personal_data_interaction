@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -19,13 +21,16 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_ROWS = 3;
     private static final int GRID_COLUMNS = 5;
-    private static final int numberOfTests = 10;
+    private static final int testDuration = 30;
+
     private Random random = new Random();
     private String arrowsDirection;
     private String centralArrowDirection;
     private TableLayout arrowsGridLayout;
     private Typeface iconFont;
-    private int counter;
+    private TextView timerCounter;
+    private int correctAnswers = 0;
+    private int wrongAnswers = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
         iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
 
         //Assigning correct font to control panel buttons
-        TextView upButton = (TextView)findViewById(R.id.upButton);
-        TextView downButton = (TextView)findViewById(R.id.downButton);
-        TextView rightButton = (TextView)findViewById(R.id.rightButton);
-        TextView leftButton = (TextView)findViewById(R.id.leftButton);
+        TextView upButton = (TextView) findViewById(R.id.upButton);
+        TextView downButton = (TextView) findViewById(R.id.downButton);
+        TextView rightButton = (TextView) findViewById(R.id.rightButton);
+        TextView leftButton = (TextView) findViewById(R.id.leftButton);
         upButton.setTypeface(iconFont);
         downButton.setTypeface(iconFont);
         rightButton.setTypeface(iconFont);
@@ -46,21 +51,24 @@ public class MainActivity extends AppCompatActivity {
 
         //Getting the arrows grid layout
         arrowsGridLayout = (TableLayout) findViewById(R.id.arrowsGrid);
-        arrowsGridLayout.setBackgroundColor(Color.YELLOW);
         arrowsGridLayout.setWeightSum(1.0f);
         drawGrid(null);
+
+        //Launch timer thread and start playing the test
+        GameState.startPlaying();
+        startTimerThread();
     }
 
     public void drawGrid(View view) {
-        if (view != null) {
+        /*if (view != null) {
             if (counter == numberOfTests) {
                 displayDialog();
                 return;
             }
             counter++;
-            /*TextView counterText = (TextView) findViewById(R.id.counter);
-            counterText.setText("Counter: " + counter);*/
-        }
+            TextView counterText = (TextView) findViewById(R.id.counter);
+            counterText.setText("Counter: " + counter);
+        }*/
         arrowsGridLayout.removeAllViews();
 
         for (int i = 0; i < GRID_ROWS; i++) {
@@ -104,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         fillTable();
     }
 
-    private void displayDialog() {
+    private void completeTest() {
         new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Test Completed!")
                 .setMessage("Contratulations, your result: XXX")
@@ -155,8 +163,9 @@ public class MainActivity extends AppCompatActivity {
             for (int j = 0; j < GRID_COLUMNS; j++) {
                 TextView textView = (TextView) row.getChildAt(j);
                 textView.setText(text);
-                //Central cell must not be touched
+                //Central cell
                 if (i == GRID_ROWS / 2 && j == GRID_COLUMNS / 2) {
+                    textView.setBackground(getDrawable(R.drawable.back));
                     if (centralArrowDirection.equals("HORIZONTAL"))
                         textView.setText(random.nextFloat() < .5 ? getString(R.string
                                 .fa_arrow_right) :
@@ -187,6 +196,36 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void startTimerThread() {
+        final Handler handler = new Handler();
+        timerCounter = (TextView) findViewById(R.id.timerCounter);
+        Runnable runnable = new Runnable() {
+            public void run() {
+                timerCounter.setText("" + testDuration);
+                int currentSeconds = 0;
+                while (currentSeconds <= testDuration) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    final int finalCurrentSeconds = currentSeconds;
+                    handler.post(new Runnable() {
+                        public void run() {
+                            timerCounter.setText("" + (testDuration - finalCurrentSeconds));
+                        }
+                    });
+                    currentSeconds++;
+                }
+                GameState.stopPlaying();
+                //Message message = new Message();
+                //handler.dispatchMessage();
+            }
+        };
+        new Thread(runnable).start();
+    }
+
+    //Might be used for menu button to restart the test
     /*public void restart(View view) {
         counter = 0;
         TextView counterText = (TextView) findViewById(R.id.counter);
