@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="arrows">
+        <item>&#xf061;</item>
+        <item>&#xf060;</item>
+        <item>&#xf062;</item>
+        <item>&#xf063;</item>
+    </string-array>
+</resources>
