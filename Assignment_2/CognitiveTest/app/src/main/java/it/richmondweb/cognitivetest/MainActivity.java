@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_ROWS = 3;
     private static final int GRID_COLUMNS = 5;
-    private static final int testDuration = 5;
+    private static final int testDuration = 10;
 
     private Random random = new Random();
     private String arrowsDirection;
