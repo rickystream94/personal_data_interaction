@@ -1,9 +1,15 @@
 package it.richmondweb.cognitivetest;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.util.ArrayList;
+
+import it.richmondweb.cognitivetest.Models.EriksenFlanker;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -45,6 +51,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_TEST_ERIKSEN_FLANKER);
 
         onCreate(db);
+    }
+
+    public void insertEriksenFlankerTest(int correct, int incorrect) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put(TEST_ERIKSEN_FLANKER_COLUMN_CORRECT, correct);
+        v.put(TEST_ERIKSEN_FLANKER_COLUMN_INCORRECT, incorrect);
+        long id = database.insert(DATABASE_TABLE_TEST_ERIKSEN_FLANKER, null, v);
+        Log.d("DB", String.format("Saved new Eriksen Flanker Test with ID: %d", id));
+    }
+
+    public ArrayList<EriksenFlanker> getAllEriksenFlankerTests() {
+        ArrayList<EriksenFlanker> tests = new ArrayList<>();
+        String sql = "SELECT * FROM " + DATABASE_TABLE_TEST_ERIKSEN_FLANKER;
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(sql, null);
+        cursor.moveToFirst();
+        if(cursor.getCount() > 0) {
+            while (cursor.isAfterLast() == false) {
+                int id = cursor.getInt(cursor.getColumnIndex(TEST_ERIKSEN_FLANKER_COLUMN_ID));
+                String created = cursor.getString(cursor.getColumnIndex(TEST_ERIKSEN_FLANKER_COLUMN_CREATED));
+                int correct = cursor.getInt(cursor.getColumnIndex(TEST_ERIKSEN_FLANKER_COLUMN_CORRECT));
+                int incorrect = cursor.getInt(cursor.getColumnIndex(TEST_ERIKSEN_FLANKER_COLUMN_INCORRECT));
+                tests.add(new EriksenFlanker(id, created, correct, incorrect));
+                cursor.moveToNext();
+            }
+        }
+        return tests;
     }
 
     /*

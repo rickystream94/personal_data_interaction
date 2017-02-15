@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import java.util.*;
 
+import it.richmondweb.cognitivetest.Models.EriksenFlanker;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_ROWS = 3;
@@ -115,6 +117,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void completeTest() {
+        DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
+        db.insertEriksenFlankerTest(1,2);
+        ArrayList<EriksenFlanker> testsEriksenFlanker = db.getAllEriksenFlankerTests();
+        for (EriksenFlanker test : testsEriksenFlanker) {
+            Log.d("EriksenFlankerTest", String.format("%d - %s. Correct: %d. Incorrect: %d", test.getId(), test.getCreated(), test.getCorrect(), test.getIncorrect()));
+        }
+
         new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Test Completed!")
                 .setMessage("Contratulations, your result: XXX")
