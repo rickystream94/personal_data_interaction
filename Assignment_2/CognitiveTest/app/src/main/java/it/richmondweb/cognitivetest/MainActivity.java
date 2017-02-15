@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_ROWS = 3;
     private static final int GRID_COLUMNS = 5;
-    private static final int testDuration = 30;
+    private static final int testDuration = 5;
 
     private Random random = new Random();
     private String arrowsDirection;
@@ -210,7 +211,6 @@ public class MainActivity extends AppCompatActivity {
         timerCounter = (TextView) findViewById(R.id.timerCounter);
         Runnable runnable = new Runnable() {
             public void run() {
-                timerCounter.setText("" + testDuration);
                 int currentSeconds = 0;
                 while (currentSeconds <= testDuration) {
                     try {
@@ -222,11 +222,11 @@ public class MainActivity extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putInt("seconds",testDuration-currentSeconds);
                     message.setData(bundle);
-                    handler.dispatchMessage(message);
+                    message.setTarget(handler);
+                    message.sendToTarget();
+                    Log.d("test",""+currentSeconds);
                     currentSeconds++;
                 }
-                GameState.stopPlaying();
-                handler.dispatchMessage(Message.obtain());
             }
         };
         new Thread(runnable).start();
