@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void completeTest() {
         DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
-        db.insertEriksenFlankerTest(1,2);
+        db.insertEriksenFlankerTest(correctAnswers,wrongAnswers);
         ArrayList<EriksenFlanker> testsEriksenFlanker = db.getAllEriksenFlankerTests();
         for (EriksenFlanker test : testsEriksenFlanker) {
             Log.d("EriksenFlankerTest", String.format("%d - %s. Correct: %d. Incorrect: %d", test.getId(), test.getCreated(), test.getCorrect(), test.getIncorrect()));
