@@ -1,4 +1,5 @@
 Assignment_2/CognitiveTest/app/*.iml
+Assignment_2/CognitiveTest/app/app.iml
 Assignment_2/CognitiveTest/*.iml
 *.iml
 Assignment_2/CognitiveTest/.gradle
