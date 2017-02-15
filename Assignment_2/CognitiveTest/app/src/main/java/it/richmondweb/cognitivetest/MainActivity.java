@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -197,7 +198,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startTimerThread() {
-        final Handler handler = new Handler();
+        final Handler handler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message message) {
+                int seconds = message.getData().getInt("seconds");
+                timerCounter.setText("" + seconds);
+                if(seconds<=0)
+                    completeTest();
+            }
+        };
         timerCounter = (TextView) findViewById(R.id.timerCounter);
         Runnable runnable = new Runnable() {
             public void run() {
@@ -209,17 +218,15 @@ public class MainActivity extends AppCompatActivity {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    final int finalCurrentSeconds = currentSeconds;
-                    handler.post(new Runnable() {
-                        public void run() {
-                            timerCounter.setText("" + (testDuration - finalCurrentSeconds));
-                        }
-                    });
+                    Message message = Message.obtain();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("seconds",testDuration-currentSeconds);
+                    message.setData(bundle);
+                    handler.dispatchMessage(message);
                     currentSeconds++;
                 }
                 GameState.stopPlaying();
-                //Message message = new Message();
-                //handler.dispatchMessage();
+                handler.dispatchMessage(Message.obtain());
             }
         };
         new Thread(runnable).start();
