@@ -34,6 +34,16 @@ public class MainActivity extends AppCompatActivity {
 
         iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
 
+        //Assigning correct font to control panel buttons
+        TextView upButton = (TextView)findViewById(R.id.upButton);
+        TextView downButton = (TextView)findViewById(R.id.downButton);
+        TextView rightButton = (TextView)findViewById(R.id.rightButton);
+        TextView leftButton = (TextView)findViewById(R.id.leftButton);
+        upButton.setTypeface(iconFont);
+        downButton.setTypeface(iconFont);
+        rightButton.setTypeface(iconFont);
+        leftButton.setTypeface(iconFont);
+
         //Getting the arrows grid layout
         arrowsGridLayout = (TableLayout) findViewById(R.id.arrowsGrid);
         arrowsGridLayout.setBackgroundColor(Color.YELLOW);
@@ -42,14 +52,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void drawGrid(View view) {
-        if(view!=null) {
-            if(counter==numberOfTests) {
+        if (view != null) {
+            if (counter == numberOfTests) {
                 displayDialog();
                 return;
             }
             counter++;
-            TextView counterText = (TextView)findViewById(R.id.counter);
-            counterText.setText("Counter: "+counter);
+            /*TextView counterText = (TextView) findViewById(R.id.counter);
+            counterText.setText("Counter: " + counter);*/
         }
         arrowsGridLayout.removeAllViews();
 
@@ -147,14 +157,14 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText(text);
                 //Central cell must not be touched
                 if (i == GRID_ROWS / 2 && j == GRID_COLUMNS / 2) {
-                    if(centralArrowDirection.equals("HORIZONTAL"))
-                        textView.setText(random.nextFloat()<.5 ? getString(R.string
+                    if (centralArrowDirection.equals("HORIZONTAL"))
+                        textView.setText(random.nextFloat() < .5 ? getString(R.string
                                 .fa_arrow_right) :
-                    getString(R
-                            .string
-                            .fa_arrow_left));
+                                getString(R
+                                        .string
+                                        .fa_arrow_left));
                     else
-                        textView.setText(random.nextFloat()<.5 ? getString(R.string
+                        textView.setText(random.nextFloat() < .5 ? getString(R.string
                                 .fa_arrow_up) :
                                 getString(R
                                         .string
@@ -177,10 +187,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void restart(View view) {
-        counter=0;
-        TextView counterText = (TextView)findViewById(R.id.counter);
-        counterText.setText("Counter: "+counter);
+    /*public void restart(View view) {
+        counter = 0;
+        TextView counterText = (TextView) findViewById(R.id.counter);
+        counterText.setText("Counter: " + counter);
         drawGrid(null);
-    }
+    }*/
 }
