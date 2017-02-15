@@ -16,7 +16,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper sInstance;
 
     private static final String DATABASE_NAME = "cognitive_test";
-    private static final String DATABASE_TABLE_TEST_ERIKSEN_FLANKER = "test_eriksenflanker";
     private static final int DATABASE_VERSION = 1;
 
     public static synchronized DatabaseHelper getInstance(Context context) {
@@ -85,6 +84,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     * Schema
     * TEST_ERIKSEN_FLANKER
     */
+    public static final String DATABASE_TABLE_TEST_ERIKSEN_FLANKER = "test_eriksenflanker";
     public static final String TEST_ERIKSEN_FLANKER_COLUMN_ID = "_id";
     public static final String TEST_ERIKSEN_FLANKER_COLUMN_CREATED = "created";
     public static final String TEST_ERIKSEN_FLANKER_COLUMN_CORRECT = "correct";
