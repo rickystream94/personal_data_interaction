@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">CognitiveTest</string>
+    <string name="app_name">Cognition Tracker</string>
     <string name="fa_arrow_right">&#xf061;</string>
     <string name="fa_arrow_left">&#xf060;</string>
     <string name="fa_arrow_up">&#xf062;</string>
     <string name="fa_arrow_down">&#xf063;</string>
+    <string name="description">Welcome to this Quantified Cognitive Ability Tracker! You
+        can start a new test or see your previous results below.</string>
 </resources>

@@ -15,14 +15,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.*;
 
@@ -71,44 +67,13 @@ public class MainActivity extends AppCompatActivity {
         GameState.startPlaying();
         startTimerThread();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        DatabaseHelper db = null;
-        switch (item.getItemId()) {
-            case R.id.menu_action_restart:
-                Log.d("Menu clicked", "restart");
-                return true;
-            case R.id.menu_action_show_results:
-                Log.d("Menu clicked", "show_results");
-                return true;
-            case R.id.menu_action_delete_data:
-                Log.d("Menu clicked", "delete_data");
-                db = DatabaseHelper.getInstance(getApplicationContext());
-                db.reset();
-                Toast.makeText(this, "All data deleted!", Toast.LENGTH_LONG).show();
-                return true;
-            case R.id.menu_action_export_data:
-                Log.d("Menu clicked", "export_data");
-                db = DatabaseHelper.getInstance(getApplicationContext());
-                db.export();
-                Toast.makeText(this, "All data deleted!", Toast.LENGTH_LONG).show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
+    
     public void onBackPressed()
     {
+        if (GameState.isPlayMode()) {
+            displayDialog("You're still playing!","Wait!",ALERT_ICON);
+            return;
+        }
         finish();
     }
 
