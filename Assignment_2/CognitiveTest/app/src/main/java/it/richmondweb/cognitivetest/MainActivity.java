@@ -3,7 +3,6 @@ package it.richmondweb.cognitivetest;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -272,6 +271,7 @@ public class MainActivity extends AppCompatActivity {
                 int seconds = message.getData().getInt("seconds");
                 if(GameState.isPlayMode())
                     timerCounter.setText("" + seconds);
+                else return;
                 //If the timer is over
                 if(seconds<=0) {
                     GameState.stopPlaying();
@@ -322,25 +322,5 @@ public class MainActivity extends AppCompatActivity {
 
         //Refreshes the grid
         drawGrid(null);
-    }
-
-    public void restart(View view) {
-        if (!GameState.isPlayMode()) {
-            displayDialog("You didn't start the test!","Error",ALERT_ICON);
-            return;
-        }
-        GameState.stopPlaying(); //Used to make the previous timer thread stop counting
-        timerCounter.setText("Counter: " + TEST_DURATION);
-        drawGrid(null);
-        GameState.startPlaying();
-        startTimerThread();
-    }
-
-    public void showResults(View view) {
-        if (GameState.isPlayMode()) {
-            displayDialog("Complete your current test first!","Wait!",ALERT_ICON);
-            return;
-        }
-
     }
 }
