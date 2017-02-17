@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Restart"/>
-    <item android:title="Show Results"/>
+    <item android:title="Restart" android:id="@+id/menu_action_restart"/>
+    <item android:title="Show Results"  android:id="@+id/menu_action_show_results"/>
+    <item android:title="Delete Data"  android:id="@+id/menu_action_delete_data"/>
+    <item android:title="Export Data"  android:id="@+id/menu_action_export_data"/>
 </menu>
