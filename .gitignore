@@ -1,8 +1,7 @@
-Assignment_2/CognitiveTest/*.iml
+*.iml
 Assignment_2/CognitiveTest/.gradle
 Assignment_2/CognitiveTest/local.properties
-Assignment_2/CognitiveTest/.idea/workspace.xml
-Assignment_2/CognitiveTest/.idea/libraries
+Assignment_2/CognitiveTest/.idea
 Assignment_2/CognitiveTest/.DS_Store
 Assignment_2/CognitiveTest/build
 Assignment_2/CognitiveTest/captures/

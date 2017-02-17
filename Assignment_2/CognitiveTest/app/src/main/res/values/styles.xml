@@ -11,6 +11,7 @@
         <item name="android:textColor">@android:color/holo_blue_dark</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textSize">40sp</item>
+        <item name="android:onClick">userButtonChoice</item>
     </style>
 
 </resources>
