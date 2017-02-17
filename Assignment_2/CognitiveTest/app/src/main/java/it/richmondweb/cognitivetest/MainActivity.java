@@ -3,6 +3,7 @@ package it.richmondweb.cognitivetest;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -15,6 +16,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -28,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_ROWS = 3;
     private static final int GRID_COLUMNS = 5;
-    private static final int testDuration = 10;
+    private static final int TEST_DURATION = 10;
+    private static final int ALERT_ICON = android.R.drawable.ic_dialog_alert;
 
     private Random random = new Random();
     private String arrowsHead;
@@ -67,16 +71,20 @@ public class MainActivity extends AppCompatActivity {
         startTimerThread();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        finish();
+    }
+
     public void drawGrid(View view) {
-        /*if (view != null) {
-            if (counter == numberOfTests) {
-                displayDialog();
-                return;
-            }
-            counter++;
-            TextView counterText = (TextView) findViewById(R.id.counter);
-            counterText.setText("Counter: " + counter);
-        }*/
         arrowsGridLayout.removeAllViews();
 
         for (int i = 0; i < GRID_ROWS; i++) {
@@ -120,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void completeTest() {
+        if(MainActivity.this.isFinishing())
+            return;
         DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
         db.insertEriksenFlankerTest(correctAnswers,wrongAnswers);
         ArrayList<EriksenFlanker> testsEriksenFlanker = db.getAllEriksenFlankerTests();
@@ -127,16 +137,23 @@ public class MainActivity extends AppCompatActivity {
             Log.d("EriksenFlankerTest", String.format("%d - %s. Correct: %d. Incorrect: %d", test.getId(), test.getCreated(), test.getCorrect(), test.getIncorrect()));
         }
 
+        String title = "Test Completed!";
+        String message = "Contratulations, your result:\nCorrect Answers: " +
+                ""+correctAnswers+"\nWrong Answers: "+wrongAnswers;
+        int icon = android.R.drawable.ic_dialog_info;
+        displayDialog(message,title,icon);
+    }
+
+    private void displayDialog(String message,String title, int icon) {
         new AlertDialog.Builder(MainActivity.this)
-                .setTitle("Test Completed!")
-                .setMessage("Contratulations, your result:\nCorrect Answers: " +
-                        ""+correctAnswers+"\nWrong Answers: "+wrongAnswers)
+                .setTitle(title)
+                .setMessage(message)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_info)
+                .setIcon(icon)
                 .setCancelable(false)
                 .show();
     }
@@ -219,11 +236,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startTimerThread() {
+        timerCounter = (TextView) findViewById(R.id.timerCounter);
         final Handler handler = new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(Message message) {
                 int seconds = message.getData().getInt("seconds");
-                timerCounter.setText("" + seconds);
+                if(GameState.isPlayMode())
+                    timerCounter.setText("" + seconds);
                 //If the timer is over
                 if(seconds<=0) {
                     GameState.stopPlaying();
@@ -231,11 +250,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-        timerCounter = (TextView) findViewById(R.id.timerCounter);
         Runnable runnable = new Runnable() {
             public void run() {
                 int currentSeconds = 0;
-                while (currentSeconds <= testDuration) {
+                while (currentSeconds <= TEST_DURATION && GameState.isPlayMode()) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -243,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Message message = Message.obtain();
                     Bundle bundle = new Bundle();
-                    bundle.putInt("seconds",testDuration-currentSeconds);
+                    bundle.putInt("seconds", TEST_DURATION -currentSeconds);
                     message.setData(bundle);
                     message.setTarget(handler);
                     message.sendToTarget();
@@ -277,11 +295,23 @@ public class MainActivity extends AppCompatActivity {
         drawGrid(null);
     }
 
-    //Might be used for menu button to restart the test
-    /*public void restart(View view) {
-        counter = 0;
-        TextView counterText = (TextView) findViewById(R.id.counter);
-        counterText.setText("Counter: " + counter);
+    public void restart(View view) {
+        if (!GameState.isPlayMode()) {
+            displayDialog("You didn't start the test!","Error",ALERT_ICON);
+            return;
+        }
+        GameState.stopPlaying(); //Used to make the previous timer thread stop counting
+        timerCounter.setText("Counter: " + TEST_DURATION);
         drawGrid(null);
-    }*/
+        GameState.startPlaying();
+        startTimerThread();
+    }
+
+    public void showResults(View view) {
+        if (GameState.isPlayMode()) {
+            displayDialog("Complete your current test first!","Wait!",ALERT_ICON);
+            return;
+        }
+
+    }
 }

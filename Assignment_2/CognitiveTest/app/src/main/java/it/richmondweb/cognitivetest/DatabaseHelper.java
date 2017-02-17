@@ -13,10 +13,33 @@ import it.richmondweb.cognitivetest.Models.EriksenFlanker;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static DatabaseHelper sInstance;
-
+    /*
+    * Schema
+    * TEST_ERIKSEN_FLANKER
+    */
+    public static final String DATABASE_TABLE_TEST_ERIKSEN_FLANKER = "test_eriksenflanker";
+    public static final String TEST_ERIKSEN_FLANKER_COLUMN_ID = "_id";
+    public static final String TEST_ERIKSEN_FLANKER_COLUMN_CREATED = "created";
+    public static final String TEST_ERIKSEN_FLANKER_COLUMN_CORRECT = "correct";
+    public static final String TEST_ERIKSEN_FLANKER_COLUMN_INCORRECT = "incorrect";
     private static final String DATABASE_NAME = "cognitive_test";
     private static final int DATABASE_VERSION = 1;
+    private static final String CREATE_DATABASE_TABLE_TEST_ERIKSEN_FLANKER = "create table "
+            + DATABASE_TABLE_TEST_ERIKSEN_FLANKER + "( "
+            + TEST_ERIKSEN_FLANKER_COLUMN_ID + " integer primary key autoincrement, "
+            + TEST_ERIKSEN_FLANKER_COLUMN_CREATED + " DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            + TEST_ERIKSEN_FLANKER_COLUMN_CORRECT + " integer null, "
+            + TEST_ERIKSEN_FLANKER_COLUMN_INCORRECT + " integer null"
+            + ");";
+    private static DatabaseHelper sInstance;
+
+    /**
+     * Constructor should be private to prevent direct instantiation.
+     * make call to static method "getInstance()" instead.
+     */
+    private DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
 
     public static synchronized DatabaseHelper getInstance(Context context) {
 
@@ -27,14 +50,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             sInstance = new DatabaseHelper(context.getApplicationContext());
         }
         return sInstance;
-    }
-
-    /**
-     * Constructor should be private to prevent direct instantiation.
-     * make call to static method "getInstance()" instead.
-     */
-    private DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -68,7 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery(sql, null);
         cursor.moveToFirst();
         if(cursor.getCount() > 0) {
-            while (cursor.isAfterLast() == false) {
+            while (!cursor.isAfterLast()) {
                 int id = cursor.getInt(cursor.getColumnIndex(TEST_ERIKSEN_FLANKER_COLUMN_ID));
                 String created = cursor.getString(cursor.getColumnIndex(TEST_ERIKSEN_FLANKER_COLUMN_CREATED));
                 int correct = cursor.getInt(cursor.getColumnIndex(TEST_ERIKSEN_FLANKER_COLUMN_CORRECT));
@@ -79,23 +94,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return tests;
     }
-
-    /*
-    * Schema
-    * TEST_ERIKSEN_FLANKER
-    */
-    public static final String DATABASE_TABLE_TEST_ERIKSEN_FLANKER = "test_eriksenflanker";
-    public static final String TEST_ERIKSEN_FLANKER_COLUMN_ID = "_id";
-    public static final String TEST_ERIKSEN_FLANKER_COLUMN_CREATED = "created";
-    public static final String TEST_ERIKSEN_FLANKER_COLUMN_CORRECT = "correct";
-    public static final String TEST_ERIKSEN_FLANKER_COLUMN_INCORRECT = "incorrect";
-
-
-    private static final String CREATE_DATABASE_TABLE_TEST_ERIKSEN_FLANKER = "create table "
-            + DATABASE_TABLE_TEST_ERIKSEN_FLANKER + "( "
-            + TEST_ERIKSEN_FLANKER_COLUMN_ID + " integer primary key autoincrement, "
-            + TEST_ERIKSEN_FLANKER_COLUMN_CREATED + " DATETIME DEFAULT CURRENT_TIMESTAMP, "
-            + TEST_ERIKSEN_FLANKER_COLUMN_CORRECT + " integer null, "
-            + TEST_ERIKSEN_FLANKER_COLUMN_INCORRECT + " integer null"
-            + ");";
 }
