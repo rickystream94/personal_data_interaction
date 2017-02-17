@@ -67,8 +67,7 @@ public class MainActivity extends AppCompatActivity {
         GameState.startPlaying();
         startTimerThread();
     }
-
-    @Override
+    
     public void onBackPressed()
     {
         if (GameState.isPlayMode()) {
