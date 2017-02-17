@@ -41,10 +41,11 @@
                 <TextView
                     android:id="@+id/upButton"
                     style="@style/controlPanelText"
+                    android:layout_width="match_parent"
                     android:layout_weight="1"
+                    android:contentDescription="UP"
                     android:text="@string/fa_arrow_up"
-                    android:textAlignment="center"
-                    android:contentDescription="UP"/>
+                    android:textAlignment="center"/>
 
                 <TextView
                     android:layout_weight="1"
@@ -57,10 +58,11 @@
                 <TextView
                     android:id="@+id/leftButton"
                     style="@style/controlPanelText"
+                    android:layout_width="match_parent"
                     android:layout_weight="1"
+                    android:contentDescription="LEFT"
                     android:text="@string/fa_arrow_left"
-                    android:textAlignment="center"
-                    android:contentDescription="LEFT"/>
+                    android:textAlignment="center"/>
 
                 <TextView
                     android:layout_weight="1"
@@ -69,10 +71,11 @@
                 <TextView
                     android:id="@+id/rightButton"
                     style="@style/controlPanelText"
+                    android:layout_width="match_parent"
                     android:layout_weight="1"
+                    android:contentDescription="RIGHT"
                     android:text="@string/fa_arrow_right"
-                    android:textAlignment="center"
-                    android:contentDescription="RIGHT"/>
+                    android:textAlignment="center"/>
             </TableRow>
 
             <TableRow
@@ -87,10 +90,11 @@
                 <TextView
                     android:id="@+id/downButton"
                     style="@style/controlPanelText"
+                    android:layout_width="match_parent"
                     android:layout_weight="1"
+                    android:contentDescription="DOWN"
                     android:text="@string/fa_arrow_down"
-                    android:textAlignment="center"
-                    android:contentDescription="DOWN"/>
+                    android:textAlignment="center"/>
 
                 <TextView
                     android:layout_weight="1"

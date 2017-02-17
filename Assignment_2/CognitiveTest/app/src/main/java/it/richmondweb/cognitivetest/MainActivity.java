@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_ROWS = 3;
     private static final int GRID_COLUMNS = 5;
-    private static final int TEST_DURATION = 10;
+    private static final int TEST_DURATION = 30;
     private static final int ALERT_ICON = android.R.drawable.ic_dialog_alert;
 
     private Random random = new Random();
