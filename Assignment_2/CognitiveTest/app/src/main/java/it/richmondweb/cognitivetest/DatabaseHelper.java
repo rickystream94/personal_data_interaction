@@ -67,6 +67,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void reset() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_TEST_ERIKSEN_FLANKER);
+        onCreate(db);
+    }
+
     public void insertEriksenFlankerTest(int correct, int incorrect) {
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues v = new ContentValues();
