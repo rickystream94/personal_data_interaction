@@ -31,6 +31,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        DatabaseHelper db = null;
         switch (item.getItemId()) {
             case R.id.menu_action_restart:
                 Log.d("Menu clicked", "restart");
@@ -40,12 +41,14 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_action_delete_data:
                 Log.d("Menu clicked", "delete_data");
-                DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
+                db = DatabaseHelper.getInstance(getApplicationContext());
                 db.reset();
                 Toast.makeText(this, "All data deleted!", Toast.LENGTH_LONG).show();
                 return true;
             case R.id.menu_action_export_data:
                 Log.d("Menu clicked", "export_data");
+                db = DatabaseHelper.getInstance(getApplicationContext());
+                db.export();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
