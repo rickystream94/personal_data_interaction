@@ -1,6 +1,8 @@
 package it.richmondweb.cognitivetest;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.provider.ContactsContract;
@@ -87,6 +89,10 @@ public class HomeActivity extends AppCompatActivity {
                 Toast.makeText(this, "Exported in Downloads/CognitiveTest as JSON", Toast
                         .LENGTH_LONG).show();
                 return true;
+            case R.id.howToPlay:
+                String message = getString(R.string.howToPlay);
+                displayDialog(message,"How to Play",android.R.drawable.ic_dialog_info);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -119,5 +125,19 @@ public class HomeActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
         }
+    }
+
+    private void displayDialog(String message,String title, int icon) {
+        new AlertDialog.Builder(HomeActivity.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(icon)
+                .setCancelable(false)
+                .show();
     }
 }

@@ -6,4 +6,6 @@
     <string name="fa_arrow_down">&#xf063;</string>
     <string name="description">Welcome to this Quantified Cognitive Ability Tracker! You
         can start a new test or see your previous results below.</string>
+    <string name="howToPlay">1) Press "Start" to begin a new test\n2) Complete the test as
+    fast as possible by choosing the right direction of the central arrow</string>
 </resources>
