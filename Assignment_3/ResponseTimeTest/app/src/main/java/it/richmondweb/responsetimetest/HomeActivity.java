@@ -27,14 +27,14 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void start(View view) {
-        String nickname = ((EditText)findViewById(R.id.nickname)).getText().toString();
-        if (nickname.length()<4) {
-            displayDialog("Please insert a nickname of at least 4 characters!","Error!",android.R
+        String nickname = ((EditText) findViewById(R.id.nickname)).getText().toString();
+        if (nickname.length() < 4) {
+            displayDialog("Please insert a nickname of at least 4 characters!", "Error!", android.R
                     .drawable.ic_dialog_alert);
             return;
         }
-        Intent intent = new Intent(HomeActivity.this,MainActivity.class);
-        intent.putExtra("nickname",nickname);
+        Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+        intent.putExtra("nickname", nickname);
         startActivity(intent);
     }
 
@@ -47,13 +47,13 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
+        db = DatabaseHelper.getInstance(getApplicationContext());
         switch (item.getItemId()) {
             case R.id.export:
                 checkWritePermissions();
-                db.export();
-                Toast.makeText(this, "Exported in Downloads/ResponseTimeTest as JSON", Toast
-                        .LENGTH_LONG).show();
+                //db.export();
+                //Toast.makeText(this, "Exported in Downloads/ResponseTimeTest as JSON", Toast
+                //        .LENGTH_LONG).show();
                 return true;
             case R.id.delete:
                 db.reset();
@@ -61,14 +61,14 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             case R.id.howto:
                 String message = getString(R.string.howTo);
-                displayDialog(message,"How to Play",android.R.drawable.ic_dialog_info);
+                displayDialog(message, "How to Play", android.R.drawable.ic_dialog_info);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void displayDialog(String message,String title, int icon) {
+    private void displayDialog(String message, String title, int icon) {
         new AlertDialog.Builder(HomeActivity.this)
                 .setTitle(title)
                 .setMessage(message)
@@ -82,7 +82,7 @@ public class HomeActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void checkWritePermissions(){
+    private void checkWritePermissions() {
 
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -103,6 +103,34 @@ public class HomeActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
+        } else
+            export();
+    }
+
+    private void export() {
+        db.export();
+        Toast.makeText(this, "Exported in Downloads/ResponseTimeTest as JSON", Toast
+                .LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    export();
+                } else {
+                    Toast.makeText(this, "Error, permission not granted!", Toast
+                            .LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
         }
     }
 
