@@ -11,7 +11,6 @@ package it.richmondweb.responsetimetest;
         import java.io.File;
         import java.io.FileOutputStream;
         import java.text.SimpleDateFormat;
-        import java.util.ArrayList;
         import java.util.Date;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -82,26 +81,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long id = database.insert(DATABASE_TABLE_TEST_RESPONSE_TIME, null, obj.getContentValues());
         Log.d("DB", String.format("Saved new test with ID: %d", id));
-    }
-
-    public ArrayList<ResponseTimeTestModel> getAllTests() {
-        ArrayList<ResponseTimeTestModel> tests = new ArrayList<>();
-        String sql = "SELECT * FROM " + DATABASE_TABLE_TEST_RESPONSE_TIME;
-        SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery(sql, null);
-        cursor.moveToFirst();
-        if(cursor.getCount() > 0) {
-            while (!cursor.isAfterLast()) {
-                int id = cursor.getInt(cursor.getColumnIndex(TEST_RESPONSE_TIME_COLUMN_ID));
-                String created = cursor.getString(cursor.getColumnIndex(TEST_RESPONSE_TIME_COLUMN_CREATED));
-                int delay = cursor.getInt(cursor.getColumnIndex(TEST_RESPONSE_TIME_COLUMN_DELAY));
-                boolean acceptable = (cursor.getInt(cursor.getColumnIndex(TEST_RESPONSE_TIME_COLUMN_ACCEPTABLE)) > 0) ? true : false;
-                String name = cursor.getString(cursor.getColumnIndex(TEST_RESPONSE_TIME_COLUMN_ACCEPTABLE));
-                tests.add(new ResponseTimeTestModel(id, created, delay, acceptable, name));
-                cursor.moveToNext();
-            }
-        }
-        return tests;
     }
 
     private JSONArray getAllDataFromTable(String tablename) {
