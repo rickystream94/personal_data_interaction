@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -35,13 +34,16 @@ public class MainActivity extends AppCompatActivity {
     private int maxMillisDelay = 500;
     private int acceptable = 0;
     private int notAcceptable = 0;
+    private int currentDelay;
     private String nickname;
+    private DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        db = DatabaseHelper.getInstance(getApplicationContext());
         nickname = getIntent().getExtras().getString("nickname");
         imageView = (ImageView) findViewById(R.id.image);
         mainPanel = (LinearLayout) findViewById(R.id.mainPanel);
@@ -69,10 +71,11 @@ public class MainActivity extends AppCompatActivity {
         delayHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message message) {
-                int delay = message.getData().getInt("delay");
-                Toast.makeText(MainActivity.this, "Delay from thread: " + delay + "ms", Toast
-                        .LENGTH_SHORT)
-                        .show();
+                currentDelay = message.getData().getInt("delay");
+                //Toast.makeText(MainActivity.this, "Delay from thread: " + currentDelay + "ms",
+                 //       Toast
+                  //      .LENGTH_SHORT)
+                   //     .show();
                 refreshImage();
             }
         };
@@ -114,11 +117,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void choice(View view) {
         String choice = ((Button) view).getText().toString();
-        if (choice.equals("yes")) {
+        boolean isAcceptable = choice.equals("yes");
+        if (isAcceptable) {
             acceptable++;
         } else {
             notAcceptable++;
         }
+        db.insertResponseTimeTest(currentDelay,isAcceptable,nickname);
         currentAttempts++;
         toggleButtons(false);
 
@@ -145,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
                                         " contribution!",
                                 Toast.LENGTH_SHORT)
                                 .show();
-                        //Do stuff here to save in DB!
                         finish();
                     }
                 })

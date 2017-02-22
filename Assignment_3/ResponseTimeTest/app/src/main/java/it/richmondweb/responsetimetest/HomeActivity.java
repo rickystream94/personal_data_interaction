@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 public class HomeActivity extends AppCompatActivity {
 
+    private DatabaseHelper db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,14 +44,15 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        db = DatabaseHelper.getInstance(getApplicationContext());
         switch (item.getItemId()) {
             case R.id.export:
-                //dbHelper.export();
+                db.export();
                 Toast.makeText(this, "Exported in Downloads/ResponseTimeTest as JSON", Toast
                         .LENGTH_LONG).show();
                 return true;
             case R.id.delete:
-                //dbHelper.reset();
+                db.reset();
                 Toast.makeText(this, "All data deleted!", Toast.LENGTH_LONG).show();
                 return true;
             case R.id.howto:
