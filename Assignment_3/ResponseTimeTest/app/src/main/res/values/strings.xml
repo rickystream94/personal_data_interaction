@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Response Time Test</string>
+    <string name="howTo">Start a new test, press the button and just answer the question,
+        but please be as much honest as possible!</string>
 </resources>

@@ -12,7 +12,32 @@
     tools:context="it.richmondweb.responsetimetest.HomeActivity">
 
     <TextView
+        android:id="@+id/hello"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:text="Hello,"
+        android:textAlignment="center"
+        android:textSize="36sp"/>
+
+    <EditText
+        android:id="@+id/nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/hello"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:hint="Insert your nickname..."
+        android:inputType="textPersonName"
+        android:maxLength="15"/>
+
+    <Button
+        android:id="@+id/start"
+        style="@style/buttonStyle"
+        android:layout_below="@+id/nickname"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:onClick="start"/>
 </RelativeLayout>
