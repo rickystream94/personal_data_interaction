@@ -1,8 +1,11 @@
 package it.richmondweb.responsetimetest;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,9 +47,10 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        db = DatabaseHelper.getInstance(getApplicationContext());
+        DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
         switch (item.getItemId()) {
             case R.id.export:
+                checkWritePermissions();
                 db.export();
                 Toast.makeText(this, "Exported in Downloads/ResponseTimeTest as JSON", Toast
                         .LENGTH_LONG).show();
@@ -77,4 +81,29 @@ public class HomeActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .show();
     }
+
+    private void checkWritePermissions(){
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // We request the permission.
+                Log.e("requesting", "write external permissions");
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            }
+        }
+    }
+
 }
