@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private final static int checkpoint = 5;
     private int currentImageResource;
     private Handler delayHandler;
-    private int maxMillisDelay = 500;
+    private int maxMillisDelay = 1500;
     private int acceptable = 0;
     private int notAcceptable = 0;
     private int currentDelay;
