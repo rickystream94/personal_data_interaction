@@ -139,13 +139,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (!savePath.exists()) {
             if (!savePath.mkdirs()) {
-                Log.e("EXPORT ERROR", "Could not create directory!");
+                Log.d("EXPORT ERROR", "Could not create directory!");
             }
         }
 
         File file = new File(savePath, fileName);
         if (file.exists()) {
-            Log.e("EXPORT", "File already exists!");
+            Log.d("EXPORT", "File already exists!");
         }
 
         Log.d("SAVING", savePath.getAbsolutePath() + "/" + fileName);

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Response Time Test</string>
+    <string name="howTo">The purpose of this app is to collect data about perception of
+        responsiveness of User Interfaces. You will be asked to evaluate the response time of a
+        common UI control (a button). Tapping on the button will make an image appear on the screen.
+        Please be as much honest as possible!</string>
 </resources>
