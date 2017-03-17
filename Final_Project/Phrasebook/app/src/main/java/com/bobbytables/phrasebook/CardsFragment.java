@@ -2,7 +2,6 @@ package com.bobbytables.phrasebook;
 
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +20,7 @@ public class CardsFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         // The last two arguments ensure LayoutParams are inflated
         // properly.
-        View rootView = inflater.inflate(R.layout.page_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_cards, container, false);
         //Handling cards recycler view
         cardsRecyclerView = (RecyclerView) rootView.findViewById(R.id.cardsRecyclerView);
         cardsRecyclerView.setHasFixedSize(true);
@@ -30,11 +29,5 @@ public class CardsFragment extends Fragment {
         cardsAdapter = new ChallengeCardsAdapter();
         cardsRecyclerView.setAdapter(cardsAdapter);
         return rootView;
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
     }
 }

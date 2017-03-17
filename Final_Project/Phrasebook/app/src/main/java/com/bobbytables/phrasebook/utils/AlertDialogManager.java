@@ -1,4 +1,4 @@
-package com.bobbytables.phrasebook;
+package com.bobbytables.phrasebook.utils;
 
 /**
  * Created by ricky on 15/03/2017.
@@ -6,7 +6,6 @@ package com.bobbytables.phrasebook;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 
 public class AlertDialogManager {
     /**

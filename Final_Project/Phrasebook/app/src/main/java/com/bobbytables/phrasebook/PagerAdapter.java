@@ -20,8 +20,14 @@ public class PagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position) {
-            case 0: return  new CardsFragment();
-            default: return new BlankFragment();
+            case 0:
+                return new CardsFragment();
+            case 1:
+                return new PhrasesFragment();
+            case 2:
+                return new ProgressFragment();
+            default:
+                return null;
         }
     }
 

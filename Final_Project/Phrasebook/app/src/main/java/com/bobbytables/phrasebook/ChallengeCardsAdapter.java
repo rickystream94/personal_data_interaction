@@ -32,6 +32,8 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     }
 
     ChallengeCardsAdapter() {
+        //In our case, each time a new (random) card is created!
+        //This is our "dataset" of 1 element (if you want more items, just create a list)
         challengeCard = new ChallengeCard();
     }
 
