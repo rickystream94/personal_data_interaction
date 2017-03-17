@@ -85,25 +85,4 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void onTabReselected(TabLayout.Tab tab) {
         //Not necessary
     }
-
-    public static class PagerAdapter extends FragmentPagerAdapter {
-
-        private int tabCount;
-
-        public PagerAdapter(FragmentManager fm, int tabCount) {
-            super(fm);
-            this.tabCount = tabCount;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            //Should change the fragment according to the position
-            return new CardsFragment();
-        }
-
-        @Override
-        public int getCount() {
-            return tabCount;
-        }
-    }
 }
