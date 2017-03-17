@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bobbytables.phrasebook.utils.AlertDialogManager;
+import com.bobbytables.phrasebook.utils.SettingsManager;
+
 public class NewUserActivity extends AppCompatActivity {
 
     private AlertDialogManager alertDialogManager;

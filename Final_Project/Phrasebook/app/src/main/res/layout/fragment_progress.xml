@@ -2,14 +2,12 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.bobbytables.phrasebook.MainActivity">
+             tools:context="com.bobbytables.phrasebook.ProgressFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/cardsRecyclerView"
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
-
-    </android.support.v7.widget.RecyclerView>
+        android:text="PROGRESS FRAGMENT"/>
 
 </FrameLayout>

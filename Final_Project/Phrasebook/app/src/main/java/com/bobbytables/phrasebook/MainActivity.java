@@ -7,13 +7,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+
+import com.bobbytables.phrasebook.utils.AlertDialogManager;
+import com.bobbytables.phrasebook.utils.SettingsManager;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
@@ -44,11 +44,33 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         settingsManager = new SettingsManager(getApplicationContext());
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity
-        settingsManager.userProfileExists();
+        settingsManager.createUserProfile();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        initializePager();
+        initFloatingActionButton();
+    }
+
+    /**
+     * Setting floating action button with onClickListener
+     */
+    private void initFloatingActionButton() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+    }
+
+    /**
+     * Initializes the ViewPager and its adapter
+     */
+    private void initializePager() {
         // ViewPager and its adapters use support library
         // fragments, so use getSupportFragmentManager.
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -59,16 +81,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         pager.setAdapter(pagerAdapter);
         //Used for changing selected tab when swiping right/left
         pager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(tabLayout));
-
-        //Setting floating action button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     @Override
@@ -84,26 +96,5 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
         //Not necessary
-    }
-
-    public static class PagerAdapter extends FragmentPagerAdapter {
-
-        private int tabCount;
-
-        public PagerAdapter(FragmentManager fm, int tabCount) {
-            super(fm);
-            this.tabCount = tabCount;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            //Should change the fragment according to the position
-            return new CardsFragment();
-        }
-
-        @Override
-        public int getCount() {
-            return tabCount;
-        }
     }
 }
