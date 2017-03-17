@@ -13,9 +13,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
@@ -100,27 +98,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         @Override
         public Fragment getItem(int position) {
             //Should change the fragment according to the position
-            Fragment fragment = new PageFragment();
-            return fragment;
+            return new CardsFragment();
         }
 
         @Override
         public int getCount() {
             return tabCount;
-        }
-    }
-
-    // Instances of this class are fragments representing a single
-// object in our collection.
-    public static class PageFragment extends Fragment {
-
-        @Override
-        public View onCreateView(LayoutInflater inflater,
-                                 ViewGroup container, Bundle savedInstanceState) {
-            // The last two arguments ensure LayoutParams are inflated
-            // properly.
-            return inflater.inflate(
-                    R.layout.page_fragment, container, false);
         }
     }
 }
