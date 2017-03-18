@@ -6,14 +6,27 @@ import java.util.Random;
  * Created by ricky on 17/03/2017.
  */
 
-public class ChallengeCard {
-    private Random random = new Random();
+class ChallengeCard {
     private final String randomText;
+    private String foreignLanguage;
+    private String motherLanguage;
 
-    public ChallengeCard() {
+    ChallengeCard(String motherLanguage,String foreignLanguage) {
+        this.motherLanguage = motherLanguage;
+        this.foreignLanguage = foreignLanguage;
+        Random random = new Random();
         randomText = String.valueOf(random.nextInt(100));
     }
-    public String getRandomText() {
+
+    String getRandomText() {
         return randomText;
+    }
+
+    public String getForeignLanguage() {
+        return foreignLanguage;
+    }
+
+    public String getMotherLanguage() {
+        return motherLanguage;
     }
 }

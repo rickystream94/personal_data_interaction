@@ -14,6 +14,7 @@ import com.bobbytables.phrasebook.NewUserActivity;
 
 public class SettingsManager {
 
+    private static SettingsManager instance;
     private SharedPreferences preferences;
     private Editor editor;
     private Context context;
@@ -24,18 +25,30 @@ public class SettingsManager {
     private static final String KEY_IS_FIRST_TIME = "isFirstTime"; //might be used for launch
     // tutorial
     // User name (make variable public to access from outside)
-    public static final String KEY_NICKNAME = "nickname";
+    private static final String KEY_NICKNAME = "nickname";
     public static final String KEY_MOTHER_LANGUAGE = "nickname";
     public static final String KEY_FOREIGN_LANGUAGE = "nickname";
     //GAMIFICATION INCLUDED OR NOT
     private static final String KEY_GAMIFICATION = "Gamification";
 
-    public SettingsManager(Context context) {
+    private SettingsManager(Context context) {
         this.context = context;
         preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = preferences.edit();
         editor.putBoolean(KEY_GAMIFICATION, false); //Change this for future release!!!
         editor.apply();
+        instance = this;
+    }
+
+    /**
+     * Singleton method to retrieve settings manager
+     * @param context
+     * @return
+     */
+    public static SettingsManager getInstance(Context context) {
+        if (instance==null)
+            return new SettingsManager(context);
+        return instance;
     }
 
     public void createUserProfile() {
@@ -58,5 +71,9 @@ public class SettingsManager {
         editor.putString(KEY_FOREIGN_LANGUAGE, foreignLanguage.toUpperCase());
         editor.putBoolean(KEY_USER_EXISTS, true);
         editor.commit();
+    }
+
+    public String getPrefValue(String key) {
+        return preferences.getString(key,"");
     }
 }

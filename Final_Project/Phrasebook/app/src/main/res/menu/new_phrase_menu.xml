@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android2="http://schemas.android.com/apk/res/android"
+      xmlns:android="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:showAsAction="always|withText"
+        android:icon="@drawable/ic_save_white_24dp"
+        android2:title="@string/save_and_close"
+        android2:icon="@drawable/ic_save_white_24dp"
+        android2:id="@+id/menu_save_and_close"/>
+</menu>

@@ -26,7 +26,7 @@ public class CardsFragment extends Fragment {
         cardsRecyclerView.setHasFixedSize(true);
         recyclerViewLayoutManager = new LinearLayoutManager(getActivity());
         cardsRecyclerView.setLayoutManager(recyclerViewLayoutManager);
-        cardsAdapter = new ChallengeCardsAdapter();
+        cardsAdapter = new ChallengeCardsAdapter(getContext());
         cardsRecyclerView.setAdapter(cardsAdapter);
         return rootView;
     }

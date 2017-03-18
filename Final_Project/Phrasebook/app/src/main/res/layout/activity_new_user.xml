@@ -19,7 +19,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="17dp"
-        android:text="Hello, let's start with some basic information:"
+        android:text="@string/basic_information"
         android:textAlignment="center"
         android:textSize="24sp"/>
 
@@ -32,7 +32,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="90dp"
         android:ems="12"
-        android:hint="Insert your nickname..."
+        android:hint="@string/insert_nickname"
         android:inputType="text"
         android:maxLength="15"
         android:maxLines="1"/>
@@ -44,7 +44,7 @@
         android:layout_below="@id/nicknameText"
         android:layout_centerHorizontal="true"
         android:ems="12"
-        android:hint="Your mother language..."
+        android:hint="@string/mother_language"
         android:inputType="text"
         android:maxLength="15"
         android:maxLines="1"/>
@@ -56,7 +56,7 @@
         android:layout_below="@id/motherLanguage"
         android:layout_centerHorizontal="true"
         android:ems="12"
-        android:hint="Language you are learning..."
+        android:hint="@string/foreign_language"
         android:inputType="text"
         android:maxLength="15"
         android:maxLines="1"/>
@@ -69,7 +69,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:onClick="createUser"
-        android:text="Create User"/>
+        android:text="@string/create_user"/>
 
 
 </RelativeLayout>

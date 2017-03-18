@@ -44,7 +44,7 @@ public class NewUserActivity extends AppCompatActivity {
             return;
         }
         //Otherwise, if everything is fine, proceed
-        SettingsManager settingsManager = new SettingsManager(getApplicationContext());
+        SettingsManager settingsManager = SettingsManager.getInstance(getApplicationContext());
         settingsManager.createUser(nickname, motherLanguage, foreignLanguage);
         Intent i = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(i);
