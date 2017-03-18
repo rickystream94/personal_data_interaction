@@ -1,8 +1,11 @@
 package com.bobbytables.phrasebook;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import com.bobbytables.phrasebook.utils.SettingsManager;
 
 /**
  * Created by ricky on 17/03/2017.

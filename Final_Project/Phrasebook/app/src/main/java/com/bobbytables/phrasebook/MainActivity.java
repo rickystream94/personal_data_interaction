@@ -1,5 +1,6 @@
 package com.bobbytables.phrasebook;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +23,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private PagerAdapter pagerAdapter;
     private ViewPager pager;
     public static Handler killerHandler;
+    private String motherLanguage;
+    private String foreignLanguage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +44,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         };
 
         //Get settings manager
-        settingsManager = new SettingsManager(getApplicationContext());
+        settingsManager = SettingsManager.getInstance(getApplicationContext());
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity
         settingsManager.createUserProfile();
+        motherLanguage = settingsManager.getPrefValue(SettingsManager.KEY_MOTHER_LANGUAGE);
+        foreignLanguage = settingsManager.getPrefValue(SettingsManager.KEY_FOREIGN_LANGUAGE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -61,8 +66,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i = new Intent(getApplicationContext(),NewPhraseActivity.class);
+                i.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE,motherLanguage);
+                i.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE,foreignLanguage);
+                startActivity(i);
             }
         });
     }
