@@ -8,6 +8,10 @@ import android.content.SharedPreferences.Editor;
 import com.bobbytables.phrasebook.MainActivity;
 import com.bobbytables.phrasebook.NewUserActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Created by ricky on 15/03/2017.
  */
@@ -26,8 +30,11 @@ public class SettingsManager {
     // tutorial
     // User name (make variable public to access from outside)
     private static final String KEY_NICKNAME = "nickname";
-    public static final String KEY_MOTHER_LANGUAGE = "nickname";
-    public static final String KEY_FOREIGN_LANGUAGE = "nickname";
+    public static final String KEY_MOTHER_LANGUAGE = "motherLanguage";
+    public static final String KEY_FOREIGN_LANGUAGE = "foreignLanguage";
+    public static final String KEY_TOTAL_XP = "totalXP";
+    public static final String KEY_LEVEL = "level";
+    public static final String KEY_CREATED = "created";
     //GAMIFICATION INCLUDED OR NOT
     private static final String KEY_GAMIFICATION = "Gamification";
 
@@ -66,14 +73,30 @@ public class SettingsManager {
     }
 
     public void createUser(String nickname, String motherLanguage, String foreignLanguage) {
+        String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date
+                ());
         editor.putString(KEY_NICKNAME, nickname);
         editor.putString(KEY_MOTHER_LANGUAGE, motherLanguage.toUpperCase());
         editor.putString(KEY_FOREIGN_LANGUAGE, foreignLanguage.toUpperCase());
         editor.putBoolean(KEY_USER_EXISTS, true);
+        editor.putInt(KEY_TOTAL_XP,0);
+        editor.putInt(KEY_LEVEL,1);
+        editor.putString(KEY_CREATED,currentTimeString);
         editor.commit();
     }
 
     public String getPrefValue(String key) {
         return preferences.getString(key,"");
+    }
+
+    public void updatePrefValue(String key,int value) {
+        editor.putInt(key, value);
+        editor.commit();
+    }
+
+    public void addValue(String key,int newValue) {
+        int currentValue = preferences.getInt(key,0);
+        editor.putInt(key,currentValue+newValue);
+        editor.commit();
     }
 }
