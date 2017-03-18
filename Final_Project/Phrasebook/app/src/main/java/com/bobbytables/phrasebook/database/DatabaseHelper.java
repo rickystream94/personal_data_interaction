@@ -27,12 +27,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Table Names
-    private static final String TABLE_PHRASES = "phrases";
-    private static final String TABLE_CHALLENGES = "challenges";
-    private static final String TABLE_BADGES = "badges";
+    public static final String TABLE_PHRASES = "phrases";
+    public static final String TABLE_CHALLENGES = "challenges";
+    public static final String TABLE_BADGES = "badges";
 
     // Phrases Table Columns
-    public static final String KEY_PHRASE_ID = "id";
+    private static final String KEY_PHRASE_ID = "id";
     public static final String KEY_MOTHER_LANG_STRING = "motherLangString";
     public static final String KEY_FOREIGN_LANG_STRING = "foreignLangString";
     public static final String KEY_ARCHIVED = "archived";
@@ -43,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String KEY_CHALLENGE_PHRASE_ID = "phraseId";
 
     // Badges Table Columns
-    public static final String KEY_BADGES_ID = "id";
+    private static final String KEY_BADGES_ID = "id";
     public static final String KEY_BADGE_TYPE_ID = "badgeId";
 
     //Common columns
@@ -73,13 +73,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             KEY_CREATED_ON + " TEXT)";
 
     private static DatabaseHelper instance;
+    private static final int CORRECT_COUNT_FOR_ARCHIVE = 3;
 
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     public static synchronized DatabaseHelper getInstance(Context context) {
-        if (instance==null)
+        if (instance == null)
             return new DatabaseHelper(context.getApplicationContext());
         return instance;
     }
@@ -100,8 +101,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void insertRecord(DatabaseModel dataObject) throws Exception {
-        if(dataObject.getTableName().equals(TABLE_PHRASES))
-            if(phraseAlreadyExists(dataObject))
+        if (dataObject.getTableName().equals(TABLE_PHRASES))
+            if (phraseAlreadyExists(dataObject))
                 throw new Exception("Error! Record already existing!");
         SQLiteDatabase database = this.getWritableDatabase();
         long id = database.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
@@ -111,20 +112,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * A phrase already exists if both mother and foreign language strings are already existing
      * in the DB in the same record (this allows synonyms)
+     *
      * @param dataObject the data object to insert in the DB
      * @return true if a record is found, false otherwise
      */
-    public boolean phraseAlreadyExists(DatabaseModel dataObject) {
+    private boolean phraseAlreadyExists(DatabaseModel dataObject) {
         ContentValues contentValues = dataObject.getContentValues();
         String motherLanguageString = contentValues.getAsString(KEY_MOTHER_LANG_STRING);
         String foreignLanguageString = contentValues.getAsString(KEY_FOREIGN_LANG_STRING);
         SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT * FROM "+TABLE_PHRASES+" WHERE " +
-                ""+KEY_MOTHER_LANG_STRING+"="+motherLanguageString+" AND " +
-                ""+KEY_FOREIGN_LANG_STRING+"="+foreignLanguageString,null);
+        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_PHRASES + " WHERE " +
+                "" + KEY_MOTHER_LANG_STRING + "=" + motherLanguageString + " AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=" + foreignLanguageString, null);
         boolean exists = cursor.moveToFirst();
         cursor.close();
         return exists;
+    }
+
+    public void updateCorrectCount(String motherLangString, String foreignLangString, boolean
+            increment) {
+        String newValue;
+        if (increment)
+            newValue = KEY_CORRECT_COUNT + 1;
+        else newValue = KEY_CORRECT_COUNT + "-1";
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.rawQuery("UPDATE " + TABLE_PHRASES + "SET " + KEY_CORRECT_COUNT + "=" + newValue + "" +
+                " WHERE " +
+                "" + KEY_MOTHER_LANG_STRING + "=" + motherLangString + " AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=" + foreignLangString, null);
+
+        //Check if correct count has reached the minimum to be archived
+        Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " + TABLE_PHRASES + " " +
+                "WHERE " + KEY_MOTHER_LANG_STRING + "=" + motherLangString + " AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=" + foreignLangString, null);
+        if (cursor.moveToFirst()) {
+            do {
+                int currentCorrect = cursor.getInt(0);
+                if (currentCorrect == CORRECT_COUNT_FOR_ARCHIVE)
+                    updateArchived(database, motherLangString, foreignLangString);
+            } while (cursor.moveToNext()); //actually useless because there will be only one row
+            // in the cursor
+        }
+    }
+
+    public void updateArchived(SQLiteDatabase database, String motherLangString, String foreignLangString) {
+        database.rawQuery("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=1" + "WHERE " + KEY_MOTHER_LANG_STRING + "=" + motherLangString + " AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=" + foreignLangString, null);
     }
 
     //Future implementation, allows to edit a currently existing record in the DB

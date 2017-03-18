@@ -7,17 +7,14 @@ import android.content.ContentValues;
  */
 
 public class PhraseModel implements DatabaseModel {
-    String id;
-    String motherLanguage;
-    String foreignLanguage;
-    String createdOn;
-    int correctCount = 0; //default 0 when created
-    int archived = 0; //represents boolean: 1 = true, 0 = false, default 0 when created
-    String tableName;
+    private String motherLanguage;
+    private String foreignLanguage;
+    private String createdOn;
+    private String tableName;
 
-    public PhraseModel(String id, String motherLanguage, String foreignLanguage, String
+    public PhraseModel(String motherLanguage, String foreignLanguage, String
             createdOn, String tableName) {
-        this.id = id;
+        this.tableName = tableName;
         this.motherLanguage = motherLanguage;
         this.foreignLanguage = foreignLanguage;
         this.createdOn = createdOn;
@@ -26,12 +23,13 @@ public class PhraseModel implements DatabaseModel {
     @Override
     public ContentValues getContentValues() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.KEY_PHRASE_ID, this.id);
         contentValues.put(DatabaseHelper.KEY_MOTHER_LANG_STRING, this.motherLanguage);
         contentValues.put(DatabaseHelper.KEY_FOREIGN_LANG_STRING, this.foreignLanguage);
         contentValues.put(DatabaseHelper.KEY_CREATED_ON, this.createdOn);
-        contentValues.put(DatabaseHelper.KEY_CORRECT_COUNT, this.correctCount);
-        contentValues.put(DatabaseHelper.KEY_ARCHIVED, this.archived);
+        int correctCount = 0;
+        contentValues.put(DatabaseHelper.KEY_CORRECT_COUNT, correctCount);
+        int archived = 0;
+        contentValues.put(DatabaseHelper.KEY_ARCHIVED, archived);
         return contentValues;
     }
 

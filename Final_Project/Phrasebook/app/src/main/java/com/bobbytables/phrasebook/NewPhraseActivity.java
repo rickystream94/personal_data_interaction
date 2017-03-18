@@ -12,8 +12,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.bobbytables.phrasebook.database.PhraseModel;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class NewPhraseActivity extends AppCompatActivity {
 
@@ -21,6 +26,8 @@ public class NewPhraseActivity extends AppCompatActivity {
     private String foreignLanguage;
     private EditText addNewMotherLangPhrase;
     private EditText addNewForeignLangPhrase;
+    private DatabaseHelper databaseHelper;
+    private AlertDialogManager alertDialogManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,9 @@ public class NewPhraseActivity extends AppCompatActivity {
                 saveNewPhrase();
             }
         });
+
+        databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
+        alertDialogManager = new AlertDialogManager();
     }
 
     @Override
@@ -77,15 +87,23 @@ public class NewPhraseActivity extends AppCompatActivity {
     public boolean saveNewPhrase() {
         if (addNewMotherLangPhrase.getText().toString().equals("") || addNewForeignLangPhrase
                 .getText().toString().equals("")) {
-            new AlertDialogManager().showAlertDialog(NewPhraseActivity.this, "Error", "Please fill" +
+            alertDialogManager.showAlertDialog(NewPhraseActivity.this, "Error", "Please fill" +
                     " all the fields!", false);
             return false;
         }
-        //Add Database insertion
-        addNewForeignLangPhrase.setText("");
-        addNewMotherLangPhrase.setText("");
-        Toast.makeText(getApplicationContext(), "New phrase saved!", Toast.LENGTH_SHORT)
-                .show();
-        return true;
+        String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date());
+        try {
+            databaseHelper.insertRecord(new PhraseModel(addNewMotherLangPhrase.getText().toString(),
+                    addNewForeignLangPhrase.getText().toString(),currentTimeString,DatabaseHelper.TABLE_PHRASES));
+            addNewForeignLangPhrase.setText("");
+            addNewMotherLangPhrase.setText("");
+            Toast.makeText(getApplicationContext(), "New phrase saved!", Toast.LENGTH_SHORT)
+                    .show();
+            return true;
+        } catch (Exception e) {
+            alertDialogManager.showAlertDialog(NewPhraseActivity.this,"Error!",e.getMessage(),false);
+            return false;
+        }
+
     }
 }
