@@ -164,6 +164,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void updatePhrase() {
     }
 
+    /**
+     * Checks if the database is currently empty (no phrases added)
+     * @return true if it's empty, false otherwise
+     */
+    public boolean isDatabaseEmpty() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String countQuery = "SELECT count(*) FROM "+TABLE_PHRASES;
+        Cursor cursor = db.rawQuery(countQuery, null);
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        return count==0;
+    }
+
     public void reset() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PHRASES);
