@@ -341,4 +341,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return result;
     }
+
+    public Cursor getDataFromTable(String table) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        return database.rawQuery("SELECT ID AS _id,* FROM " + table, null);
+    }
 }

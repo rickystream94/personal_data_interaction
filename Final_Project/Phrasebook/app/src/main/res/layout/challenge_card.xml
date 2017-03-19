@@ -50,8 +50,15 @@
             android:inputType="textMultiLine"
             android:maxLength="50"
             android:maxLines="3"
-            android:textSize="24sp"
-            android:padding="3dp"/>
+            android:padding="3dp"
+            android:textSize="24sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_above="@id/translation"
+            android:layout_marginTop="3dp"
+            android:background="@android:color/darker_gray"/>
 
         <TextView
             android:id="@+id/correctTranslation"
@@ -59,10 +66,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/translation"
             android:layout_marginTop="10dp"
-            android:textSize="24sp"
-            android:visibility="invisible"
+            android:padding="3dp"
             android:textColor="@color/wrongAnser"
-            android:padding="3dp"/>
+            android:textSize="24sp"
+            android:visibility="invisible"/>
 
         <Button
             android:id="@+id/checkTranslation"
