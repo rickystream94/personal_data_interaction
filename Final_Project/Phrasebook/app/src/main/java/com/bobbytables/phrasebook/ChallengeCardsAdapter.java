@@ -1,15 +1,10 @@
 package com.bobbytables.phrasebook;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +14,6 @@ import android.widget.TextView;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.SettingsManager;
-
-import java.io.Console;
-
-import static com.bobbytables.phrasebook.R.id.foreignLanguage;
-import static com.bobbytables.phrasebook.R.id.motherLanguage;
-import static com.bobbytables.phrasebook.R.id.motherLanguageText;
-import static com.bobbytables.phrasebook.R.id.nextChallenge;
 
 /**
  * Created by ricky on 16/03/2017.
@@ -67,9 +55,9 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         //In our case, each time a new (random) card is created!
         //This is our "dataset" of 1 element (if you want more items, just create a list)
         this.context = context;
-        motherLanguage = SettingsManager.getInstance(context).getPrefValue(SettingsManager
+        motherLanguage = SettingsManager.getInstance(context).getPrefStringValue(SettingsManager
                 .KEY_MOTHER_LANGUAGE);
-        foreignLanguage = SettingsManager.getInstance(context).getPrefValue(SettingsManager
+        foreignLanguage = SettingsManager.getInstance(context).getPrefStringValue(SettingsManager
                 .KEY_FOREIGN_LANGUAGE);
         challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
         databaseHelper = DatabaseHelper.getInstance(context);
@@ -79,27 +67,33 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     @Override
     public ChallengeCardsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                                int viewType) {
+        int layout;
+        if(databaseHelper.isDatabaseEmpty())
+            layout = R.layout.empty_database;
+        else
+            layout = R.layout.challenge_card;
+
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.challenge_card, parent, false);
+                .inflate(layout, parent, false);
         return new ViewHolder(v);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        if (databaseHelper.isDatabaseEmpty())
+            return;
+
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+        holder.setIsRecyclable(false); //Must be specified since we're using a custom animator
         holder.foreignLanguageText.setText(challengeCard.getForeignLanguage());
-        String motherLanguageText;
-        if (!databaseHelper.isDatabaseEmpty()) {
-            motherLanguageText = databaseHelper.getRandomChallenge();
-        } else motherLanguageText = "EMPTY DB"; //to be changed
-        holder.motherLanguageText.setText(motherLanguageText);
+        holder.motherLanguageText.setText(databaseHelper.getRandomChallenge());
         holder.checkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String translation = holder.translation.getText().toString().toLowerCase();
+                String translation = holder.translation.getText().toString().trim().toLowerCase();
                 String correctTranslation = databaseHelper.getTranslation(holder.motherLanguageText.getText
                         ().toString());
                 holder.correctTranslation.setText(correctTranslation);
@@ -125,6 +119,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                 holder.checkButton.setVisibility(View.VISIBLE);
                 holder.translation.setText("");
                 challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
+                //notifyItemInserted(getItemCount());
                 notifyItemChanged(0);
             }
         });

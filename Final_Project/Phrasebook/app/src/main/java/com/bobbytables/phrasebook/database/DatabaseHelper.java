@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
 
+import com.bobbytables.phrasebook.utils.SettingsManager;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,7 +108,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 throw new Exception("Error! Record already existing!");
         SQLiteDatabase database = this.getWritableDatabase();
         long id = database.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
-        Log.d("DB", String.format("Saved new test with ID: %d", id));
+        Log.d("DB", String.format("Saved new record with ID: %d", id));
     }
 
     /**
@@ -182,11 +184,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " WHERE " +
                 "" + KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
                 "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'";
-        System.out.println(updateQuery);
-        database.rawQuery(updateQuery, null);
+        database.execSQL(updateQuery); //Always use execSQL with update statements!
 
         //Check if correct count has reached the minimum to be archived
-        Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " + TABLE_PHRASES + " " +
+        Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " +
+                TABLE_PHRASES +
+                " " +
                 "WHERE " + KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
                 "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'", null);
         if (cursor.moveToFirst()) {
@@ -201,8 +204,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void updateArchived(SQLiteDatabase database, String motherLangString, String foreignLangString) {
-        database.rawQuery("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=1" + "WHERE " + KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'", null);
+        database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=1 " + "WHERE " +
+                KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'");
     }
 
     //Future implementation, allows to edit a currently existing record in the DB
@@ -220,6 +224,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
+        cursor.close();
         return count == 0;
     }
 
@@ -231,17 +236,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void exportToJSON() {
+    public void exportToJSON(Context context) {
         String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date());
-        JSONArray json_phrases = getAllDataFromTable(TABLE_PHRASES);
-        JSONArray json_challenges = getAllDataFromTable(TABLE_CHALLENGES);
-        JSONArray json_badges = getAllDataFromTable(TABLE_BADGES);
         JSONObject obj = new JSONObject();
-
         try {
+            JSONArray json_phrases = getAllDataFromTable(TABLE_PHRASES);
+            JSONArray json_challenges = getAllDataFromTable(TABLE_CHALLENGES);
+            JSONArray json_badges = getAllDataFromTable(TABLE_BADGES);
+            JSONArray json_user = getUserData(context);
             obj.put("phrasebook", json_phrases);
             obj.put("challenges", json_challenges);
             obj.put("badges", json_badges);
+            obj.put("user",json_user);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -272,6 +278,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private JSONArray getUserData(Context context) throws JSONException {
+        JSONArray resultSet = new JSONArray();
+        SettingsManager settingsManager = SettingsManager.getInstance(context);
+        JSONObject rowObject = settingsManager.getUserData();
+        resultSet.put(rowObject);
+        Log.d("USER DATA DUMP:", resultSet.toString());
+        return resultSet;
     }
 
     private JSONArray getAllDataFromTable(String tablename) {

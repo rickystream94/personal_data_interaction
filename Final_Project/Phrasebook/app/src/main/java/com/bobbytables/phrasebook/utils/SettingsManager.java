@@ -8,9 +8,11 @@ import android.content.SharedPreferences.Editor;
 import com.bobbytables.phrasebook.MainActivity;
 import com.bobbytables.phrasebook.NewUserActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by ricky on 15/03/2017.
@@ -28,7 +30,7 @@ public class SettingsManager {
     private static final String KEY_USER_EXISTS = "userExists";
     private static final String KEY_IS_FIRST_TIME = "isFirstTime"; //might be used for launch
     // tutorial
-    // User name (make variable public to access from outside)
+    // User name
     private static final String KEY_NICKNAME = "nickname";
     public static final String KEY_MOTHER_LANGUAGE = "motherLanguage";
     public static final String KEY_FOREIGN_LANGUAGE = "foreignLanguage";
@@ -73,7 +75,7 @@ public class SettingsManager {
     }
 
     public void createUser(String nickname, String motherLanguage, String foreignLanguage) {
-        String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date
+        String currentTimeString = new SimpleDateFormat("y/MM/dd HH:mm:ss").format(new Date
                 ());
         editor.putString(KEY_NICKNAME, nickname);
         editor.putString(KEY_MOTHER_LANGUAGE, motherLanguage.toUpperCase());
@@ -85,18 +87,67 @@ public class SettingsManager {
         editor.commit();
     }
 
-    public String getPrefValue(String key) {
+    /**
+     * Get a generic shared preference string value given a specific key
+     * @param key
+     * @return
+     */
+    public String getPrefStringValue(String key) {
         return preferences.getString(key,"");
     }
 
+    /**
+     * Get a generic shared preference integer value given a specific key
+     * @param key
+     * @return
+     */
+    public int getPrefIntValue(String key) {
+        return preferences.getInt(key,-1);
+    }
+
+    /**
+     * Get a generic shared preference boolean value given a specific key
+     * @param key
+     * @return
+     */
+    public boolean getPrefBoolValue(String key) {
+        return preferences.getBoolean(key,false);
+    }
+
+    /**
+     * It will be used to update the current level of the user
+     * @param key
+     * @param value
+     */
     public void updatePrefValue(String key,int value) {
         editor.putInt(key, value);
         editor.commit();
     }
 
+    /**
+     * It will be used to add experience points
+     * @param key
+     * @param newValue
+     */
     public void addValue(String key,int newValue) {
         int currentValue = preferences.getInt(key,0);
         editor.putInt(key,currentValue+newValue);
         editor.commit();
+    }
+
+    /**
+     * Returns all user's data in a JSONObject, used to export data
+     * @return
+     */
+    public JSONObject getUserData() throws JSONException {
+        JSONObject userData = new JSONObject();
+        userData.put(KEY_NICKNAME, getPrefStringValue(KEY_NICKNAME));
+        userData.put(KEY_MOTHER_LANGUAGE, getPrefStringValue(KEY_MOTHER_LANGUAGE));
+        userData.put(KEY_FOREIGN_LANGUAGE, getPrefStringValue(KEY_FOREIGN_LANGUAGE));
+        userData.put(KEY_CREATED, getPrefStringValue(KEY_CREATED));
+        userData.put(KEY_LEVEL, getPrefIntValue(KEY_LEVEL));
+        userData.put(KEY_TOTAL_XP, getPrefIntValue(KEY_TOTAL_XP));
+        userData.put(KEY_GAMIFICATION, getPrefBoolValue(KEY_GAMIFICATION) ? 1 : 0);
+        return userData;
     }
 }

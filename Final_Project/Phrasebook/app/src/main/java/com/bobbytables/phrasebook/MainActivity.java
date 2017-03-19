@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener;
 import android.support.v4.app.ActivityCompat;
@@ -60,14 +59,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity
         settingsManager.createUserProfile();
-        motherLanguage = settingsManager.getPrefValue(SettingsManager.KEY_MOTHER_LANGUAGE);
-        foreignLanguage = settingsManager.getPrefValue(SettingsManager.KEY_FOREIGN_LANGUAGE);
+        motherLanguage = settingsManager.getPrefStringValue(SettingsManager.KEY_MOTHER_LANGUAGE);
+        foreignLanguage = settingsManager.getPrefStringValue(SettingsManager.KEY_FOREIGN_LANGUAGE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         initializePager();
         initFloatingActionButton();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Needed to refresh the layout of the fragments and always display the
+        // most up-to-date content
+        initializePager();
     }
 
     @Override
@@ -89,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 Toast.makeText(this, "All data successfully deleted!", Toast
                         .LENGTH_SHORT)
                         .show();
+                initializePager();
                 break;
             case R.id.export_data:
                 checkWritePermissions();
@@ -192,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     public void exportData() {
-        databaseHelper.exportToJSON();
+        databaseHelper.exportToJSON(getApplicationContext());
         Toast.makeText(this, "Exported in Downloads/Phrasebook_Exports as JSON file", Toast
                 .LENGTH_SHORT)
                 .show();

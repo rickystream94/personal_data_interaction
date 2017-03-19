@@ -91,7 +91,7 @@ public class NewPhraseActivity extends AppCompatActivity {
                     " all the fields!", false);
             return false;
         }
-        String currentTimeString = new SimpleDateFormat("y/MM/dd/HH:mm:ss").format(new Date());
+        String currentTimeString = new SimpleDateFormat("y/MM/dd HH:mm:ss").format(new Date());
         try {
             databaseHelper.insertRecord(new PhraseModel(addNewMotherLangPhrase.getText().toString
                     ().trim().toLowerCase(),
