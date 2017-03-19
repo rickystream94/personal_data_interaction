@@ -122,29 +122,73 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String foreignLanguageString = contentValues.getAsString(KEY_FOREIGN_LANG_STRING);
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + "=" + motherLanguageString + " AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=" + foreignLanguageString, null);
+                "" + KEY_MOTHER_LANG_STRING + "='" + motherLanguageString + "' AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLanguageString + "'", null);
         boolean exists = cursor.moveToFirst();
         cursor.close();
         return exists;
+    }
+
+    /**
+     * Checks if there is a match between the two inputs
+     *
+     * @param motherLanguageString
+     * @param foreignLangString
+     * @param correctTranslation
+     * @return true if found (at least one!), false otherwise
+     */
+    public boolean checkIfCorrect(String motherLanguageString, String foreignLangString, String correctTranslation) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_PHRASES + " WHERE " +
+                "" + KEY_MOTHER_LANG_STRING + " ='" + motherLanguageString + "' AND " +
+                "" + KEY_FOREIGN_LANG_STRING + " ='" + foreignLangString + "'", null);
+        cursor.moveToFirst();
+        boolean result = cursor.getInt(0) > 0;
+        cursor.close();
+
+        //Increment/Decrement correct count for the current phrase
+        updateCorrectCount(motherLanguageString, correctTranslation, result);
+        return result;
+    }
+
+    /**
+     * Returns the correct translation of the meaning passed as parameter.
+     * IMPORTANT: Returns just the first matching result, if multiple meanings are found, they're
+     * ignored
+     *
+     * @param motherLanguageString text in mother language
+     * @return translation
+     */
+    public String getTranslation(String motherLanguageString) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT " + KEY_FOREIGN_LANG_STRING + " FROM " +
+                "" + TABLE_PHRASES + " WHERE " + KEY_MOTHER_LANG_STRING + "='" + motherLanguageString + "' " +
+                "LIMIT 1", null);
+        cursor.moveToFirst();
+        String translation = cursor.getString(0);
+        cursor.close();
+        return translation;
     }
 
     public void updateCorrectCount(String motherLangString, String foreignLangString, boolean
             increment) {
         String newValue;
         if (increment)
-            newValue = KEY_CORRECT_COUNT + 1;
+            newValue = KEY_CORRECT_COUNT + "+1";
         else newValue = KEY_CORRECT_COUNT + "-1";
         SQLiteDatabase database = this.getWritableDatabase();
-        database.rawQuery("UPDATE " + TABLE_PHRASES + "SET " + KEY_CORRECT_COUNT + "=" + newValue + "" +
+        String updateQuery = "UPDATE " + TABLE_PHRASES + " SET " + KEY_CORRECT_COUNT + "=" +
+                newValue + "" +
                 " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + "=" + motherLangString + " AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=" + foreignLangString, null);
+                "" + KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'";
+        System.out.println(updateQuery);
+        database.rawQuery(updateQuery, null);
 
         //Check if correct count has reached the minimum to be archived
         Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " + TABLE_PHRASES + " " +
-                "WHERE " + KEY_MOTHER_LANG_STRING + "=" + motherLangString + " AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=" + foreignLangString, null);
+                "WHERE " + KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'", null);
         if (cursor.moveToFirst()) {
             do {
                 int currentCorrect = cursor.getInt(0);
@@ -153,11 +197,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext()); //actually useless because there will be only one row
             // in the cursor
         }
+        cursor.close();
     }
 
     public void updateArchived(SQLiteDatabase database, String motherLangString, String foreignLangString) {
-        database.rawQuery("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=1" + "WHERE " + KEY_MOTHER_LANG_STRING + "=" + motherLangString + " AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=" + foreignLangString, null);
+        database.rawQuery("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=1" + "WHERE " + KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'", null);
     }
 
     //Future implementation, allows to edit a currently existing record in the DB
@@ -166,15 +211,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Checks if the database is currently empty (no phrases added)
+     *
      * @return true if it's empty, false otherwise
      */
     public boolean isDatabaseEmpty() {
         SQLiteDatabase db = this.getWritableDatabase();
-        String countQuery = "SELECT count(*) FROM "+TABLE_PHRASES;
+        String countQuery = "SELECT count(*) FROM " + TABLE_PHRASES;
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
-        return count==0;
+        return count == 0;
     }
 
     public void reset() {
@@ -185,7 +231,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    private void exportToJSON() {
+    public void exportToJSON() {
         String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date());
         JSONArray json_phrases = getAllDataFromTable(TABLE_PHRASES);
         JSONArray json_challenges = getAllDataFromTable(TABLE_CHALLENGES);
@@ -269,5 +315,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         Log.d(String.format("DB DUMP: %s", tablename), resultSet.toString());
         return resultSet;
+    }
+
+    public String getRandomChallenge() {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT " + KEY_MOTHER_LANG_STRING + " FROM " +
+                "" + TABLE_PHRASES + " ORDER BY RANDOM() LIMIT 1", null);
+        cursor.moveToFirst();
+        String result = cursor.getString(0);
+        cursor.close();
+        return result;
     }
 }

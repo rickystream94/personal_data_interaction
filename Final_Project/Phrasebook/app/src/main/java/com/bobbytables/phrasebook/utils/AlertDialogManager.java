@@ -6,6 +6,7 @@ package com.bobbytables.phrasebook.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 
 public class AlertDialogManager {
     /**
@@ -19,7 +20,7 @@ public class AlertDialogManager {
      */
     public void showAlertDialog(Context context, String title, String message,
                                 Boolean status) {
-        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
 
         // Setting Dialog Title
         alertDialog.setTitle(title);
@@ -27,13 +28,17 @@ public class AlertDialogManager {
         // Setting Dialog Message
         alertDialog.setMessage(message);
 
+        //Set dismiss button
+        alertDialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
         if (status != null)
             // Setting alert dialog icon
             alertDialog.setIcon((status) ? android.R.drawable.star_big_on : android.R.drawable
                     .ic_dialog_alert);
-
-        // Setting OK Button
-        //missing
 
         // Showing Alert Message
         alertDialog.show();

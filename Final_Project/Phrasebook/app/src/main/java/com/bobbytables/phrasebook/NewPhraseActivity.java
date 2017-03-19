@@ -91,10 +91,12 @@ public class NewPhraseActivity extends AppCompatActivity {
                     " all the fields!", false);
             return false;
         }
-        String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date());
+        String currentTimeString = new SimpleDateFormat("y/MM/dd/HH:mm:ss").format(new Date());
         try {
-            databaseHelper.insertRecord(new PhraseModel(addNewMotherLangPhrase.getText().toString(),
-                    addNewForeignLangPhrase.getText().toString(),currentTimeString,DatabaseHelper.TABLE_PHRASES));
+            databaseHelper.insertRecord(new PhraseModel(addNewMotherLangPhrase.getText().toString
+                    ().trim().toLowerCase(),
+                    addNewForeignLangPhrase.getText().toString().trim().toLowerCase(), currentTimeString,
+                    DatabaseHelper.TABLE_PHRASES));
             addNewForeignLangPhrase.setText("");
             addNewMotherLangPhrase.setText("");
             Toast.makeText(getApplicationContext(), "New phrase saved!", Toast.LENGTH_SHORT)
@@ -104,6 +106,5 @@ public class NewPhraseActivity extends AppCompatActivity {
             alertDialogManager.showAlertDialog(NewPhraseActivity.this,"Error!",e.getMessage(),false);
             return false;
         }
-
     }
 }
