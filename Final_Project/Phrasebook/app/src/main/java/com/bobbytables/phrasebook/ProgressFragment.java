@@ -7,18 +7,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bobbytables.phrasebook.database.DatabaseHelper;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ProgressFragment extends Fragment {
 
+    private DatabaseHelper databaseHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        databaseHelper = DatabaseHelper.getInstance(getContext());
+        int layout;
+        if (databaseHelper.isDatabaseEmpty())
+            layout = R.layout.empty_database;
+        else layout = R.layout.fragment_progress;
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_progress, container, false);
+        return inflater.inflate(layout, container, false);
     }
 
 }

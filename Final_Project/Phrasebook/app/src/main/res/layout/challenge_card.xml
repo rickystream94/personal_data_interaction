@@ -4,7 +4,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/challengeCardView"
     android:layout_width="match_parent"
-    android:layout_height="350dp"
+    android:layout_height="300dp"
     android:layout_margin="5dp"
     card_view:cardBackgroundColor="@color/colorChallengeCard"
     card_view:cardCornerRadius="4dp">
@@ -50,7 +50,8 @@
             android:inputType="textMultiLine"
             android:maxLength="50"
             android:maxLines="3"
-            android:textSize="24sp"/>
+            android:textSize="24sp"
+            android:padding="3dp"/>
 
         <TextView
             android:id="@+id/correctTranslation"
@@ -59,7 +60,9 @@
             android:layout_below="@id/translation"
             android:layout_marginTop="10dp"
             android:textSize="24sp"
-            android:visibility="invisible"/>
+            android:visibility="invisible"
+            android:textColor="@color/wrongAnser"
+            android:padding="3dp"/>
 
         <Button
             android:id="@+id/checkTranslation"

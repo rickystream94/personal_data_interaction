@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
+
 public class CardsFragment extends Fragment {
 
     private RecyclerView cardsRecyclerView;
@@ -24,6 +26,7 @@ public class CardsFragment extends Fragment {
         //Handling cards recycler view
         cardsRecyclerView = (RecyclerView) rootView.findViewById(R.id.cardsRecyclerView);
         cardsRecyclerView.setHasFixedSize(true);
+        cardsRecyclerView.setItemAnimator(new SlideInRightAnimator());
         recyclerViewLayoutManager = new LinearLayoutManager(getActivity());
         cardsRecyclerView.setLayoutManager(recyclerViewLayoutManager);
         cardsAdapter = new ChallengeCardsAdapter(getContext());
