@@ -39,11 +39,11 @@ public class NewPhraseActivity extends AppCompatActivity {
         motherLanguage = i.getExtras().getString(SettingsManager.KEY_MOTHER_LANGUAGE);
         foreignLanguage = i.getExtras().getString(SettingsManager.KEY_FOREIGN_LANGUAGE);
 
-        TextView foreignLangTextView = (TextView)findViewById(R.id.textView_new_phrase_language);
+        TextView foreignLangTextView = (TextView) findViewById(R.id.textView_new_phrase_language);
         foreignLangTextView.setText(foreignLanguage);
         Button saveAddMore = (Button) findViewById(R.id.save_and_add_more);
-        addNewMotherLangPhrase = (EditText)findViewById(R.id.add_new_mother_lang);
-        addNewForeignLangPhrase = (EditText)findViewById(R.id.add_new_foreign_lang);
+        addNewMotherLangPhrase = (EditText) findViewById(R.id.add_new_mother_lang);
+        addNewForeignLangPhrase = (EditText) findViewById(R.id.add_new_foreign_lang);
         saveAddMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,30 +58,29 @@ public class NewPhraseActivity extends AppCompatActivity {
     @Override
     //Remember: this method is invoked just once, exactly when the activity is created!
     //The return value states whether the menu will be active for the activity (true) or not (false)
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.new_phrase_menu,menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.new_phrase_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        int id=item.getItemId();
-        switch(id)
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
             case R.id.menu_save_and_close:
-                if(saveNewPhrase())
+                if (saveNewPhrase())
                     finish();
                 break;
-            default: break;
+            default:
+                break;
         }
         return false;
     }
 
     /**
      * Saves to database
+     *
      * @return true if successful, false otherwise
      */
     public boolean saveNewPhrase() {
@@ -103,7 +102,7 @@ public class NewPhraseActivity extends AppCompatActivity {
                     .show();
             return true;
         } catch (Exception e) {
-            alertDialogManager.showAlertDialog(NewPhraseActivity.this,"Error!",e.getMessage(),false);
+            alertDialogManager.showAlertDialog(NewPhraseActivity.this, "Error!", e.getMessage(), false);
             return false;
         }
     }

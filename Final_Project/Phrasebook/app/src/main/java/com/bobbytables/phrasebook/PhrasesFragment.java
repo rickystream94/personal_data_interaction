@@ -1,9 +1,6 @@
 package com.bobbytables.phrasebook;
 
 
-import android.app.SearchManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
