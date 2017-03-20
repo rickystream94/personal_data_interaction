@@ -4,8 +4,63 @@
              android:layout_height="match_parent"
              tools:context="com.bobbytables.phrasebook.PhrasesFragment">
 
-    <ListView
-        android:id="@+id/dataListView"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <SearchView
+            android:id="@+id/search_phrase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:padding="5dp"
+                     android:shrinkColumns="*"
+                     android:stretchColumns="*">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/phrases_lang1"
+                    android:layout_width="0dp"
+                    android:layout_weight="9"
+                    android:textAlignment="center"
+                    android:textSize="18sp"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".1"
+                    android:background="@android:color/darker_gray"/>
+
+                <TextView
+                    android:id="@+id/phrases_lang2"
+                    android:layout_width="0dp"
+                    android:layout_weight="9"
+                    android:textAlignment="center"
+                    android:textSize="18sp"/>
+            </TableRow>
+        </TableLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <ListView
+            android:id="@+id/dataListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
 </FrameLayout>
