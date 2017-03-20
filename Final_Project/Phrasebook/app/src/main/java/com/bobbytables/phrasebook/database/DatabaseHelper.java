@@ -247,7 +247,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             obj.put("phrasebook", json_phrases);
             obj.put("challenges", json_challenges);
             obj.put("badges", json_badges);
-            obj.put("user",json_user);
+            obj.put("user", json_user);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -345,5 +345,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getDataFromTable(String table) {
         SQLiteDatabase database = this.getReadableDatabase();
         return database.rawQuery("SELECT ID AS _id,* FROM " + table, null);
+    }
+
+    public Cursor searchPhrase(String query) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        return database.rawQuery("SELECT ID AS _id,* FROM " + TABLE_PHRASES + " WHERE " +
+                "" + KEY_MOTHER_LANG_STRING + " LIKE '%" + query + "%' OR " + KEY_FOREIGN_LANG_STRING + " LIKE " +
+                "'%" + query + "%'", null);
     }
 }

@@ -24,6 +24,8 @@ import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
+import static com.bobbytables.phrasebook.R.id.tabLayout;
+
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
     private AlertDialogManager alertDialogManager = new AlertDialogManager();
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private String motherLanguage;
     private String foreignLanguage;
     private DatabaseHelper databaseHelper;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private void initializePager() {
         // ViewPager and its adapters use support library
         // fragments, so use getSupportFragmentManager.
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         //used to change tab when selected
         tabLayout.addOnTabSelectedListener(this);
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());

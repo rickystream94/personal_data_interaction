@@ -7,18 +7,19 @@
     <string name="tab3">Progress</string>
     <string name="translate_this_in">Translate this in:</string>
     <string name="basic_information">Hello, let\'s start with some basic information:</string>
-    <string name="insert_nickname">Insert your nickname...</string>
-    <string name="mother_language">Your mother language...</string>
-    <string name="foreign_language">Language you are learning...</string>
+    <string name="insert_nickname">Insert your nickname…</string>
+    <string name="mother_language">Your mother language…</string>
+    <string name="foreign_language">Language you are learning…</string>
     <string name="create_user">Create User</string>
     <string name="check">Check</string>
     <string name="next_challenge">Next</string>
-    <string name="type_the_translation">Type the translation...</string>
+    <string name="type_the_translation">Type the translation…</string>
     <string name="title_activity_new_phrase">New Phrase</string>
     <string name="add_new_phrase">Add a new word, phrase or common expression to your phrasebook
         of:</string>
-    <string name="type_the_phrase_in_your_mother_language">Type the phrase in your mother language...</string>
-    <string name="type_the_phrase_in_the_foreign_language">Type the phrase in the foreign language...</string>
+    <string name="type_the_phrase_in_your_mother_language">Type the phrase in your mother language…</string>
+    <string name="type_the_phrase_in_the_foreign_language">Type the phrase in the foreign language…</string>
     <string name="save_and_close">Save and Close</string>
     <string name="empty_database_text">Your phrasebook is currently empty!\nStart adding something by pressing the \'+\' button below!</string>
+    <string name="search_hint">Search in phrasebook…</string>
 </resources>
