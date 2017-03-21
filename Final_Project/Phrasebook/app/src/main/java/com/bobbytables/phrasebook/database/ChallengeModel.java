@@ -7,24 +7,25 @@ import android.content.ContentValues;
  */
 
 public class ChallengeModel implements DatabaseModel {
-    String id;
-    String phraseId;
+    int phraseId;
     String createdOn;
     String tableName;
+    int correct;
 
-    public ChallengeModel(String id, String phraseId, String createdOn, String tableName) {
-        this.id = id;
+
+    public ChallengeModel(int phraseId, String createdOn, String tableName, int correct) {
         this.phraseId = phraseId;
         this.createdOn = createdOn;
         this.tableName = tableName;
+        this.correct = correct;
     }
 
     @Override
     public ContentValues getContentValues() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.KEY_CHALLENGE_ID, this.id);
         contentValues.put(DatabaseHelper.KEY_CHALLENGE_PHRASE_ID, this.phraseId);
         contentValues.put(DatabaseHelper.KEY_CREATED_ON, this.createdOn);
+        contentValues.put(DatabaseHelper.KEY_CHALLENGE_CORRECT, this.correct);
         return contentValues;
     }
 

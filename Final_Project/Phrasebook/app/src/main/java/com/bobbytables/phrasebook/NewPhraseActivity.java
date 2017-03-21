@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.database.PhraseModel;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
+import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
 import java.text.SimpleDateFormat;
@@ -90,7 +91,7 @@ public class NewPhraseActivity extends AppCompatActivity {
                     " all the fields!", false);
             return false;
         }
-        String currentTimeString = new SimpleDateFormat("y/MM/dd HH:mm:ss").format(new Date());
+        String currentTimeString = DateUtil.getCurrentTimestamp();
         try {
             databaseHelper.insertRecord(new PhraseModel(addNewMotherLangPhrase.getText().toString
                     ().trim().toLowerCase(),

@@ -3,7 +3,6 @@ package com.bobbytables.phrasebook.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
@@ -44,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Challenges Table Columns
     public static final String KEY_CHALLENGE_ID = "id";
     public static final String KEY_CHALLENGE_PHRASE_ID = "phraseId";
+    public static final String KEY_CHALLENGE_CORRECT = "correct";
 
     // Badges Table Columns
     private static final String KEY_BADGES_ID = "id";
@@ -67,6 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             KEY_CHALLENGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
             KEY_CHALLENGE_PHRASE_ID + " INTEGER REFERENCES " + TABLE_PHRASES + ", " + // Define
             // a foreign key
+            KEY_CHALLENGE_CORRECT + " INTEGER T, " +
             KEY_CREATED_ON + " TEXT)";
 
     private static final String CREATE_BADGES_TABLE = "CREATE TABLE " + TABLE_BADGES +
@@ -83,8 +84,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public static synchronized DatabaseHelper getInstance(Context context) {
-        if (instance == null)
-            return new DatabaseHelper(context.getApplicationContext());
+        if (instance == null) {
+            instance = new DatabaseHelper(context.getApplicationContext());
+        }
         return instance;
     }
 
@@ -103,13 +105,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Inserts a new data object in a specified table
+     *
+     * @param dataObject either a new phrase or challenge data row
+     * @throws Exception if the data row already exists in the DB
+     */
     public void insertRecord(DatabaseModel dataObject) throws Exception {
         if (dataObject.getTableName().equals(TABLE_PHRASES))
             if (phraseAlreadyExists(dataObject))
                 throw new Exception("Error! Record already existing!");
         SQLiteDatabase database = this.getWritableDatabase();
         long id = database.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
-        Log.d("DB", String.format("Saved new record with ID: %d", id));
+        Log.d("DB", String.format("Saved new record in table " + dataObject.getTableName() + " with ID: %d", id));
     }
 
     /**
@@ -173,6 +181,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String translation = cursor.getString(0);
         cursor.close();
         return translation;
+    }
+
+    public int getPhraseId(String motherLangString, String foreignLangString) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT " + KEY_PHRASE_ID + " FROM " +
+                "" + TABLE_PHRASES + " WHERE " + KEY_MOTHER_LANG_STRING + "=? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=? LIMIT 1", new String[]{motherLangString,
+                foreignLangString});
+        cursor.moveToFirst();
+        int phraseId = cursor.getInt(0);
+        cursor.close();
+        return phraseId;
     }
 
     public void updateCorrectCount(String motherLangString, String foreignLangString, boolean
@@ -355,8 +375,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor searchPhrase(String query) {
         SQLiteDatabase database = this.getReadableDatabase();
         return database.rawQuery("SELECT ID AS _id,* FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + " LIKE '%?%' OR " + KEY_FOREIGN_LANG_STRING + " " +
-                "LIKE " +
-                "'%?%'", new String[]{query, query});
+                "" + KEY_MOTHER_LANG_STRING + " LIKE ? OR " + KEY_FOREIGN_LANG_STRING + " " +
+                "LIKE ?", new String[]{"%" + query + "%", "%" + query + "%"});
     }
 }

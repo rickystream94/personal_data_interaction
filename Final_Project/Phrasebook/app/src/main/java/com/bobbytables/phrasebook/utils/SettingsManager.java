@@ -75,8 +75,7 @@ public class SettingsManager {
     }
 
     public void createUser(String nickname, String motherLanguage, String foreignLanguage) {
-        String currentTimeString = new SimpleDateFormat("y/MM/dd HH:mm:ss").format(new Date
-                ());
+        String currentTimeString = DateUtil.getCurrentTimestamp();
         editor.putString(KEY_NICKNAME, nickname);
         editor.putString(KEY_MOTHER_LANGUAGE, motherLanguage.toUpperCase());
         editor.putString(KEY_FOREIGN_LANGUAGE, foreignLanguage.toUpperCase());
