@@ -3,6 +3,7 @@ package com.bobbytables.phrasebook.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
@@ -124,8 +125,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String foreignLanguageString = contentValues.getAsString(KEY_FOREIGN_LANG_STRING);
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + "='" + motherLanguageString + "' AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLanguageString + "'", null);
+                        "" + KEY_MOTHER_LANG_STRING + "=? AND " +
+                        "" + KEY_FOREIGN_LANG_STRING + "=?",
+                new String[]{motherLanguageString, foreignLanguageString});
         boolean exists = cursor.moveToFirst();
         cursor.close();
         return exists;
@@ -142,8 +144,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean checkIfCorrect(String motherLanguageString, String foreignLangString, String correctTranslation) {
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + " ='" + motherLanguageString + "' AND " +
-                "" + KEY_FOREIGN_LANG_STRING + " ='" + foreignLangString + "'", null);
+                "" + KEY_MOTHER_LANG_STRING + " =? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + " =?", new String[]{motherLanguageString,
+                foreignLangString});
         cursor.moveToFirst();
         boolean result = cursor.getInt(0) > 0;
         cursor.close();
@@ -164,8 +167,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String getTranslation(String motherLanguageString) {
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT " + KEY_FOREIGN_LANG_STRING + " FROM " +
-                "" + TABLE_PHRASES + " WHERE " + KEY_MOTHER_LANG_STRING + "='" + motherLanguageString + "' " +
-                "LIMIT 1", null);
+                "" + TABLE_PHRASES + " WHERE " + KEY_MOTHER_LANG_STRING + "=? " +
+                "LIMIT 1", new String[]{motherLanguageString});
         cursor.moveToFirst();
         String translation = cursor.getString(0);
         cursor.close();
@@ -182,16 +185,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String updateQuery = "UPDATE " + TABLE_PHRASES + " SET " + KEY_CORRECT_COUNT + "=" +
                 newValue + "" +
                 " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'";
-        database.execSQL(updateQuery); //Always use execSQL with update statements!
+                "" + KEY_MOTHER_LANG_STRING + "=? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=?";
+        database.execSQL(updateQuery, new Object[]{motherLangString, foreignLangString}); //Always use execSQL with
+        // update
+        // statements!
 
         //Check if correct count has reached the minimum to be archived
         Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " +
                 TABLE_PHRASES +
                 " " +
-                "WHERE " + KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'", null);
+                "WHERE " + KEY_MOTHER_LANG_STRING + "=? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString, foreignLangString});
         if (cursor.moveToFirst()) {
             do {
                 int currentCorrect = cursor.getInt(0);
@@ -205,8 +210,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void updateArchived(SQLiteDatabase database, String motherLangString, String foreignLangString) {
         database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=1 " + "WHERE " +
-                KEY_MOTHER_LANG_STRING + "='" + motherLangString + "' AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "='" + foreignLangString + "'");
+                KEY_MOTHER_LANG_STRING + "=? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=?'", new Object[]{motherLangString, foreignLangString});
     }
 
     //Future implementation, allows to edit a currently existing record in the DB
@@ -350,7 +355,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor searchPhrase(String query) {
         SQLiteDatabase database = this.getReadableDatabase();
         return database.rawQuery("SELECT ID AS _id,* FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + " LIKE '%" + query + "%' OR " + KEY_FOREIGN_LANG_STRING + " LIKE " +
-                "'%" + query + "%'", null);
+                "" + KEY_MOTHER_LANG_STRING + " LIKE '%?%' OR " + KEY_FOREIGN_LANG_STRING + " " +
+                "LIKE " +
+                "'%?%'", new String[]{query, query});
     }
 }
