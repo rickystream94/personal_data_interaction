@@ -5,15 +5,23 @@ import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bobbytables.phrasebook.database.ChallengeModel;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.bobbytables.phrasebook.utils.AlertDialogManager;
+import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by ricky on 16/03/2017.
@@ -26,6 +34,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     private ChallengeCard challengeCard;
     private static final int NUMBER_OF_CARDS = 1;
     private DatabaseHelper databaseHelper;
+    private AlertDialogManager alertDialogManager;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -61,6 +70,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                 .KEY_FOREIGN_LANGUAGE);
         challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
         databaseHelper = DatabaseHelper.getInstance(context);
+        alertDialogManager = new AlertDialogManager();
     }
 
     // Create new views (invoked by the layout manager)
@@ -68,7 +78,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     public ChallengeCardsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                                int viewType) {
         int layout;
-        if(databaseHelper.isDatabaseEmpty())
+        if (databaseHelper.isDatabaseEmpty())
             layout = R.layout.empty_database;
         else
             layout = R.layout.challenge_card;
@@ -93,6 +103,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         holder.checkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Perform check in the DB
                 String translation = holder.translation.getText().toString().trim().toLowerCase();
                 String correctTranslation = databaseHelper.getTranslation(holder.motherLanguageText.getText
                         ().toString());
@@ -100,10 +111,31 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                 boolean result = databaseHelper.checkIfCorrect(holder.motherLanguageText.getText
                                 ().toString(),
                         translation, correctTranslation);
+                boolean isArchived = databaseHelper.updateCorrectCount(holder.motherLanguageText.getText
+                        ().toString(), correctTranslation, result);
+
+                //Insert new record in DB
+                int correct = result ? 1 : 0;
+                int phraseId = databaseHelper.getPhraseId(holder.motherLanguageText.getText
+                        ().toString(), correctTranslation);
+                String currentTimeString = DateUtil.getCurrentTimestamp();
+                try {
+                    databaseHelper.insertRecord(new ChallengeModel(phraseId, currentTimeString,
+                            DatabaseHelper.TABLE_CHALLENGES, correct));
+                } catch (Exception e) {
+                    alertDialogManager.showAlertDialog(context, "Error!", e.getMessage(), false);
+                }
+
+                //Update UI user feedback
                 int editTextBackgroundColor = result ? ContextCompat.getColor(context, R.color
                         .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnser);
                 if (!result) {
                     holder.correctTranslation.setVisibility(View.VISIBLE);
+                }
+                if (isArchived) {
+                    Toast.makeText(context, "Great! New word just stored in long term " +
+                            "memory.", Toast.LENGTH_SHORT).show();
+                    Log.d("DEBUG", "Word correctly archived!");
                 }
                 holder.translation.setBackgroundColor(editTextBackgroundColor);
                 view.setVisibility(View.INVISIBLE);

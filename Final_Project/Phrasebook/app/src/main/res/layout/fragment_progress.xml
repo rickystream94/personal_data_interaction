@@ -4,10 +4,8 @@
              android:layout_height="match_parent"
              tools:context="com.bobbytables.phrasebook.ProgressFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/challengePieChart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="PROGRESS FRAGMENT"/>
-
+        android:layout_height="match_parent"/>
 </FrameLayout>
