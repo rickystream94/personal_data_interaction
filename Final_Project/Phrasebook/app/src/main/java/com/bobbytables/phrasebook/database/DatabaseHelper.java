@@ -158,9 +158,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         boolean result = cursor.getInt(0) > 0;
         cursor.close();
-
-        //Increment/Decrement correct count for the current phrase
-        updateCorrectCount(motherLanguageString, correctTranslation, result);
         return result;
     }
 
@@ -195,7 +192,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return phraseId;
     }
 
-    public void updateCorrectCount(String motherLangString, String foreignLangString, boolean
+    /**
+     * Updates the current correct count of a phrase row in the DB
+     * If the correct count has reached the minimum to be archived, return true. False otherwise
+     * @param motherLangString
+     * @param foreignLangString
+     * @param increment
+     * @return
+     */
+    public boolean updateCorrectCount(String motherLangString, String foreignLangString, boolean
             increment) {
         String newValue;
         if (increment)
@@ -208,8 +213,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "" + KEY_MOTHER_LANG_STRING + "=? AND " +
                 "" + KEY_FOREIGN_LANG_STRING + "=?";
         database.execSQL(updateQuery, new Object[]{motherLangString, foreignLangString}); //Always use execSQL with
-        // update
-        // statements!
+        // update statements!
 
         //Check if correct count has reached the minimum to be archived
         Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " +
@@ -217,21 +221,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " " +
                 "WHERE " + KEY_MOTHER_LANG_STRING + "=? AND " +
                 "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString, foreignLangString});
+        boolean result = false;
         if (cursor.moveToFirst()) {
             do {
                 int currentCorrect = cursor.getInt(0);
-                if (currentCorrect == CORRECT_COUNT_FOR_ARCHIVE)
+                if (currentCorrect == CORRECT_COUNT_FOR_ARCHIVE) {
                     updateArchived(database, motherLangString, foreignLangString);
+                    result = true;
+                }
             } while (cursor.moveToNext()); //actually useless because there will be only one row
             // in the cursor
         }
         cursor.close();
+        return result;
     }
 
     public void updateArchived(SQLiteDatabase database, String motherLangString, String foreignLangString) {
         database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=1 " + "WHERE " +
                 KEY_MOTHER_LANG_STRING + "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?'", new Object[]{motherLangString, foreignLangString});
+                "" + KEY_FOREIGN_LANG_STRING + "=?", new Object[]{motherLangString, foreignLangString});
     }
 
     //Future implementation, allows to edit a currently existing record in the DB
@@ -367,9 +375,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    /**
+     * Invoked by the PhrasesFragment, returns a subset of the phrases stored by the user.
+     *
+     * @param table
+     * @return
+     */
     public Cursor getDataFromTable(String table) {
         SQLiteDatabase database = this.getReadableDatabase();
-        return database.rawQuery("SELECT ID AS _id,* FROM " + table, null);
+        return database.rawQuery("SELECT ID AS _id,* FROM " + table + " ORDER BY " +
+                        "datetime(" + KEY_CREATED_ON + ")" +
+                        " DESC LIMIT 30",
+                null);
     }
 
     public Cursor searchPhrase(String query) {

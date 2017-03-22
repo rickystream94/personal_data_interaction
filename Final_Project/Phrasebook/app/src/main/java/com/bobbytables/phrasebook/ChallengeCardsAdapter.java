@@ -5,12 +5,14 @@ import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bobbytables.phrasebook.database.ChallengeModel;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
@@ -76,7 +78,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     public ChallengeCardsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                                int viewType) {
         int layout;
-        if(databaseHelper.isDatabaseEmpty())
+        if (databaseHelper.isDatabaseEmpty())
             layout = R.layout.empty_database;
         else
             layout = R.layout.challenge_card;
@@ -101,6 +103,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         holder.checkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Perform check in the DB
                 String translation = holder.translation.getText().toString().trim().toLowerCase();
                 String correctTranslation = databaseHelper.getTranslation(holder.motherLanguageText.getText
                         ().toString());
@@ -108,6 +111,8 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                 boolean result = databaseHelper.checkIfCorrect(holder.motherLanguageText.getText
                                 ().toString(),
                         translation, correctTranslation);
+                boolean isArchived = databaseHelper.updateCorrectCount(holder.motherLanguageText.getText
+                        ().toString(), correctTranslation, result);
 
                 //Insert new record in DB
                 int correct = result ? 1 : 0;
@@ -126,6 +131,11 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                         .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnser);
                 if (!result) {
                     holder.correctTranslation.setVisibility(View.VISIBLE);
+                }
+                if (isArchived) {
+                    Toast.makeText(context, "Great! New word just stored in long term " +
+                            "memory.", Toast.LENGTH_SHORT).show();
+                    Log.d("DEBUG", "Word correctly archived!");
                 }
                 holder.translation.setBackgroundColor(editTextBackgroundColor);
                 view.setVisibility(View.INVISIBLE);

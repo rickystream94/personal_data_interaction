@@ -10,6 +10,6 @@ import java.util.Date;
 public abstract class DateUtil {
 
     public static String getCurrentTimestamp() {
-        return new SimpleDateFormat("y/MM/dd HH:mm:ss").format(new Date());
+        return new SimpleDateFormat("y-MM-dd HH:mm:ss").format(new Date());
     }
 }
