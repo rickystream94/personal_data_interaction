@@ -192,9 +192,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return phraseId;
     }
 
+    public int getPhraseCorrectCount(String motherLangString, String foreignLangString) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " + TABLE_PHRASES
+                + " " +
+                "WHERE " +
+                KEY_MOTHER_LANG_STRING + "=? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString, foreignLangString});
+        cursor.moveToFirst();
+        int correctCount = cursor.getInt(0);
+        cursor.close();
+        return correctCount;
+
+    }
+
     /**
      * Updates the current correct count of a phrase row in the DB
      * If the correct count has reached the minimum to be archived, return true. False otherwise
+     *
      * @param motherLangString
      * @param foreignLangString
      * @param increment
@@ -207,6 +222,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             newValue = KEY_CORRECT_COUNT + "+1";
         else newValue = KEY_CORRECT_COUNT + "-1";
         SQLiteDatabase database = this.getWritableDatabase();
+        int previousCorrectCount = getPhraseCorrectCount(motherLangString, foreignLangString);
         String updateQuery = "UPDATE " + TABLE_PHRASES + " SET " + KEY_CORRECT_COUNT + "=" +
                 newValue + "" +
                 " WHERE " +
@@ -221,25 +237,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " " +
                 "WHERE " + KEY_MOTHER_LANG_STRING + "=? AND " +
                 "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString, foreignLangString});
-        boolean result = false;
+        boolean isArchived = false;
         if (cursor.moveToFirst()) {
             do {
-                int currentCorrect = cursor.getInt(0);
-                if (currentCorrect == CORRECT_COUNT_FOR_ARCHIVE) {
-                    updateArchived(database, motherLangString, foreignLangString);
-                    result = true;
+                int currentCorrectCount = cursor.getInt(0);
+                //Mark as archived if correct count reaches the threshold
+                if (currentCorrectCount == CORRECT_COUNT_FOR_ARCHIVE && currentCorrectCount > previousCorrectCount) {
+                    updateArchived(database, motherLangString, foreignLangString, true);
+                    Log.d("DEBUG ARCHIVED", "Current correct:" + currentCorrectCount + " Previous " +
+                            "correct: " + previousCorrectCount);
+                    isArchived = true;
                 }
+                //Mark as no more archived when correct count goes down the threshold
+                if (previousCorrectCount == CORRECT_COUNT_FOR_ARCHIVE && currentCorrectCount < previousCorrectCount)
+                    updateArchived(database, motherLangString, foreignLangString, false);
             } while (cursor.moveToNext()); //actually useless because there will be only one row
             // in the cursor
         }
         cursor.close();
-        return result;
+        return isArchived;
     }
 
-    public void updateArchived(SQLiteDatabase database, String motherLangString, String foreignLangString) {
-        database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=1 " + "WHERE " +
+    /**
+     * Marks a record as archived or not according to isArchived parameter
+     *
+     * @param database
+     * @param motherLangString
+     * @param foreignLangString
+     * @param isArchived        if true the record will be archived, otherwise it won't be archived
+     */
+    public void updateArchived(SQLiteDatabase database, String motherLangString, String
+            foreignLangString, boolean isArchived) {
+        int isArchivedParam = isArchived ? 1 : 0;
+        database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=? " + "WHERE " +
                 KEY_MOTHER_LANG_STRING + "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?", new Object[]{motherLangString, foreignLangString});
+                "" + KEY_FOREIGN_LANG_STRING + "=?", new Object[]{isArchivedParam, motherLangString,
+                foreignLangString});
     }
 
     //Future implementation, allows to edit a currently existing record in the DB
@@ -394,5 +427,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return database.rawQuery("SELECT ID AS _id,* FROM " + TABLE_PHRASES + " WHERE " +
                 "" + KEY_MOTHER_LANG_STRING + " LIKE ? OR " + KEY_FOREIGN_LANG_STRING + " " +
                 "LIKE ?", new String[]{"%" + query + "%", "%" + query + "%"});
+    }
+
+    public ContentValues getChallengesStats() {
+        SQLiteDatabase database = this.getReadableDatabase();
+
+        //Get total challenges
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_CHALLENGES, null);
+        cursor.moveToFirst();
+        int total = cursor.getInt(0);
+        cursor.close();
+
+        //Get won challenges
+        cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_CHALLENGES + " WHERE " +
+                "" + KEY_CHALLENGE_CORRECT + "=1", null);
+        cursor.moveToFirst();
+        int won = cursor.getInt(0);
+        cursor.close();
+
+        //Create content values
+        ContentValues values = new ContentValues();
+        values.put("total", total);
+        values.put("won", won);
+        return values;
+    }
+
+    public ContentValues getPhrasesStats() {
+        SQLiteDatabase database = this.getReadableDatabase();
+
+        //Get total phrases
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_PHRASES, null);
+        cursor.moveToFirst();
+        int total = cursor.getInt(0);
+        cursor.close();
+
+        //Get archived phrases
+        cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_PHRASES + " WHERE " +
+                "" + KEY_ARCHIVED + "=1", null);
+        cursor.moveToFirst();
+        int archived = cursor.getInt(0);
+        cursor.close();
+
+        ContentValues values = new ContentValues();
+        values.put("total", total);
+        values.put("archived", archived);
+        return values;
     }
 }
