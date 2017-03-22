@@ -47,11 +47,10 @@
             android:layout_below="@id/motherLanguageText"
             android:layout_marginTop="10dp"
             android:hint="@string/type_the_translation"
-            android:inputType="textMultiLine"
-            android:maxLength="50"
-            android:maxLines="3"
+            android:inputType="textCapSentences"
             android:padding="3dp"
-            android:textSize="24sp"/>
+            android:textSize="24sp"
+            android:imeOptions="actionDone"/>
 
         <View
             android:layout_width="match_parent"
