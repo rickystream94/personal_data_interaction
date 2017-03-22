@@ -6,4 +6,6 @@
     <color name="colorChallengeCard">#ffe5cc</color>
     <color name="correctAnswer">#4dff4d</color>
     <color name="wrongAnser">#ff3333</color>
+    <color name="pieChartLost">#ff3333</color>
+    <color name="pieChartWon">#53ff1a</color>
 </resources>

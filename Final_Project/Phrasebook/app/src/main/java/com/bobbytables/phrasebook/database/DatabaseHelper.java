@@ -395,4 +395,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "" + KEY_MOTHER_LANG_STRING + " LIKE ? OR " + KEY_FOREIGN_LANG_STRING + " " +
                 "LIKE ?", new String[]{"%" + query + "%", "%" + query + "%"});
     }
+
+    public ContentValues getChallengesData() {
+        SQLiteDatabase database = this.getReadableDatabase();
+
+        //Get total challenges
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM "+TABLE_CHALLENGES,null);
+        cursor.moveToFirst();
+        int total = cursor.getInt(0);
+        cursor.close();
+
+        //Get won challenges
+        cursor = database.rawQuery("SELECT count(*) FROM "+TABLE_CHALLENGES +" WHERE " +
+                ""+KEY_CHALLENGE_CORRECT+"=1",null);
+        cursor.moveToFirst();
+        int won = cursor.getInt(0);
+        cursor.close();
+
+        //Get lost challenges
+        cursor = database.rawQuery("SELECT count(*) FROM "+TABLE_CHALLENGES +" WHERE " +
+                ""+KEY_CHALLENGE_CORRECT+"=0",null);
+        cursor.moveToFirst();
+        int lost = cursor.getInt(0);
+        cursor.close();
+
+        //Create content values
+        ContentValues values = new ContentValues();
+        values.put("total",total);
+        values.put("won",won);
+        values.put("lost",lost);
+        return  values;
+    }
 }
