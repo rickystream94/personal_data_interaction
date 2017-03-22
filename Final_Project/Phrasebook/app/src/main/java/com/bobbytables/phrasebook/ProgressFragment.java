@@ -44,15 +44,58 @@ public class ProgressFragment extends Fragment {
         rootView = inflater.inflate(layout, container, false);
 
         //Initialize charts
-        initPieChart();
+        initChallengesPieChart();
+        initPhrasesPieChart();
         return rootView;
     }
 
-    private void initPieChart() {
-        ContentValues values = databaseHelper.getChallengesData();
+    private void initPhrasesPieChart() {
+        ContentValues values = databaseHelper.getPhrasesStats();
+        int total = values.getAsInteger("total");
+        int archived = values.getAsInteger("archived");
+        int notArchived = total - archived;
+
+        //Get pie chart from layout
+        PieChart pieChart = (PieChart) rootView.findViewById(R.id.phrasesPieChart);
+
+        //Add entries
+        List<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry(archived, "Learnt"));
+        entries.add(new PieEntry(notArchived, "To Study"));
+        PieDataSet dataSet = new PieDataSet(entries, "Phrases");
+
+        //Styling dataset
+        dataSet.setValueTextSize(18f);
+        ArrayList<Integer> colors = new ArrayList<>();
+        colors.add(0, ContextCompat.getColor(getContext(), R.color.pieChartArchived));
+        colors.add(1, ContextCompat.getColor(getContext(), R.color.pieChartToStudy));
+        dataSet.setColors(colors);
+        dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setSliceSpace(3f);
+
+        //Adding the data to the chart
+        PieData pieData = new PieData(dataSet);
+        pieChart.setData(pieData);
+
+        //Styling pie chart
+        pieChart.setEntryLabelColor(Color.BLACK);
+        pieChart.setCenterText("Total Phrases:\n" + total);
+        pieChart.setCenterTextSize(18f);
+        Description description = new Description();
+        description.setText("");
+        pieChart.setDescription(description);
+        pieChart.setEntryLabelTextSize(18f);
+        pieChart.setHoleRadius(50);
+        Legend legend = pieChart.getLegend();
+        legend.setTextSize(12f);
+        pieChart.invalidate(); //refresh
+    }
+
+    private void initChallengesPieChart() {
+        ContentValues values = databaseHelper.getChallengesStats();
         int total = values.getAsInteger("total");
         int won = values.getAsInteger("won");
-        int lost = values.getAsInteger("lost");
+        int lost = total - won;
 
         //Get pie chart from layout
         PieChart pieChart = (PieChart) rootView.findViewById(R.id.challengePieChart);
@@ -78,7 +121,7 @@ public class ProgressFragment extends Fragment {
 
         //Styling pie chart
         pieChart.setEntryLabelColor(Color.BLACK);
-        pieChart.setCenterText("Total Challenges:\n"+total);
+        pieChart.setCenterText("Total Challenges:\n" + total);
         pieChart.setCenterTextSize(18f);
         Description description = new Description();
         description.setText("");

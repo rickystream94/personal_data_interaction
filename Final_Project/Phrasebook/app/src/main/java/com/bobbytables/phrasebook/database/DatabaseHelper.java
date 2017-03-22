@@ -396,7 +396,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "LIKE ?", new String[]{"%" + query + "%", "%" + query + "%"});
     }
 
-    public ContentValues getChallengesData() {
+    public ContentValues getChallengesStats() {
         SQLiteDatabase database = this.getReadableDatabase();
 
         //Get total challenges
@@ -412,18 +412,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int won = cursor.getInt(0);
         cursor.close();
 
-        //Get lost challenges
-        cursor = database.rawQuery("SELECT count(*) FROM "+TABLE_CHALLENGES +" WHERE " +
-                ""+KEY_CHALLENGE_CORRECT+"=0",null);
-        cursor.moveToFirst();
-        int lost = cursor.getInt(0);
-        cursor.close();
-
         //Create content values
         ContentValues values = new ContentValues();
         values.put("total",total);
         values.put("won",won);
-        values.put("lost",lost);
         return  values;
+    }
+
+    public ContentValues getPhrasesStats() {
+        SQLiteDatabase database = this.getReadableDatabase();
+
+        //Get total phrases
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_PHRASES, null);
+        cursor.moveToFirst();
+        int total = cursor.getInt(0);
+        cursor.close();
+
+        //Get archived phrases
+        cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_PHRASES + " WHERE " +
+                "" + KEY_ARCHIVED + "=1", null);
+        cursor.moveToFirst();
+        int archived = cursor.getInt(0);
+        cursor.close();
+
+        ContentValues values = new ContentValues();
+        values.put("total", total);
+        values.put("archived", archived);
+        return values;
     }
 }

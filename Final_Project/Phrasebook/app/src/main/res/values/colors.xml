@@ -8,4 +8,6 @@
     <color name="wrongAnser">#ff3333</color>
     <color name="pieChartLost">#ff3333</color>
     <color name="pieChartWon">#53ff1a</color>
+    <color name="pieChartArchived">#33adff</color>
+    <color name="pieChartToStudy">#ffbf80</color>
 </resources>

@@ -23,6 +23,7 @@ public class PhrasesFragment extends Fragment {
     private String motherLanguage;
     private String foreignLanguage;
     private DataRowCursorAdapter rowCursorAdapter;
+    private View rootView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,7 +36,7 @@ public class PhrasesFragment extends Fragment {
             return inflater.inflate(layout, container, false);
         }
         layout = R.layout.fragment_phrases;
-        View rootView = inflater.inflate(layout, container, false);
+        rootView = inflater.inflate(layout, container, false);
 
         motherLanguage = SettingsManager.getInstance(getContext()).getPrefStringValue(SettingsManager
                 .KEY_MOTHER_LANGUAGE);
@@ -57,7 +58,10 @@ public class PhrasesFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String query) {
-                searchPhrase(query);
+                if (query.equals(""))
+                    initPhrasebookData();
+                else
+                    searchPhrase(query);
                 return false;
             }
         });
@@ -65,12 +69,16 @@ public class PhrasesFragment extends Fragment {
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 
         //Creating cursor adapter to attach to list view
+        initPhrasebookData();
+
+        return rootView;
+    }
+
+    private void initPhrasebookData() {
         Cursor dataCursor = getAllPhrases();
         rowCursorAdapter = new DataRowCursorAdapter(getContext(), dataCursor);
         ListView dataListView = (ListView) rootView.findViewById(R.id.dataListView);
         dataListView.setAdapter(rowCursorAdapter);
-
-        return rootView;
     }
 
     public Cursor getAllPhrases() {
