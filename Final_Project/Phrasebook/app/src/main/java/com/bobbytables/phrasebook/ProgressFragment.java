@@ -2,28 +2,46 @@ package com.bobbytables.phrasebook;
 
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.DefaultValueFormatter;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.R.attr.data;
 
 
 /**
@@ -50,7 +68,120 @@ public class ProgressFragment extends Fragment {
         //Initialize charts
         initChallengesPieChart();
         initPhrasesPieChart();
+        initActivityBarChart();
+        initChallengesRatioChart();
         return rootView;
+    }
+
+    private void initChallengesRatioChart() {
+        //Get chart
+        LineChart lineChart = (LineChart) rootView.findViewById(R.id.ratioChart);
+
+        //Retrieve and set entries
+        Cursor cursor = databaseHelper.getChallengesRatio();
+        List<Entry> entries = new ArrayList<>();
+        List<String> dates = new ArrayList<>();
+        int i = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                entries.add(new Entry(i, cursor.getFloat(cursor.getColumnIndex("RATIO"))));
+                dates.add(cursor.getString(cursor.getColumnIndex("DATE")));
+                i++;
+            } while (cursor.moveToNext());
+        }
+
+        //Setting the data to the line chart
+        LineDataSet dataSet = new LineDataSet(entries, "Correctness Ratio");
+
+        //Styling dataset
+        dataSet.setValueTextSize(16f);
+        dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.ratioLine));
+        dataSet.setCircleColor(ContextCompat.getColor(getContext(), R.color.ratioCircle));
+        dataSet.setDrawValues(false);
+
+        //Adding data to the chart
+        LineData data = new LineData(dataSet);
+        lineChart.setData(data);
+
+        //Styling chart
+        lineChart.setScaleYEnabled(false);
+        lineChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
+        lineChart.getXAxis().setDrawGridLines(false);
+        lineChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
+        lineChart.getAxisRight().setEnabled(false);
+        Description description = new Description();
+        description.setText("");
+        lineChart.setDescription(description);
+        Legend legend = lineChart.getLegend();
+        legend.setTextSize(12f);
+        ;
+        lineChart.invalidate();
+    }
+
+    private void initActivityBarChart() {
+        //Get bar chart from layout
+        BarChart barChart = (BarChart) rootView.findViewById(R.id.activityBarChart);
+
+        //Add entries
+        Cursor cursor = databaseHelper.getActivityStats();
+        List<BarEntry> entries = new ArrayList<>();
+        List<String> dates = new ArrayList<>();
+        int i = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                entries.add(new BarEntry(i, cursor.getInt(1), cursor.getString(0)));
+                dates.add(cursor.getString(0));
+                i++;
+            } while (cursor.moveToNext());
+        }
+        BarDataSet dataSet = new BarDataSet(entries, "Frequency");
+
+        //Styling dataset
+        dataSet.setValueTextSize(18f);
+        dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setColor(ContextCompat.getColor(getContext(), R.color.frequencyChart));
+        dataSet.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return String.valueOf((int) value);
+            }
+        });
+
+        //Adding the data to the chart
+        BarData barData = new BarData(dataSet);
+        barChart.setData(barData);
+
+        //Styling bar chart
+        barChart.setScaleYEnabled(false);
+        barChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
+        barChart.getXAxis().setDrawGridLines(false);
+        barChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getAxisLeft().setGranularity(1f);
+        Description description = new Description();
+        description.setText("");
+        barChart.setDescription(description);
+        Legend legend = barChart.getLegend();
+        legend.setTextSize(12f);
+        barChart.invalidate();
+    }
+
+    /**
+     * XAxis formatter to display correctly dates on XAxis
+     */
+    private static class DateXAxisValueFormatter implements IAxisValueFormatter {
+        private List<String> dates;
+
+        public DateXAxisValueFormatter(List<String> dates) {
+            this.dates = dates;
+        }
+
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+            int index = (int) value;
+            return dates.get(index);
+        }
     }
 
     private void initPhrasesPieChart() {
