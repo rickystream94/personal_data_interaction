@@ -69,7 +69,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:onClick="createUser"
-        android:text="@string/create_user"/>
+        android:text="@string/create_user"
+        style="@style/Widget.AppCompat.Button.Colored"/>
 
 
 </RelativeLayout>
