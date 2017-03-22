@@ -14,9 +14,13 @@ import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.DefaultValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,23 +76,18 @@ public class ProgressFragment extends Fragment {
         dataSet.setColors(colors);
         dataSet.setValueTextColor(Color.BLACK);
         dataSet.setSliceSpace(3f);
+        dataSet.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return ((int) value) + "";
+            }
+        });
 
         //Adding the data to the chart
         PieData pieData = new PieData(dataSet);
         pieChart.setData(pieData);
 
-        //Styling pie chart
-        pieChart.setEntryLabelColor(Color.BLACK);
-        pieChart.setCenterText("Total Phrases:\n" + total);
-        pieChart.setCenterTextSize(18f);
-        Description description = new Description();
-        description.setText("");
-        pieChart.setDescription(description);
-        pieChart.setEntryLabelTextSize(18f);
-        pieChart.setHoleRadius(50);
-        Legend legend = pieChart.getLegend();
-        legend.setTextSize(12f);
-        pieChart.invalidate(); //refresh
+        setStandardPieChartStyle(pieChart, "Total Phrases:\n" + total);
     }
 
     private void initChallengesPieChart() {
@@ -114,14 +113,24 @@ public class ProgressFragment extends Fragment {
         dataSet.setColors(colors);
         dataSet.setValueTextColor(Color.BLACK);
         dataSet.setSliceSpace(3f);
+        dataSet.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return ((int) value) + "";
+            }
+        });
 
         //Adding the data to the chart
         PieData pieData = new PieData(dataSet);
         pieChart.setData(pieData);
 
+        setStandardPieChartStyle(pieChart, "Total Challenges:\n" + total);
+    }
+
+    private void setStandardPieChartStyle(PieChart pieChart, String centerText) {
         //Styling pie chart
         pieChart.setEntryLabelColor(Color.BLACK);
-        pieChart.setCenterText("Total Challenges:\n" + total);
+        pieChart.setCenterText(centerText);
         pieChart.setCenterTextSize(18f);
         Description description = new Description();
         description.setText("");
