@@ -474,20 +474,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return values;
     }
 
+    /**
+     * Currently limited to 1 year of data
+     *
+     * @return
+     */
     public Cursor getActivityStats() {
         SQLiteDatabase database = this.getReadableDatabase();
         return database.rawQuery("SELECT date(" + KEY_CREATED_ON + ") AS DATE,count(*) FROM " +
                 "" + TABLE_PHRASES + "" +
-                " GROUP BY date(" + KEY_CREATED_ON + ") ORDER BY DATE ASC", null);
+                " GROUP BY date(" + KEY_CREATED_ON + ") ORDER BY DATE ASC LIMIT 365", null);
     }
 
+    /**
+     * Currently limited to 1 year of data
+     * @return
+     */
     public Cursor getChallengesRatio() {
         SQLiteDatabase database = this.getReadableDatabase();
         String rawQuery = "SELECT date(" + KEY_CREATED_ON + ") as DATE, sum(CASE WHEN " +
                 "" + KEY_CHALLENGE_CORRECT + "=1 THEN 1 ELSE 0 END)*1.0/count(*) AS RATIO " +
                 "FROM " +
                 "" + TABLE_CHALLENGES + " GROUP BY date(" + KEY_CREATED_ON + ") ORDER BY DATE" +
-                " ASC";
+                " ASC LIMIT 365";
         return database.rawQuery(rawQuery, null);
     }
 }
