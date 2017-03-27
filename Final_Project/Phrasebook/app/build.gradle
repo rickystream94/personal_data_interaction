@@ -31,5 +31,6 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.3.0'
     compile 'jp.wasabeef:recyclerview-animators:2.2.6'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
+    compile 'hanks.xyz:htextview-library:0.1.5'
     testCompile 'junit:junit:4.12'
 }

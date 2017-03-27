@@ -103,6 +103,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 break;
             case R.id.export_data:
                 checkWritePermissions();
+                break;
+            case R.id.reset_xp:
+                settingsManager.resetXP();
+                Toast.makeText(this, "Successfully reset!", Toast
+                        .LENGTH_SHORT)
+                        .show();
+                break;
             default:
                 break;
         }

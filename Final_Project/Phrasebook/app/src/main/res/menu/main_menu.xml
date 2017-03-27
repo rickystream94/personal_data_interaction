@@ -6,4 +6,6 @@
     <item
         android:title="Delete Data"
         android:id="@+id/delete_data"/>
+    <item android:title="Reset XP"
+          android:id="@+id/reset_xp"/>
 </menu>

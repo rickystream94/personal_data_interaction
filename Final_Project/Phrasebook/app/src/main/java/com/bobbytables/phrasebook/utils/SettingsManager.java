@@ -81,7 +81,7 @@ public class SettingsManager {
         editor.putString(KEY_FOREIGN_LANGUAGE, foreignLanguage.toUpperCase());
         editor.putBoolean(KEY_USER_EXISTS, true);
         editor.putInt(KEY_TOTAL_XP,0);
-        editor.putInt(KEY_LEVEL,1);
+        editor.putInt(KEY_LEVEL,0);
         editor.putString(KEY_CREATED,currentTimeString);
         editor.commit();
     }
@@ -148,5 +148,11 @@ public class SettingsManager {
         userData.put(KEY_TOTAL_XP, getPrefIntValue(KEY_TOTAL_XP));
         userData.put(KEY_GAMIFICATION, getPrefBoolValue(KEY_GAMIFICATION) ? 1 : 0);
         return userData;
+    }
+
+    public void resetXP() {
+        editor.putInt(KEY_TOTAL_XP,0);
+        editor.putInt(KEY_LEVEL,0);
+        editor.commit();
     }
 }
