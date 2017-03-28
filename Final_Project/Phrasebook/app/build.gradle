@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "com.bobbytables.phrasebook"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -32,5 +32,7 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:2.2.6'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
     compile 'hanks.xyz:htextview-library:0.1.5'
+    compile 'com.github.gigamole.arcprogressstackview:library:1.0.3'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
     testCompile 'junit:junit:4.12'
 }

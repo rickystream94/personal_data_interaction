@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 
 import com.bobbytables.phrasebook.MainActivity;
 import com.bobbytables.phrasebook.NewUserActivity;
@@ -11,8 +12,11 @@ import com.bobbytables.phrasebook.NewUserActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 /**
  * Created by ricky on 15/03/2017.
@@ -31,7 +35,7 @@ public class SettingsManager {
     private static final String KEY_IS_FIRST_TIME = "isFirstTime"; //might be used for launch
     // tutorial
     // User name
-    private static final String KEY_NICKNAME = "nickname";
+    public static final String KEY_NICKNAME = "nickname";
     public static final String KEY_MOTHER_LANGUAGE = "motherLanguage";
     public static final String KEY_FOREIGN_LANGUAGE = "foreignLanguage";
     public static final String KEY_TOTAL_XP = "totalXP";
@@ -39,23 +43,25 @@ public class SettingsManager {
     public static final String KEY_CREATED = "created";
     //GAMIFICATION INCLUDED OR NOT
     private static final String KEY_GAMIFICATION = "Gamification";
+    public static final String KEY_PROFILE_PIC = "profilePic";
 
     private SettingsManager(Context context) {
         this.context = context;
         preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = preferences.edit();
-        editor.putBoolean(KEY_GAMIFICATION, false); //Change this for future release!!!
+        editor.putBoolean(KEY_GAMIFICATION, true); //Change this for future release!!!
         editor.apply();
         instance = this;
     }
 
     /**
      * Singleton method to retrieve settings manager
+     *
      * @param context
      * @return
      */
     public static SettingsManager getInstance(Context context) {
-        if (instance==null)
+        if (instance == null)
             return new SettingsManager(context);
         return instance;
     }
@@ -80,62 +86,79 @@ public class SettingsManager {
         editor.putString(KEY_MOTHER_LANGUAGE, motherLanguage.toUpperCase());
         editor.putString(KEY_FOREIGN_LANGUAGE, foreignLanguage.toUpperCase());
         editor.putBoolean(KEY_USER_EXISTS, true);
-        editor.putInt(KEY_TOTAL_XP,0);
-        editor.putInt(KEY_LEVEL,0);
-        editor.putString(KEY_CREATED,currentTimeString);
+        editor.putInt(KEY_TOTAL_XP, 0);
+        editor.putInt(KEY_LEVEL, 0);
+        editor.putString(KEY_CREATED, currentTimeString);
+        editor.putString(KEY_PROFILE_PIC, "DEFAULT");
         editor.commit();
     }
 
     /**
      * Get a generic shared preference string value given a specific key
+     *
      * @param key
      * @return
      */
     public String getPrefStringValue(String key) {
-        return preferences.getString(key,"");
+        return preferences.getString(key, "");
     }
 
     /**
      * Get a generic shared preference integer value given a specific key
+     *
      * @param key
      * @return
      */
     public int getPrefIntValue(String key) {
-        return preferences.getInt(key,-1);
+        return preferences.getInt(key, -1);
     }
 
     /**
      * Get a generic shared preference boolean value given a specific key
+     *
      * @param key
      * @return
      */
     public boolean getPrefBoolValue(String key) {
-        return preferences.getBoolean(key,false);
+        return preferences.getBoolean(key, false);
     }
 
     /**
      * It will be used to update the current level of the user
+     *
      * @param key
      * @param value
      */
-    public void updatePrefValue(String key,int value) {
+    public void updatePrefValue(String key, int value) {
         editor.putInt(key, value);
         editor.commit();
     }
 
     /**
+     * Used to update profile pic
+     * @param key
+     * @param value
+     */
+    public void updatePrefValue(String key, String value) {
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    /**
      * It will be used to add experience points
+     *
      * @param key
      * @param newValue
      */
-    public void addValue(String key,int newValue) {
-        int currentValue = preferences.getInt(key,0);
-        editor.putInt(key,currentValue+newValue);
+    public void addValue(String key, int newValue) {
+        int currentValue = preferences.getInt(key, 0);
+        editor.putInt(key, currentValue + newValue);
         editor.commit();
     }
 
     /**
      * Returns all user's data in a JSONObject, used to export data
+     *
      * @return
      */
     public JSONObject getUserData() throws JSONException {
@@ -151,8 +174,8 @@ public class SettingsManager {
     }
 
     public void resetXP() {
-        editor.putInt(KEY_TOTAL_XP,0);
-        editor.putInt(KEY_LEVEL,0);
+        editor.putInt(KEY_TOTAL_XP, 0);
+        editor.putInt(KEY_LEVEL, 0);
         editor.commit();
     }
 }

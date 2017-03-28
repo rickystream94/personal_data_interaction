@@ -24,6 +24,7 @@ import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
+import static com.bobbytables.phrasebook.R.id.start;
 import static com.bobbytables.phrasebook.R.id.tabLayout;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
@@ -110,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                         .LENGTH_SHORT)
                         .show();
                 break;
+            case R.id.profile:
+                Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
+                startActivity(i);
             default:
                 break;
         }
