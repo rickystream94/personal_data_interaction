@@ -20,7 +20,7 @@ public class XPManager {
     public static final int XP_CHALLENGE_WON = 10;
     public static final int XP_BONUS_ARCHIVED = 20;
     private static final int MIN_LEVEL = 0;
-    private static final int MAX_LEVEL = 10;
+    public static final int MAX_LEVEL = 10;
     private static final int LEVEL_1_XP = 50;
     private static final int LEVEL_2_XP = LEVEL_1_XP * 2;
     private static final int LEVEL_3_XP = LEVEL_2_XP * 2;
@@ -69,8 +69,12 @@ public class XPManager {
         if (currentLevel == MAX_LEVEL)
             return false;
         int XpToLevelUp = levelsXP.get(currentLevel + 1) - currentXp;
-        Log.d("DEBUG XP POINTS","Missing "+XpToLevelUp+" XP points to level up");
+        Log.d("DEBUG XP POINTS", "Missing " + XpToLevelUp + " XP points to level up");
         return XpToLevelUp <= 0;
+    }
+
+    public int getXpPerLevel(int level) {
+        return levelsXP.get(level);
     }
 
     public int getCurrentXp() {

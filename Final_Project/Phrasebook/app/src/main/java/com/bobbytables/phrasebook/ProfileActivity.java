@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -17,7 +18,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.bobbytables.phrasebook.utils.SettingsManager;
+import com.hanks.htextview.HTextView;
 
 import java.io.File;
 
@@ -28,6 +31,7 @@ public class ProfileActivity extends AppCompatActivity {
     private int PICK_IMAGE_REQUEST = 1;
     private CircleImageView profileImage;
     private SettingsManager settingsManager;
+    private XPManager xpManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +39,12 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         settingsManager = SettingsManager.getInstance(getApplicationContext());
+        xpManager = XPManager.getInstance(getApplicationContext());
         profileImage = (CircleImageView) findViewById(R.id.profileImage);
 
         //Set nickname text
-        TextView nicknameText = (TextView) findViewById(R.id.nicknameText);
-        nicknameText.setText(settingsManager.getPrefStringValue(SettingsManager.KEY_NICKNAME));
+        HTextView nicknameText = (HTextView) findViewById(R.id.nicknameText);
+        nicknameText.animateText(settingsManager.getPrefStringValue(SettingsManager.KEY_NICKNAME));
 
         //Load profile picture
         String path = settingsManager.getPrefStringValue(SettingsManager
@@ -48,6 +53,30 @@ public class ProfileActivity extends AppCompatActivity {
             loadProfilePic(path);
         } else
             profileImage.setImageResource(R.drawable.camera);
+
+        //Load experience progress bar and level bar
+        RoundCornerProgressBar xpPointsBar = (RoundCornerProgressBar) findViewById(R.id.xpPointsBar);
+        RoundCornerProgressBar levelBar = (RoundCornerProgressBar) findViewById(R.id.levelsBar);
+        TextView currentLevelLabel = (TextView) findViewById(R.id.currentLevelLabel);
+        TextView currentXpLabel = (TextView) findViewById(R.id.currentXpLabel);
+        int currentLevel = xpManager.getCurrentLevel();
+        int currentXp = xpManager.getCurrentXp();
+        int currentLevelMinExp = xpManager.getXpPerLevel(currentLevel);
+        int nextLevelXp = xpManager.getXpPerLevel(currentLevel + 1);
+        currentLevelLabel.setText("Level " + currentLevel + "/" + XPManager.MAX_LEVEL);
+        currentXpLabel.setText(currentXp + "/" + nextLevelXp + " XP");
+        if (xpManager.getCurrentLevel() == XPManager.MAX_LEVEL) {
+            int XPmax = xpManager.getXpPerLevel(currentLevel);
+            xpPointsBar.setMax(XPmax);
+            xpPointsBar.setProgress(XPmax);
+        } else {
+            xpPointsBar.setMax(nextLevelXp - currentLevelMinExp);
+            xpPointsBar.setProgress(currentXp - currentLevelMinExp);
+        }
+        levelBar.setMax(XPManager.MAX_LEVEL);
+        levelBar.setProgress(currentLevel);
+        xpPointsBar.invalidate();
+        levelBar.invalidate();
     }
 
     /**

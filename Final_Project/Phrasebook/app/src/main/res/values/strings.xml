@@ -22,4 +22,5 @@
     <string name="save_and_close">Save and Close</string>
     <string name="empty_database_text">Your phrasebook is currently empty!\nStart adding something by pressing the \'+\' button below!</string>
     <string name="search_hint">Search in phrasebook…</string>
+    <string name="experience_points">Experience Points</string>
 </resources>
