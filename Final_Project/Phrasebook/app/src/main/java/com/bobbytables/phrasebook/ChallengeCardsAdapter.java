@@ -145,7 +145,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                         holder.newLevelText.setAnimateType(HTextViewType.SCALE);
                         holder.newLevelText.animateText("Level " + newLevel + " reached!");
                         xpManager.addExperience(XPManager.XP_BONUS_ARCHIVED);
-                        xp+=XPManager.XP_BONUS_ARCHIVED;
+                        xp += XPManager.XP_BONUS_ARCHIVED;
                     }
 
                     holder.xpText.setVisibility(View.VISIBLE);
@@ -153,6 +153,8 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                     holder.xpText.animateText("+" + xp + "XP!");
                     Log.d("XP DEBUG", "Added XP points, new XP: " + xpManager.getCurrentXp());
                 }
+
+                //TODO: check badges achieved
 
                 //Update UI user feedback
                 int editTextBackgroundColor = result ? ContextCompat.getColor(context, R.color
@@ -165,6 +167,8 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                             "memory.", Toast.LENGTH_SHORT).show();
                     Log.d("DEBUG", "Word correctly archived!");
                 }
+                //TODO: give eventually feedback about badges unlocked (easiest way with custom
+                // dialog)
                 holder.translation.setBackgroundColor(editTextBackgroundColor);
                 view.setVisibility(View.INVISIBLE);
                 holder.nextChallenge.setVisibility(View.VISIBLE);
