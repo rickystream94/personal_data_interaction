@@ -2,20 +2,28 @@ package com.bobbytables.phrasebook.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.bobbytables.phrasebook.R;
+import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -26,7 +34,9 @@ import java.util.Date;
 public class DatabaseHelper extends SQLiteOpenHelper {
     //Database info
     private static final String DATABASE_NAME = "phrasebookDatabase";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
+    private static final String TAG = DatabaseHelper.class.getName();
+    private Context context;
 
     // Table Names
     public static final String TABLE_PHRASES = "phrases";
@@ -47,8 +57,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Badges Table Columns
     private static final String KEY_BADGES_ID = "id";
-    public static final String KEY_BADGE_TYPE_ID = "badgeId";
-
+    public static final String KEY_BADGE_ICON_RESOURCE = "badgeIcon";
+    public static final String KEY_BADGE_NAME = "badgeName";
     //Common columns
     public static final String KEY_CREATED_ON = "createdOn";
 
@@ -73,7 +83,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_BADGES_TABLE = "CREATE TABLE " + TABLE_BADGES +
             "(" +
             KEY_BADGES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
-            KEY_BADGE_TYPE_ID + " INTEGER, " +
+            KEY_BADGE_NAME + " TEXT, " +
+            KEY_BADGE_ICON_RESOURCE + " INTEGER, " +
             KEY_CREATED_ON + " TEXT)";
 
     private static DatabaseHelper instance;
@@ -81,6 +92,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     public static synchronized DatabaseHelper getInstance(Context context) {
@@ -90,20 +102,122 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return instance;
     }
 
-    // Called when the database is created for the FIRST time.
-    // If a database already exists on disk with the same DATABASE_NAME, this method will NOT be called.
+    /**
+     * Called when the database is created for the FIRST time.
+     * If a database already exists on disk with the same DATABASE_NAME, this method will NOT be called.
+     * It will be called ONLY when user installs the app for the first time. If he's upgrading,
+     * onUpgrade() will be invoked instead.
+     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_PHRASES_TABLE);
         sqLiteDatabase.execSQL(CREATE_CHALLENGES_TABLE);
         sqLiteDatabase.execSQL(CREATE_BADGES_TABLE);
-        //Badges table must be filled here
+        //TODO: Badges table must be populated correctly here! New in version 2 of DB!
+        try {
+            for (int i = 0; i < 20; i++) {
+                DatabaseModel dataObject = new BadgeModel("Example", R.drawable.badge, TABLE_BADGES);
+                sqLiteDatabase.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Invoked every time the user upgrades the app. It should be implemented according to
+     * whether the DB version has changed or not (if no changes were made, it should be transparent)
+     *
+     * @param db         database
+     * @param oldVersion old DB version
+     * @param newVersion new DB version
+     */
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //We need to update the gamification and the profile pic, since they were not specified
+        // in version 1. Besides, level was set by mistake to 1. Must be set to 0!
+        if (oldVersion == 1) {
+            SettingsManager settingsManager = SettingsManager.getInstance(context);
+            settingsManager.updatePrefValue(SettingsManager.KEY_LEVEL, 0);
+            settingsManager.updateBoolValue(SettingsManager.KEY_GAMIFICATION, true);
+            settingsManager.updatePrefValue(SettingsManager.KEY_PROFILE_PIC, "DEFAULT");
+        }
+
+        /*TODO: Change SQL script from_1_to_2.sql with correct info about badges! Now it's still
+        placeholder! */
+        Log.e(TAG, "Updating table from " + oldVersion + " to " + newVersion);
+        // You will not need to modify this unless you need to do some android specific things.
+        // When upgrading the database, all you need to do is add a file to the assets folder and name it:
+        // from_1_to_2.sql with the version that you are upgrading to as the last version.
+        try {
+            for (int i = oldVersion; i < newVersion; ++i) {
+                String migrationName = String.format("from_%d_to_%d.sql", i, (i + 1));
+                Log.d(TAG, "Looking for migration file: " + migrationName);
+                readAndExecuteSQLScript(db, context, migrationName);
+            }
+        } catch (Exception exception) {
+            Log.e(TAG, "Exception running upgrade script:", exception);
+        }
+    }
+
+    /**
+     * Invoked on upgrade of the DB, allows to execute all the needed SQL scripts in the assets
+     * folder. These must be placed properly and contain all the needed SQL statements to upgrade
+     * the DB from an old version to a new version (drops, creates, updates etc.)
+     *
+     * @param db
+     * @param ctx
+     * @param fileName
+     */
+    private void readAndExecuteSQLScript(SQLiteDatabase db, Context ctx, String fileName) {
+        if (TextUtils.isEmpty(fileName)) {
+            Log.d(TAG, "SQL script file name is empty");
+            return;
+        }
+
+        Log.d(TAG, "Script found. Executing...");
+        AssetManager assetManager = ctx.getAssets();
+        BufferedReader reader = null;
+
+        try {
+            InputStream is = assetManager.open(fileName);
+            InputStreamReader isr = new InputStreamReader(is);
+            reader = new BufferedReader(isr);
+            executeSQLScript(db, reader);
+        } catch (IOException e) {
+            Log.e(TAG, "IOException:", e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "IOException:", e);
+                }
+            }
+        }
 
     }
+
+    /**
+     * Executes the SQL script defined by the file (reader) contained in assets folder
+     *
+     * @param db
+     * @param reader
+     * @throws IOException
+     */
+    private void executeSQLScript(SQLiteDatabase db, BufferedReader reader) throws IOException {
+        String line;
+        StringBuilder statement = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            statement.append(line);
+            statement.append("\n");
+            if (line.endsWith(";")) {
+                db.execSQL(statement.toString());
+                statement = new StringBuilder();
+            }
+        }
+    }
+
 
     /**
      * Inserts a new data object in a specified table
@@ -416,10 +530,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public Cursor getDataFromTable(String table) {
         SQLiteDatabase database = this.getReadableDatabase();
-        return database.rawQuery("SELECT ID AS _id,* FROM " + table + " ORDER BY " +
+        String query;
+        switch (table) {
+            case TABLE_PHRASES:
+                query = "SELECT ID AS _id,* FROM " + table + " ORDER BY " +
                         "datetime(" + KEY_CREATED_ON + ")" +
-                        " DESC LIMIT 30",
-                null);
+                        " DESC LIMIT 30";
+                break;
+            case TABLE_BADGES:
+                query = "SELECT ID AS _id,* FROM " + table;
+                break;
+            default:
+                query = ""; //won't happen ideally
+        }
+        return database.rawQuery(query, null);
     }
 
     public Cursor searchPhrase(String query) {
@@ -488,6 +612,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Currently limited to 1 year of data
+     *
      * @return
      */
     public Cursor getChallengesRatio() {
