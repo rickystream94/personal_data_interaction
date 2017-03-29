@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,8 @@ import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
+import com.hanks.htextview.HTextView;
+import com.hanks.htextview.HTextViewType;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,6 +38,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     private static final int NUMBER_OF_CARDS = 1;
     private DatabaseHelper databaseHelper;
     private AlertDialogManager alertDialogManager;
+    private XPManager xpManager;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -43,10 +47,12 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         TextView foreignLanguageText;
         TextView motherLanguageText;
         TextView correctTranslation;
+        HTextView newLevelText;
         EditText translation;
         CardView cardView;
         Button checkButton;
         Button nextChallenge;
+        HTextView xpText;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -54,9 +60,11 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
             motherLanguageText = (TextView) itemView.findViewById(R.id.motherLanguageText);
             translation = (EditText) itemView.findViewById(R.id.translation);
             correctTranslation = (TextView) itemView.findViewById(R.id.correctTranslation);
+            newLevelText = (HTextView) itemView.findViewById(R.id.newLevel);
             cardView = (CardView) itemView.findViewById(R.id.challengeCardView);
             checkButton = (Button) itemView.findViewById(R.id.checkTranslation);
             nextChallenge = (Button) itemView.findViewById(R.id.nextChallenge);
+            xpText = (HTextView) itemView.findViewById(R.id.xpText);
         }
     }
 
@@ -71,6 +79,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
         databaseHelper = DatabaseHelper.getInstance(context);
         alertDialogManager = new AlertDialogManager();
+        this.xpManager = XPManager.getInstance(context);
     }
 
     // Create new views (invoked by the layout manager)
@@ -126,6 +135,25 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                     alertDialogManager.showAlertDialog(context, "Error!", e.getMessage(), false);
                 }
 
+                //Check XP and Level
+                if (result) {
+                    int xp = XPManager.XP_CHALLENGE_WON;
+                    xpManager.addExperience(xp);
+                    if (xpManager.checkLevelUp()) {
+                        int newLevel = xpManager.levelUp();
+                        holder.newLevelText.setVisibility(View.VISIBLE);
+                        holder.newLevelText.setAnimateType(HTextViewType.SCALE);
+                        holder.newLevelText.animateText("Level " + newLevel + " reached!");
+                        xpManager.addExperience(XPManager.XP_BONUS_ARCHIVED);
+                        xp+=XPManager.XP_BONUS_ARCHIVED;
+                    }
+
+                    holder.xpText.setVisibility(View.VISIBLE);
+                    holder.xpText.setAnimateType(HTextViewType.ANVIL);
+                    holder.xpText.animateText("+" + xp + "XP!");
+                    Log.d("XP DEBUG", "Added XP points, new XP: " + xpManager.getCurrentXp());
+                }
+
                 //Update UI user feedback
                 int editTextBackgroundColor = result ? ContextCompat.getColor(context, R.color
                         .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnser);
@@ -149,6 +177,9 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                 holder.translation.setBackgroundColor(Color.parseColor("#00000000"));
                 holder.correctTranslation.setVisibility(View.INVISIBLE);
                 holder.checkButton.setVisibility(View.VISIBLE);
+                holder.newLevelText.setVisibility(View.INVISIBLE);
+                holder.xpText.setVisibility(View.INVISIBLE);
+                holder.xpText.setText("");
                 holder.translation.setText("");
                 challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
                 //notifyItemInserted(getItemCount());
