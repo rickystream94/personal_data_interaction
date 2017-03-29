@@ -47,7 +47,7 @@
             app:rcBackgroundPadding="5dp"
             app:rcMax="100"
             app:rcProgress="50"
-            app:rcProgressColor="@color/primary_light"
+            app:rcProgressColor="@color/xpBarProgressBg"
             app:rcRadius="20dp"
             app:rcReverse="false"/>
 
@@ -78,11 +78,11 @@
             android:layout_below="@id/xpPointsBar"
             android:layout_centerHorizontal="true"
             android:layout_margin="10dp"
-            app:rcBackgroundColor="@color/colorAccent"
+            app:rcBackgroundColor="@color/levelBarBg"
             app:rcBackgroundPadding="5dp"
             app:rcMax="100"
             app:rcProgress="20"
-            app:rcProgressColor="@color/primary_text"
+            app:rcProgressColor="@color/levelBarProgressBg"
             app:rcRadius="20dp"
             app:rcReverse="false"/>
 
