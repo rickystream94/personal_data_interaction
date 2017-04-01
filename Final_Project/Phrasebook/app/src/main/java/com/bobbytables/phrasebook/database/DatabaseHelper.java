@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.bobbytables.phrasebook.R;
-import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
 import org.json.JSONArray;
@@ -56,7 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String KEY_CHALLENGE_CORRECT = "correct";
 
     // Badges Table Columns
-    private static final String KEY_BADGES_ID = "id";
+    public static final String KEY_BADGES_ID = "id";
     public static final String KEY_BADGE_ICON_RESOURCE = "badgeIcon";
     public static final String KEY_BADGE_NAME = "badgeName";
     //Common columns
@@ -623,5 +622,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "" + TABLE_CHALLENGES + " GROUP BY date(" + KEY_CREATED_ON + ") ORDER BY DATE" +
                 " ASC LIMIT 365";
         return database.rawQuery(rawQuery, null);
+    }
+
+    public int getBadgesCount() {
+        SQLiteDatabase database = this.getReadableDatabase();
+        String rawQuery = "SELECT COUNT(*) FROM " + TABLE_BADGES;
+        Cursor cursor = database.rawQuery(rawQuery, null);
+        int count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+
+    public Cursor performRawQuery(String query) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        return database.rawQuery(query, null);
     }
 }

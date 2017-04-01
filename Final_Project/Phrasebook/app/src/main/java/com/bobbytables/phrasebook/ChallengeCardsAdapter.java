@@ -39,6 +39,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     private DatabaseHelper databaseHelper;
     private AlertDialogManager alertDialogManager;
     private XPManager xpManager;
+    private BadgeManager badgeManager;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -80,6 +81,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         databaseHelper = DatabaseHelper.getInstance(context);
         alertDialogManager = new AlertDialogManager();
         this.xpManager = XPManager.getInstance(context);
+        this.badgeManager = BadgeManager.getInstance(context);
     }
 
     // Create new views (invoked by the layout manager)
@@ -135,8 +137,8 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                     alertDialogManager.showAlertDialog(context, "Error!", e.getMessage(), false);
                 }
 
-                //Check XP and Level
-                if (result) {
+                //Check XP and Level (gain XP only if not archived!)
+                if (result && !isArchived) {
                     int xp = XPManager.XP_CHALLENGE_WON;
                     xpManager.addExperience(xp);
                     if (xpManager.checkLevelUp()) {
