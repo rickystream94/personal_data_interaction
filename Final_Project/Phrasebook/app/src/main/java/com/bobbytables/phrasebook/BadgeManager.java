@@ -65,7 +65,7 @@ public class BadgeManager {
         }
 
         //TODO: for all the achieved badges, update the created_on key in the DB
-        //using the newAchievedBadges because it has the unique ID
+        //TODO: and the corresponding correct icon
 
         List<String> newAchievedBadgesNames = new ArrayList<>();
         for (Integer id : newAchievedBadges)
@@ -82,13 +82,6 @@ public class BadgeManager {
         return cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_BADGE_NAME));
     }
 
-    /**
-     * Main method that asks for the specific queries to lookup for unlocked badges related to
-     * phrases
-     * TODO: CORRECT BADGE IDS!
-     *
-     * @return an array containing the IDs of unlocked badges
-     */
     private List<Integer> checkPhrasesBadgeAchieved() {
         List<Integer> achievedBadgesIds = new ArrayList<>();
         Cursor cursor;
@@ -107,49 +100,49 @@ public class BadgeManager {
 
         //Check Beginner (10 added), Novice (100 added), Expert (250 added)
         cursor = databaseHelper.performRawQuery(queryCount);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: change the count to 10
-            achievedBadgesIds.add(1);
-        else if (cursor.getInt(0) == 100)
-            achievedBadgesIds.add(3);
-        else if (cursor.getInt(0) == 250)
-            achievedBadgesIds.add(5);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: change the count to 10
+                achievedBadgesIds.add(1);
+            else if (cursor.getInt(0) == 100)
+                achievedBadgesIds.add(3);
+            else if (cursor.getInt(0) == 250)
+                achievedBadgesIds.add(5);
+        }
 
         //Check added 10 in 1 day
         cursor = databaseHelper.performRawQuery(queryOneDay);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
-            achievedBadgesIds.add(8);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+                achievedBadgesIds.add(8);
+        }
 
         //Check "I like it difficult", "Get on my level"
         cursor = databaseHelper.performRawQuery(queryLongPhrase);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 1)
-            achievedBadgesIds.add(11);
-        else if (cursor.getInt(0) == 2) //TODO: Change the count to 5
-            achievedBadgesIds.add(12);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 1)
+                achievedBadgesIds.add(11);
+            else if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+                achievedBadgesIds.add(12);
+        }
 
         //Check "Inspiring dreams"
         cursor = databaseHelper.performRawQuery(queryNight);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 5
-            achievedBadgesIds.add(16);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+                achievedBadgesIds.add(16);
+        }
 
         //Check "Sudden inspiration"
         cursor = databaseHelper.performRawQuery(query15Mins);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: change the count to 10
-            achievedBadgesIds.add(17);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: change the count to 10
+                achievedBadgesIds.add(17);
+        }
 
         cursor.close();
         return achievedBadgesIds;
     }
 
-    /**
-     * TODO: CORRECT BADGE IDS!
-     *
-     * @return
-     */
     private List<Integer> checkChallengesBadgeAchieved() {
         List<Integer> achievedBadgesIds = new ArrayList<>();
         Cursor cursor;
@@ -172,20 +165,22 @@ public class BadgeManager {
         String queryCount = "SELECT COUNT(*) FROM " + TABLE_CHALLENGES + " WHERE " +
                 CHALLENGE_CORRECT + "=1";
         cursor = databaseHelper.performRawQuery(queryCount);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
-            achievedBadgesIds.add(2);
-        else if (cursor.getInt(0) == 4) //TODO: Change the count to 100
-            achievedBadgesIds.add(4);
-        else if (cursor.getInt(0) == 8) //TODO: Change the count to 250
-            achievedBadgesIds.add(6);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+                achievedBadgesIds.add(2);
+            else if (cursor.getInt(0) == 4) //TODO: Change the count to 100
+                achievedBadgesIds.add(4);
+            else if (cursor.getInt(0) == 8) //TODO: Change the count to 250
+                achievedBadgesIds.add(6);
+        }
 
         //Check 10 guessed in one day
         cursor = databaseHelper.performRawQuery(queryOneDay + " AND " + DatabaseHelper
                 .KEY_CHALLENGE_CORRECT + "=1");
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
-            achievedBadgesIds.add(7);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+                achievedBadgesIds.add(7);
+        }
 
         //Check "High fidelity" and "Not too shabby"
         String queryInRow = "SELECT COUNT(*) FROM (SELECT * FROM " + TABLE_CHALLENGES + " ORDER BY " +
@@ -193,35 +188,41 @@ public class BadgeManager {
         String queryCorrectInRow = queryInRow + "1";
         String queryIncorrectInRow = queryInRow + "0";
         cursor = databaseHelper.performRawQuery(queryCorrectInRow);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
-            achievedBadgesIds.add(9);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+                achievedBadgesIds.add(9);
+        }
         cursor = databaseHelper.performRawQuery(queryIncorrectInRow);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
-            achievedBadgesIds.add(10);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+                achievedBadgesIds.add(10);
+        }
 
         //Check "Rise and Shine", "Night owl" and "No sleep"
         cursor = databaseHelper.performRawQuery(queryMorning);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 5
-            achievedBadgesIds.add(13);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+                achievedBadgesIds.add(13);
+        }
 
         cursor = databaseHelper.performRawQuery(queryNight);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 5
-            achievedBadgesIds.add(14);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+                achievedBadgesIds.add(14);
+        }
 
         cursor = databaseHelper.performRawQuery(queryNoSleep);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 5
-            achievedBadgesIds.add(15);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+                achievedBadgesIds.add(15);
+        }
 
         //Check "Extreme stamina"
         cursor = databaseHelper.performRawQuery(query15Mins);
-        cursor.moveToFirst();
-        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
-            achievedBadgesIds.add(18);
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+                achievedBadgesIds.add(18);
+        }
 
         cursor.close();
         return achievedBadgesIds;
