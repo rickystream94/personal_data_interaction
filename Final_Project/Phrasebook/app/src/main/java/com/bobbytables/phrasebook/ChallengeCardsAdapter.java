@@ -183,9 +183,10 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         //TODO: check badges achieved
         //Check achieved badges
         List<String> achievedBadges = badgeManager.checkNewBadges(BadgeManager.TABLE_CHALLENGES);
-        if (achievedBadges.size() > 0)
+        if (achievedBadges.size() > 0) {
             alertDialogManager.showAlertDialog(context, "Unlocked Badges", achievedBadges.toString(),
                     true);
+        }
 
         //Update UI user feedback
         int editTextBackgroundColor = result ? ContextCompat.getColor(context, R.color

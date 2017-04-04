@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.bobbytables.phrasebook.utils.AlertDialogManager;
 
 /**
  * Created by ricky on 29/03/2017.
@@ -37,29 +38,31 @@ public class BadgeAdapter extends CursorAdapter {
         String text = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_BADGE_NAME));
         badgeName.setText(text);
-
-        int resource = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper
-                .KEY_BADGE_ICON_RESOURCE));
+        String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_CREATED_ON));
+        int resource = createdOn != null ? cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_BADGE_ICON_RESOURCE)) : R.drawable.badge;
         badgeIcon.setImageResource(resource);
     }
 
-    /**
-     * Needed to make all the child views of the current view group non-selectable
-     *
-     * @return
-     */
-    @Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }
 
     /**
      * Needed to make all the child views of the current view group non-selectable
      *
      * @return
      */
-    @Override
+    /*@Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }*/
+
+    /**
+     * Needed to make all the child views of the current view group non-selectable
+     *
+     * @return
+     */
+    /*@Override
     public boolean isEnabled(int position) {
         return false;
-    }
+    }*/
 }

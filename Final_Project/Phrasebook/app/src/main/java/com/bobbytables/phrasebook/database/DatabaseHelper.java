@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.bobbytables.phrasebook.R;
+import com.bobbytables.phrasebook.utils.CSVUtils;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
 import org.json.JSONArray;
@@ -24,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
     private static final String TAG = DatabaseHelper.class.getName();
     private Context context;
+    private CSVUtils csvUtils;
 
     // Table Names
     public static final String TABLE_PHRASES = "phrases";
@@ -60,6 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String KEY_BADGES_ID = "id";
     public static final String KEY_BADGE_ICON_RESOURCE = "badgeIcon";
     public static final String KEY_BADGE_NAME = "badgeName";
+    public static final String KEY_BADGE_DESCRIPTION = "badgeDesc";
     //Common columns
     public static final String KEY_CREATED_ON = "createdOn";
 
@@ -85,8 +87,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "(" +
             KEY_BADGES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
             KEY_BADGE_NAME + " TEXT, " +
-            KEY_BADGE_ICON_RESOURCE + " INTEGER, " +
-            KEY_CREATED_ON + " TEXT)";
+            KEY_BADGE_ICON_RESOURCE + " BLOB, " +
+            KEY_CREATED_ON + " TEXT, " +
+            KEY_BADGE_DESCRIPTION + " TEXT)";
 
     private static DatabaseHelper instance;
     private static final int CORRECT_COUNT_FOR_ARCHIVE = 3;
@@ -94,6 +97,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
+        this.csvUtils = CSVUtils.getInstance(context);
     }
 
     public static synchronized DatabaseHelper getInstance(Context context) {
@@ -122,15 +126,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void populateBadgesTable(SQLiteDatabase sqLiteDatabase) {
-        int placeHolderIcon = R.drawable.badge;
-        String[] badgeNames = new String[]{"Beginner", "Doing Good", "Novice", "Novice", "Expert",
-                "Beacon of Light", "Keep Going", "Greedy", "High Fidelity", "Not Too Shabby", "I " +
-                "Like It " +
-                "Difficult", "Get On My Level", "Rise and Shine", "Night Owl", "No Sleep", "Inspiring " +
-                "Dreams", "Sudden Inspiration", "Extreme Stamina"};
-
-        for (String badgeName : badgeNames) {
-            DatabaseModel dataObject = new BadgeModel(badgeName, placeHolderIcon, TABLE_BADGES);
+        List<String[]> badgesData = csvUtils.readCSV("badges.csv");
+        for (String[] data : badgesData) {
+            //TODO: replace correct icons in the badges.csv file when populating DB
+            DatabaseModel dataObject = new BadgeModel(data[0], data[1], data[2], TABLE_BADGES);
             sqLiteDatabase.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
         }
     }

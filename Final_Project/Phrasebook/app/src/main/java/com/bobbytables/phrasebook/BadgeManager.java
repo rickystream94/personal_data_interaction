@@ -1,6 +1,5 @@
 package com.bobbytables.phrasebook;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 

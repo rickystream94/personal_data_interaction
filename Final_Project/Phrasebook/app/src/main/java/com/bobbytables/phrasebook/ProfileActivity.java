@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 import com.hanks.htextview.HTextView;
 
@@ -29,13 +31,14 @@ import java.io.File;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private int PICK_IMAGE_REQUEST = 1;
     private CircleImageView profileImage;
     private SettingsManager settingsManager;
     private XPManager xpManager;
     private DatabaseHelper databaseHelper;
+    private AlertDialogManager alertDialogManager = new AlertDialogManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +71,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadBadgesGrid() {
         ExpandableHeightGridView badgesGridView = (ExpandableHeightGridView) findViewById(R.id.badgesGridView);
+        badgesGridView.setOnItemClickListener(this);
 
         Cursor cursor = databaseHelper
                 .getDataFromTable(DatabaseHelper.TABLE_BADGES);
@@ -202,5 +206,16 @@ public class ProfileActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        Cursor cursor = (Cursor) adapterView.getAdapter().getItem(position);
+        cursor.moveToPosition(position);
+        String description = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_BADGE_DESCRIPTION));
+        String badgeName = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_BADGE_NAME));
+        alertDialogManager.showAlertDialog(ProfileActivity.this, badgeName, description, true);
     }
 }
