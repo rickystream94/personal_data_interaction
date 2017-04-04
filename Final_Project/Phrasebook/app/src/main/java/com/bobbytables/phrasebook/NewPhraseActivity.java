@@ -107,4 +107,6 @@ public class NewPhraseActivity extends AppCompatActivity {
             return false;
         }
     }
+
+    //TODO: CHECK ACHIEVED PHRASES BADGES
 }

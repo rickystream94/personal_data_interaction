@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by ricky on 18/03/2017.
@@ -112,14 +114,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_PHRASES_TABLE);
         sqLiteDatabase.execSQL(CREATE_CHALLENGES_TABLE);
         sqLiteDatabase.execSQL(CREATE_BADGES_TABLE);
-        //TODO: Badges table must be populated correctly here! New in version 2 of DB!
         try {
-            for (int i = 0; i < 20; i++) {
-                DatabaseModel dataObject = new BadgeModel("Example", R.drawable.badge, TABLE_BADGES);
-                sqLiteDatabase.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
-            }
+            populateBadgesTable(sqLiteDatabase);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void populateBadgesTable(SQLiteDatabase sqLiteDatabase) {
+        int placeHolderIcon = R.drawable.badge;
+        String[] badgeNames = new String[]{"Beginner", "Doing Good", "Novice", "Novice", "Expert",
+                "Beacon of Light", "Keep Going", "Greedy", "High Fidelity", "Not Too Shabby", "I " +
+                "Like It " +
+                "Difficult", "Get On My Level", "Rise and Shine", "Night Owl", "No Sleep", "Inspiring " +
+                "Dreams", "Sudden Inspiration", "Extreme Stamina"};
+
+        for (String badgeName : badgeNames) {
+            DatabaseModel dataObject = new BadgeModel(badgeName, placeHolderIcon, TABLE_BADGES);
+            sqLiteDatabase.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
         }
     }
 

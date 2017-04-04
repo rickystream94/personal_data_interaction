@@ -68,12 +68,12 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadBadgesGrid() {
         ExpandableHeightGridView badgesGridView = (ExpandableHeightGridView) findViewById(R.id.badgesGridView);
-        badgesGridView.setExpanded(true);
 
         Cursor cursor = databaseHelper
                 .getDataFromTable(DatabaseHelper.TABLE_BADGES);
         BadgeAdapter badgeAdapter = new BadgeAdapter(ProfileActivity.this, cursor);
         badgesGridView.setAdapter(badgeAdapter);
+        badgesGridView.setExpanded(true);
     }
 
     private void loadProgressBars() {

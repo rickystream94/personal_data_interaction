@@ -22,15 +22,13 @@ public class BadgeManager {
 
     private static BadgeManager instance;
     private DatabaseHelper databaseHelper;
-    private int[] badgesIds;
-    private int badgesCount;
+    public static final String TABLE_CHALLENGES = DatabaseHelper.TABLE_CHALLENGES;
+    public static final String TABLE_PHRASES = DatabaseHelper.TABLE_PHRASES;
+    private static final String CREATED_ON = DatabaseHelper.KEY_CREATED_ON;
+    private static final String CHALLENGE_CORRECT = DatabaseHelper.KEY_CHALLENGE_CORRECT;
 
     private BadgeManager(Context context) {
         databaseHelper = DatabaseHelper.getInstance(context);
-        badgesCount = databaseHelper.getBadgesCount();
-        badgesIds = new int[badgesCount];
-        for (int i = 0; i < badgesCount; i++)
-            badgesIds[i] = i;
     }
 
     public static BadgeManager getInstance(Context context) {
@@ -39,89 +37,116 @@ public class BadgeManager {
         return instance;
     }
 
-    public List<Integer> getBadgesAchieved() {
+    /**
+     * TODO: Right now badges IDs are hardcoded when added to list; in the future, find a better way
+     *
+     * @param table either "phrases" or "challenges"
+     * @return List of newly achieved badges IDs
+     */
+    public List<String> checkNewBadges(String table) {
+        List<Integer> badgesToCheck;
+        switch (table) {
+            case TABLE_PHRASES:
+                badgesToCheck = checkPhrasesBadgeAchieved();
+                break;
+            case TABLE_CHALLENGES:
+                badgesToCheck = checkChallengesBadgeAchieved();
+                break;
+            default:
+                badgesToCheck = new ArrayList<>();
+        }
         List<Integer> achievedBadges = getAchievedBadges();
-        List<Integer> phrasesBadges = checkPhrasesBadgeAchieved();
-        List<Integer> challengesBadges = checkChallengesBadgeAchieved();
         List<Integer> newAchievedBadges = new ArrayList<>();
 
         //Remove already unlocked badges
-        for (Integer i : phrasesBadges) {
+        for (Integer i : badgesToCheck) {
             if (!achievedBadges.contains(i))
                 newAchievedBadges.add(i);
         }
-        for (Integer i : challengesBadges) {
-            if (!achievedBadges.contains(i))
-                newAchievedBadges.add(i);
-        }
-        return newAchievedBadges;
+
+        //TODO: for all the achieved badges, update the created_on key in the DB
+        //using the newAchievedBadges because it has the unique ID
+
+        List<String> newAchievedBadgesNames = new ArrayList<>();
+        for (Integer id : newAchievedBadges)
+            newAchievedBadgesNames.add(getBadgeName(id));
+
+        return newAchievedBadgesNames;
+    }
+
+    private String getBadgeName(Integer id) {
+        String query = "SELECT " + DatabaseHelper.KEY_BADGE_NAME + " FROM " + DatabaseHelper
+                .TABLE_BADGES + " WHERE " + DatabaseHelper.KEY_BADGES_ID + "=" + id + "";
+        Cursor cursor = databaseHelper.performRawQuery(query);
+        cursor.moveToFirst();
+        return cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_BADGE_NAME));
     }
 
     /**
      * Main method that asks for the specific queries to lookup for unlocked badges related to
      * phrases
-     * TODO: ADAPT BADGE IDS!
+     * TODO: CORRECT BADGE IDS!
      *
      * @return an array containing the IDs of unlocked badges
      */
     private List<Integer> checkPhrasesBadgeAchieved() {
         List<Integer> achievedBadgesIds = new ArrayList<>();
         Cursor cursor;
-        String queryCount = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_PHRASES;
+        String queryCount = "SELECT COUNT(*) FROM " + TABLE_PHRASES;
         String timestamp = DateUtil.getCurrentTimestamp();
         String today = timestamp.split("\\s+")[0];
-        String queryOneDay = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_PHRASES + " WHERE DATE" +
+        String queryOneDay = "SELECT COUNT(*) FROM " + TABLE_PHRASES + " WHERE DATE" +
                 "(" + DatabaseHelper.KEY_CREATED_ON + ")='" + today + "'";
-        String queryLongPhrase = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_PHRASES + " WHERE " +
+        String queryLongPhrase = "SELECT COUNT(*) FROM " + TABLE_PHRASES + " WHERE " +
                 "LENGTH(" + DatabaseHelper.KEY_FOREIGN_LANG_STRING + ")>=25";
         String queryNight = queryOneDay +
-                " AND strftime('%H'," + DatabaseHelper.KEY_CREATED_ON + ") BETWEEN '00' AND '06'";
-        String query15Mins = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_PHRASES + " WHERE " +
-                "strftime('%M','" + timestamp + "' - " + DatabaseHelper.KEY_CREATED_ON + ")<='15'";
+                " AND strftime('%H'," + CREATED_ON + ") BETWEEN '00' AND '06'";
+        String query15Mins = "SELECT COUNT(*) FROM " + TABLE_PHRASES + " WHERE " +
+                "strftime('%M','" + timestamp + "' - " + CREATED_ON + ")<='15'";
 
 
         //Check Beginner (10 added), Novice (100 added), Expert (250 added)
         cursor = databaseHelper.performRawQuery(queryCount);
         cursor.moveToFirst();
-        if (cursor.getInt(0) >= 10)
-            achievedBadgesIds.add(0);
-        else if (cursor.getInt(0) > 100)
-            achievedBadgesIds.add(2);
-        else if (cursor.getInt(0) > 250)
-            achievedBadgesIds.add(4);
+        if (cursor.getInt(0) == 2) //TODO: change the count to 10
+            achievedBadgesIds.add(1);
+        else if (cursor.getInt(0) == 100)
+            achievedBadgesIds.add(3);
+        else if (cursor.getInt(0) == 250)
+            achievedBadgesIds.add(5);
 
         //Check added 10 in 1 day
         cursor = databaseHelper.performRawQuery(queryOneDay);
         cursor.moveToFirst();
-        if (cursor.getInt(0) >= 10)
-            achievedBadgesIds.add(13);
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+            achievedBadgesIds.add(8);
 
         //Check "I like it difficult", "Get on my level"
         cursor = databaseHelper.performRawQuery(queryLongPhrase);
         cursor.moveToFirst();
         if (cursor.getInt(0) == 1)
-            achievedBadgesIds.add(16);
-        else if (cursor.getInt(0) >= 5)
-            achievedBadgesIds.add(17);
+            achievedBadgesIds.add(11);
+        else if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+            achievedBadgesIds.add(12);
 
-        //Check "No sleep"
+        //Check "Inspiring dreams"
         cursor = databaseHelper.performRawQuery(queryNight);
         cursor.moveToFirst();
-        if (cursor.getInt(0) >= 5)
-            achievedBadgesIds.add(22);
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+            achievedBadgesIds.add(16);
 
         //Check "Sudden inspiration"
         cursor = databaseHelper.performRawQuery(query15Mins);
         cursor.moveToFirst();
-        if (cursor.getInt(0) >= 10)
-            achievedBadgesIds.add(23);
+        if (cursor.getInt(0) == 2) //TODO: change the count to 10
+            achievedBadgesIds.add(17);
 
         cursor.close();
         return achievedBadgesIds;
     }
 
     /**
-     * TODO: ADAPT BADGE IDS!
+     * TODO: CORRECT BADGE IDS!
      *
      * @return
      */
@@ -130,56 +155,82 @@ public class BadgeManager {
         Cursor cursor;
         String timestamp = DateUtil.getCurrentTimestamp();
         String today = timestamp.split("\\s+")[0];
-        String queryOneDay = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_CHALLENGES + " WHERE DATE" +
-                "(" + DatabaseHelper.KEY_CREATED_ON + ")='" + today + "'";
+        String queryOneDay = "SELECT COUNT(*) FROM " + TABLE_CHALLENGES + " WHERE DATE" +
+                "(" + CREATED_ON + ")='" + today + "'";
+        String queryMorning = queryOneDay + " AND" +
+                " strftime('%H'," + CREATED_ON + ") BETWEEN '04' AND '10' AND " +
+                "" + CHALLENGE_CORRECT + "=1";
+        String queryNight = queryOneDay + " AND" +
+                " strftime('%H'," + CREATED_ON + ")>= '22' AND strftime('%H',"
+                + DatabaseHelper.KEY_CREATED_ON + ")<='02' AND " + CHALLENGE_CORRECT + "=1";
+        String queryNoSleep = queryOneDay + " AND" +
+                " strftime('%H'," + CREATED_ON + ") BETWEEN '00' AND '06' AND " + CHALLENGE_CORRECT + "=1";
+        String query15Mins = "SELECT COUNT(*) FROM " + TABLE_CHALLENGES + " WHERE " +
+                "strftime('%M','" + timestamp + "' - " + CREATED_ON + ")<='15'";
 
-        //Check Doing Good (10 correct), Novice (100 correct)
-        String queryCount = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_CHALLENGES + " WHERE " +
-                DatabaseHelper
-                        .KEY_CHALLENGE_CORRECT + "=1";
+        //Check Doing Good (10 correct), Novice (100 correct), Beacon of light (250 correct)
+        String queryCount = "SELECT COUNT(*) FROM " + TABLE_CHALLENGES + " WHERE " +
+                CHALLENGE_CORRECT + "=1";
         cursor = databaseHelper.performRawQuery(queryCount);
         cursor.moveToFirst();
-        if (cursor.getInt(0) >= 10)
-            achievedBadgesIds.add(1);
-        else if (cursor.getInt(0) >= 100)
-            achievedBadgesIds.add(3);
-        else if (cursor.getInt(0) >= 250)
-            achievedBadgesIds.add(5);
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+            achievedBadgesIds.add(2);
+        else if (cursor.getInt(0) == 4) //TODO: Change the count to 100
+            achievedBadgesIds.add(4);
+        else if (cursor.getInt(0) == 8) //TODO: Change the count to 250
+            achievedBadgesIds.add(6);
 
         //Check 10 guessed in one day
         cursor = databaseHelper.performRawQuery(queryOneDay + " AND " + DatabaseHelper
                 .KEY_CHALLENGE_CORRECT + "=1");
         cursor.moveToFirst();
-        if (cursor.getInt(0) >= 10)
-            achievedBadgesIds.add(12);
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+            achievedBadgesIds.add(7);
 
         //Check "High fidelity" and "Not too shabby"
-        String queryInRow = "SELECT COUNT(*) FROM (SELECT * FROM " + DatabaseHelper
-                .TABLE_CHALLENGES + " ORDER BY " +
-                "" + DatabaseHelper.KEY_CREATED_ON + " DESC LIMIT 10) AS A WHERE A." + DatabaseHelper
-                .KEY_CHALLENGE_CORRECT + "=";
+        String queryInRow = "SELECT COUNT(*) FROM (SELECT * FROM " + TABLE_CHALLENGES + " ORDER BY " +
+                "" + CREATED_ON + " DESC LIMIT 10) AS A WHERE A." + CHALLENGE_CORRECT + "=";
         String queryCorrectInRow = queryInRow + "1";
         String queryIncorrectInRow = queryInRow + "0";
         cursor = databaseHelper.performRawQuery(queryCorrectInRow);
         cursor.moveToFirst();
-        if (cursor.getInt(0) == 10)
-            achievedBadgesIds.add(14);
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+            achievedBadgesIds.add(9);
         cursor = databaseHelper.performRawQuery(queryIncorrectInRow);
         cursor.moveToFirst();
-        if (cursor.getInt(0) == 10)
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+            achievedBadgesIds.add(10);
+
+        //Check "Rise and Shine", "Night owl" and "No sleep"
+        cursor = databaseHelper.performRawQuery(queryMorning);
+        cursor.moveToFirst();
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+            achievedBadgesIds.add(13);
+
+        cursor = databaseHelper.performRawQuery(queryNight);
+        cursor.moveToFirst();
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 5
+            achievedBadgesIds.add(14);
+
+        cursor = databaseHelper.performRawQuery(queryNoSleep);
+        cursor.moveToFirst();
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 5
             achievedBadgesIds.add(15);
 
-        //TODO: Continue from ID=18
-
+        //Check "Extreme stamina"
+        cursor = databaseHelper.performRawQuery(query15Mins);
+        cursor.moveToFirst();
+        if (cursor.getInt(0) == 2) //TODO: Change the count to 10
+            achievedBadgesIds.add(18);
 
         cursor.close();
         return achievedBadgesIds;
     }
 
-    public List<Integer> getAchievedBadges() {
+    private List<Integer> getAchievedBadges() {
         List<Integer> achievedBadges = new ArrayList<>();
         String query = "SELECT " + DatabaseHelper.KEY_BADGES_ID + " FROM " + DatabaseHelper
-                .TABLE_BADGES + " WHERE " + DatabaseHelper.KEY_BADGES_ID + " IS NOT NULL";
+                .TABLE_BADGES + " WHERE " + CREATED_ON + " IS NOT NULL";
         Cursor cursor = databaseHelper.performRawQuery(query);
         if (cursor.moveToFirst()) {
             do {

@@ -25,12 +25,14 @@ import com.hanks.htextview.HTextViewType;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by ricky on 16/03/2017.
  */
 
-class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.ViewHolder> {
+class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.ViewHolder>
+        implements View.OnClickListener {
     private final Context context;
     private String motherLanguage;
     private String foreignLanguage;
@@ -40,6 +42,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     private AlertDialogManager alertDialogManager;
     private XPManager xpManager;
     private BadgeManager badgeManager;
+    private ViewHolder holder;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -102,101 +105,115 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
         if (databaseHelper.isDatabaseEmpty())
             return;
 
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+        this.holder = viewHolder;
         holder.setIsRecyclable(false); //Must be specified since we're using a custom animator
         holder.foreignLanguageText.setText(challengeCard.getForeignLanguage());
         holder.motherLanguageText.setText(databaseHelper.getRandomChallenge());
-        holder.checkButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Perform check in the DB
-                String translation = holder.translation.getText().toString().trim().toLowerCase();
-                String correctTranslation = databaseHelper.getTranslation(holder.motherLanguageText.getText
-                        ().toString());
-                holder.correctTranslation.setText(correctTranslation);
-                boolean result = databaseHelper.checkIfCorrect(holder.motherLanguageText.getText
-                                ().toString(),
-                        translation, correctTranslation);
-                boolean isArchived = databaseHelper.updateCorrectCount(holder.motherLanguageText.getText
-                        ().toString(), correctTranslation, result);
-
-                //Insert new record in DB
-                int correct = result ? 1 : 0;
-                int phraseId = databaseHelper.getPhraseId(holder.motherLanguageText.getText
-                        ().toString(), correctTranslation);
-                String currentTimeString = DateUtil.getCurrentTimestamp();
-                try {
-                    databaseHelper.insertRecord(new ChallengeModel(phraseId, currentTimeString,
-                            DatabaseHelper.TABLE_CHALLENGES, correct));
-                } catch (Exception e) {
-                    alertDialogManager.showAlertDialog(context, "Error!", e.getMessage(), false);
-                }
-
-                //Check XP and Level (gain XP only if not archived!)
-                if (result && !isArchived) {
-                    int xp = XPManager.XP_CHALLENGE_WON;
-                    xpManager.addExperience(xp);
-                    if (xpManager.checkLevelUp()) {
-                        int newLevel = xpManager.levelUp();
-                        holder.newLevelText.setVisibility(View.VISIBLE);
-                        holder.newLevelText.setAnimateType(HTextViewType.SCALE);
-                        holder.newLevelText.animateText("Level " + newLevel + " reached!");
-                        xpManager.addExperience(XPManager.XP_BONUS_ARCHIVED);
-                        xp += XPManager.XP_BONUS_ARCHIVED;
-                    }
-
-                    holder.xpText.setVisibility(View.VISIBLE);
-                    holder.xpText.setAnimateType(HTextViewType.ANVIL);
-                    holder.xpText.animateText("+" + xp + "XP!");
-                    Log.d("XP DEBUG", "Added XP points, new XP: " + xpManager.getCurrentXp());
-                }
-
-                //TODO: check badges achieved
-
-                //Update UI user feedback
-                int editTextBackgroundColor = result ? ContextCompat.getColor(context, R.color
-                        .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnser);
-                if (!result) {
-                    holder.correctTranslation.setVisibility(View.VISIBLE);
-                }
-                if (isArchived) {
-                    Toast.makeText(context, "Great! New word just stored in long term " +
-                            "memory.", Toast.LENGTH_SHORT).show();
-                    Log.d("DEBUG", "Word correctly archived!");
-                }
-                //TODO: give eventually feedback about badges unlocked (easiest way with custom
-                // dialog)
-                holder.translation.setBackgroundColor(editTextBackgroundColor);
-                view.setVisibility(View.INVISIBLE);
-                holder.nextChallenge.setVisibility(View.VISIBLE);
-            }
-        });
-        holder.nextChallenge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                view.setVisibility(View.INVISIBLE);
-                holder.translation.setBackgroundColor(Color.parseColor("#00000000"));
-                holder.correctTranslation.setVisibility(View.INVISIBLE);
-                holder.checkButton.setVisibility(View.VISIBLE);
-                holder.newLevelText.setVisibility(View.INVISIBLE);
-                holder.xpText.setVisibility(View.INVISIBLE);
-                holder.xpText.setText("");
-                holder.translation.setText("");
-                challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
-                //notifyItemInserted(getItemCount());
-                notifyItemChanged(0);
-            }
-        });
+        holder.checkButton.setOnClickListener(this);
+        holder.nextChallenge.setOnClickListener(this);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return NUMBER_OF_CARDS; //we will always display just one card! Otherwise, change it accordingly
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id) {
+            case R.id.checkTranslation:
+                checkTranslation(view);
+                break;
+            case R.id.nextChallenge:
+                nextChallenge(view);
+                break;
+        }
+    }
+
+    private void checkTranslation(View view) {
+        //Perform check in the DB
+        String translation = holder.translation.getText().toString().trim().toLowerCase();
+        String correctTranslation = databaseHelper.getTranslation(holder.motherLanguageText.getText
+                ().toString());
+        holder.correctTranslation.setText(correctTranslation);
+        boolean result = databaseHelper.checkIfCorrect(holder.motherLanguageText.getText
+                        ().toString(),
+                translation, correctTranslation);
+        boolean isArchived = databaseHelper.updateCorrectCount(holder.motherLanguageText.getText
+                ().toString(), correctTranslation, result);
+
+        //Insert new record in DB
+        int correct = result ? 1 : 0;
+        int phraseId = databaseHelper.getPhraseId(holder.motherLanguageText.getText
+                ().toString(), correctTranslation);
+        String currentTimeString = DateUtil.getCurrentTimestamp();
+        try {
+            databaseHelper.insertRecord(new ChallengeModel(phraseId, currentTimeString,
+                    DatabaseHelper.TABLE_CHALLENGES, correct));
+        } catch (Exception e) {
+            alertDialogManager.showAlertDialog(context, "Error!", e.getMessage(), false);
+        }
+
+        //Check XP and Level (gain XP only if not archived!)
+        if (result && !isArchived) {
+            int xp = XPManager.XP_CHALLENGE_WON;
+            xpManager.addExperience(xp);
+            if (xpManager.checkLevelUp()) {
+                int newLevel = xpManager.levelUp();
+                holder.newLevelText.setVisibility(View.VISIBLE);
+                holder.newLevelText.setAnimateType(HTextViewType.SCALE);
+                holder.newLevelText.animateText("Level " + newLevel + " reached!");
+                xpManager.addExperience(XPManager.XP_BONUS_ARCHIVED);
+                xp += XPManager.XP_BONUS_ARCHIVED;
+            }
+            holder.xpText.setVisibility(View.VISIBLE);
+            holder.xpText.setAnimateType(HTextViewType.ANVIL);
+            holder.xpText.animateText("+" + xp + "XP!");
+            Log.d("XP DEBUG", "Added XP points, new XP: " + xpManager.getCurrentXp());
+        }
+
+        //TODO: check badges achieved
+        //Check achieved badges
+        List<String> achievedBadges = badgeManager.checkNewBadges(BadgeManager.TABLE_CHALLENGES);
+        if (achievedBadges.size() > 0)
+            alertDialogManager.showAlertDialog(context, "Unlocked Badges", achievedBadges.toString(),
+                    true);
+
+        //Update UI user feedback
+        int editTextBackgroundColor = result ? ContextCompat.getColor(context, R.color
+                .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnser);
+        if (!result) {
+            holder.correctTranslation.setVisibility(View.VISIBLE);
+        }
+        if (isArchived) {
+            Toast.makeText(context, "Great! New word just stored in long term " +
+                    "memory.", Toast.LENGTH_SHORT).show();
+            Log.d("DEBUG", "Word correctly archived!");
+        }
+        holder.translation.setBackgroundColor(editTextBackgroundColor);
+        view.setVisibility(View.INVISIBLE);
+        holder.nextChallenge.setVisibility(View.VISIBLE);
+    }
+
+    private void nextChallenge(View view) {
+        view.setVisibility(View.INVISIBLE);
+        holder.translation.setBackgroundColor(Color.parseColor("#00000000"));
+        holder.correctTranslation.setVisibility(View.INVISIBLE);
+        holder.checkButton.setVisibility(View.VISIBLE);
+        holder.newLevelText.setVisibility(View.INVISIBLE);
+        holder.xpText.setVisibility(View.INVISIBLE);
+        holder.xpText.setText("");
+        holder.translation.setText("");
+        challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
+        //notifyItemInserted(getItemCount());
+        notifyItemChanged(0);
     }
 }

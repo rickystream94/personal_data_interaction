@@ -7,9 +7,9 @@ import android.content.ContentValues;
  */
 
 public class BadgeModel implements DatabaseModel {
-    String tableName;
-    String badgeName;
-    int badgeResource;
+    private String tableName;
+    private String badgeName;
+    private int badgeResource;
 
     public BadgeModel(String badgeName, int badgeResource, String tableName) {
         this.badgeName = badgeName;
