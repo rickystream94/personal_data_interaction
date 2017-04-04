@@ -44,25 +44,4 @@ public class BadgeAdapter extends CursorAdapter {
                 .KEY_BADGE_ICON_RESOURCE)) : R.drawable.badge;
         badgeIcon.setImageResource(resource);
     }
-
-
-    /**
-     * Needed to make all the child views of the current view group non-selectable
-     *
-     * @return
-     */
-    /*@Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }*/
-
-    /**
-     * Needed to make all the child views of the current view group non-selectable
-     *
-     * @return
-     */
-    /*@Override
-    public boolean isEnabled(int position) {
-        return false;
-    }*/
 }

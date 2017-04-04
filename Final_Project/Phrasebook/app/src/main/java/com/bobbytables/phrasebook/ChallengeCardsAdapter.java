@@ -180,12 +180,10 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
             Log.d("XP DEBUG", "Added XP points, new XP: " + xpManager.getCurrentXp());
         }
 
-        //TODO: check badges achieved
         //Check achieved badges
         List<String> achievedBadges = badgeManager.checkNewBadges(BadgeManager.TABLE_CHALLENGES);
         if (achievedBadges.size() > 0) {
-            alertDialogManager.showAlertDialog(context, "Unlocked Badges", achievedBadges.toString(),
-                    true);
+            badgeManager.showDialogAchievedBadges(context, achievedBadges);
         }
 
         //Update UI user feedback

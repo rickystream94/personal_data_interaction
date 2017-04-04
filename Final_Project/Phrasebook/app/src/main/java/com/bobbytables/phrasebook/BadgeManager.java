@@ -1,7 +1,15 @@
 package com.bobbytables.phrasebook;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.DateUtil;
@@ -64,7 +72,6 @@ public class BadgeManager {
         }
 
         //TODO: for all the achieved badges, update the created_on key in the DB
-        //TODO: and the corresponding correct icon
 
         List<String> newAchievedBadgesNames = new ArrayList<>();
         for (Integer id : newAchievedBadges)
@@ -239,5 +246,24 @@ public class BadgeManager {
         }
         cursor.close();
         return achievedBadges;
+    }
+
+    public void showDialogAchievedBadges(Context context, List<String> achievedBadges) {
+        final Dialog d = new Dialog(context, android.R.style.Theme_DeviceDefault_Dialog);
+        d.setTitle("New Badges Unlocked!");
+        d.setContentView(R.layout.badges_dialog);
+        TextView badgeText = (TextView) d.findViewById(R.id.newBadgeText);
+        Button closeButton = (Button) d.findViewById(R.id.closeDialog);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                d.dismiss();
+            }
+        });
+        String text = "";
+        for (String badgeName : achievedBadges)
+            text += badgeName + "\n";
+        badgeText.setText(text);
+        d.show();
     }
 }

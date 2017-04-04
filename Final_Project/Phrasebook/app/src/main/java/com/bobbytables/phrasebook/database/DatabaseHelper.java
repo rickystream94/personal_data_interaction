@@ -153,8 +153,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             settingsManager.updatePrefValue(SettingsManager.KEY_PROFILE_PIC, "DEFAULT");
         }
 
-        /*TODO: Change SQL script from_1_to_2.sql with correct info about badges! Now it's still
-        placeholder! */
         Log.e(TAG, "Updating table from " + oldVersion + " to " + newVersion);
         // You will not need to modify this unless you need to do some android specific things.
         // When upgrading the database, all you need to do is add a file to the assets folder and name it:
