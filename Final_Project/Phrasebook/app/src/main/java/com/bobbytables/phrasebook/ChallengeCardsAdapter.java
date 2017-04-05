@@ -167,6 +167,9 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                 ().toString(), correctTranslation);
         if (result && !currentlyArchived) {
             int xp = XPManager.XP_CHALLENGE_WON;
+            //if(notMaxLevel()) { xpManager.addExperience(xp); } //todo: there will be a bug when maximum level is
+            // reached, because experience is still added! Perform a check to add experience only
+            // if maximum experience is not reached yet
             xpManager.addExperience(xp);
             if (xpManager.checkLevelUp()) {
                 int newLevel = xpManager.levelUp();

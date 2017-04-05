@@ -109,6 +109,7 @@ public class ProgressFragment extends Fragment {
         lineChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
         lineChart.getXAxis().setDrawGridLines(false);
         lineChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
+        //lineChart.getXAxis().setGranularity(1f); //TODO: it doesn't work for this chart! Why?
         lineChart.getAxisRight().setEnabled(false);
         Description description = new Description();
         description.setText("");
@@ -159,6 +160,7 @@ public class ProgressFragment extends Fragment {
         barChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
         barChart.getAxisRight().setEnabled(false);
         barChart.getAxisLeft().setGranularity(1f);
+        barChart.getXAxis().setGranularity(1f); //TODO: eventually remove if causes problems
         Description description = new Description();
         description.setText("");
         barChart.setDescription(description);
