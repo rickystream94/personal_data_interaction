@@ -399,6 +399,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //Future implementation, allows to edit a currently existing record in the DB
+    //TODO: TO IMPLEMENT
     public void updatePhrase() {
     }
 
