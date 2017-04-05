@@ -160,7 +160,7 @@ public class ProgressFragment extends Fragment {
         barChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
         barChart.getAxisRight().setEnabled(false);
         barChart.getAxisLeft().setGranularity(1f);
-        barChart.getXAxis().setGranularity(1f); //TODO: eventually remove if causes problems
+        barChart.getXAxis().setGranularity(1f);
         Description description = new Description();
         description.setText("");
         barChart.setDescription(description);
