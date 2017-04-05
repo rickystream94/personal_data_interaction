@@ -216,6 +216,10 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
                 .KEY_BADGE_DESCRIPTION));
         String badgeName = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_BADGE_NAME));
+        String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_CREATED_ON));
+        if (createdOn != null)
+            description += "\n\nAchieved on: " + createdOn.split("\\s")[0];
         alertDialogManager.showAlertDialog(ProfileActivity.this, badgeName, description, true);
     }
 }

@@ -163,7 +163,9 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         }
 
         //Check XP and Level (gain XP only if not archived!)
-        if (result && !isArchived) {
+        boolean currentlyArchived = databaseHelper.getArchivedStatus(holder.motherLanguageText.getText
+                ().toString(), correctTranslation);
+        if (result && !currentlyArchived) {
             int xp = XPManager.XP_CHALLENGE_WON;
             xpManager.addExperience(xp);
             if (xpManager.checkLevelUp()) {

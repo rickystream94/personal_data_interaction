@@ -112,7 +112,6 @@ public class NewPhraseActivity extends AppCompatActivity {
         }
     }
 
-    //TODO: CHECK ACHIEVED PHRASES BADGES
     private void checkNewBadges() {
         List<String> achievedBadges = badgeManager.checkNewBadges(BadgeManager.TABLE_PHRASES);
         if (achievedBadges.size() > 0) {

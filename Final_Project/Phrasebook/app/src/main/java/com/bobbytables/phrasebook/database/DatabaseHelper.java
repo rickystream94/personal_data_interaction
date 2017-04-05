@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.bobbytables.phrasebook.R;
 import com.bobbytables.phrasebook.utils.CSVUtils;
+import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
 import org.json.JSONArray;
@@ -633,17 +634,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return database.rawQuery(rawQuery, null);
     }
 
-    public int getBadgesCount() {
+    public void updateAchievedBadgeDate(int badgeId) {
         SQLiteDatabase database = this.getReadableDatabase();
-        String rawQuery = "SELECT COUNT(*) FROM " + TABLE_BADGES;
-        Cursor cursor = database.rawQuery(rawQuery, null);
-        int count = cursor.getCount();
-        cursor.close();
-        return count;
+        String timestamp = DateUtil.getCurrentTimestamp();
+        String updateQuery = "UPDATE " + TABLE_BADGES + " SET " + KEY_CREATED_ON + "=?" +
+                " WHERE " +
+                "" + KEY_BADGES_ID + "=?";
+        database.execSQL(updateQuery, new Object[]{timestamp, badgeId}); //Always use execSQL
+        // with update statements!
     }
 
     public Cursor performRawQuery(String query) {
         SQLiteDatabase database = this.getReadableDatabase();
         return database.rawQuery(query, null);
+    }
+
+    public boolean getArchivedStatus(String s1, String s2) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT " + KEY_ARCHIVED + " FROM " + TABLE_PHRASES + " WHERE " +
+                "" + KEY_MOTHER_LANG_STRING + "=? AND " + KEY_FOREIGN_LANG_STRING + "=?", new String[]{s1,
+                s2});
+        cursor.moveToFirst();
+        boolean result = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ARCHIVED)) == 1;
+        cursor.close();
+        return result;
     }
 }
