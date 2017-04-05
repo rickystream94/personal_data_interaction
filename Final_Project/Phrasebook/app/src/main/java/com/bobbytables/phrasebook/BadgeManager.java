@@ -67,7 +67,7 @@ public class BadgeManager {
                 newAchievedBadges.add(i);
         }
 
-        //TODO: for all the achieved badges, update the created_on key in the DB
+        //Update created on key for the newly achieved badges
         for (Integer i : newAchievedBadges)
             databaseHelper.updateAchievedBadgeDate(i);
 
