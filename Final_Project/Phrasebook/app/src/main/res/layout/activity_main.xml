@@ -28,20 +28,17 @@
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@mipmap/gym"
-                android:text="@string/tab1"/>
+                android:icon="@mipmap/gym"/>
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@mipmap/book"
-                android:text="@string/tab2"/>
+                android:icon="@mipmap/book"/>
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@mipmap/chart"
-                android:text="@string/tab3"/>
+                android:icon="@mipmap/chart"/>
         </android.support.design.widget.TabLayout>
 
     </android.support.design.widget.AppBarLayout>

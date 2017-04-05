@@ -42,14 +42,13 @@ public class SettingsManager {
     public static final String KEY_LEVEL = "level";
     public static final String KEY_CREATED = "created";
     //GAMIFICATION INCLUDED OR NOT
-    private static final String KEY_GAMIFICATION = "Gamification";
+    public static final String KEY_GAMIFICATION = "Gamification";
     public static final String KEY_PROFILE_PIC = "profilePic";
 
     private SettingsManager(Context context) {
         this.context = context;
         preferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = preferences.edit();
-        editor.putBoolean(KEY_GAMIFICATION, true); //Change this for future release!!!
         editor.apply();
         instance = this;
     }
@@ -89,7 +88,8 @@ public class SettingsManager {
         editor.putInt(KEY_TOTAL_XP, 0);
         editor.putInt(KEY_LEVEL, 0);
         editor.putString(KEY_CREATED, currentTimeString);
-        editor.putString(KEY_PROFILE_PIC, "DEFAULT");
+        editor.putString(KEY_PROFILE_PIC, "DEFAULT"); //is updated in version 2!
+        editor.putBoolean(KEY_GAMIFICATION, true); //is updated in version 2!
         editor.commit();
     }
 
@@ -136,11 +136,17 @@ public class SettingsManager {
 
     /**
      * Used to update profile pic
+     *
      * @param key
      * @param value
      */
     public void updatePrefValue(String key, String value) {
         editor.putString(key, value);
+        editor.commit();
+    }
+
+    public void updateBoolValue(String key, boolean value) {
+        editor.putBoolean(key, value);
         editor.commit();
     }
 

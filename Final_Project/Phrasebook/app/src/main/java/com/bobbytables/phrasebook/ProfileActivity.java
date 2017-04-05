@@ -15,10 +15,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 import com.hanks.htextview.HTextView;
 
@@ -26,12 +31,14 @@ import java.io.File;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private int PICK_IMAGE_REQUEST = 1;
     private CircleImageView profileImage;
     private SettingsManager settingsManager;
     private XPManager xpManager;
+    private DatabaseHelper databaseHelper;
+    private AlertDialogManager alertDialogManager = new AlertDialogManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +47,14 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         settingsManager = SettingsManager.getInstance(getApplicationContext());
         xpManager = XPManager.getInstance(getApplicationContext());
-        profileImage = (CircleImageView) findViewById(R.id.profileImage);
+        databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
 
         //Set nickname text
         HTextView nicknameText = (HTextView) findViewById(R.id.nicknameText);
         nicknameText.animateText(settingsManager.getPrefStringValue(SettingsManager.KEY_NICKNAME));
 
         //Load profile picture
+        profileImage = (CircleImageView) findViewById(R.id.profileImage);
         String path = settingsManager.getPrefStringValue(SettingsManager
                 .KEY_PROFILE_PIC);
         if (!path.equals("DEFAULT")) {
@@ -55,6 +63,24 @@ public class ProfileActivity extends AppCompatActivity {
             profileImage.setImageResource(R.drawable.camera);
 
         //Load experience progress bar and level bar
+        loadProgressBars();
+
+        //Load badges grid
+        loadBadgesGrid();
+    }
+
+    private void loadBadgesGrid() {
+        ExpandableHeightGridView badgesGridView = (ExpandableHeightGridView) findViewById(R.id.badgesGridView);
+        badgesGridView.setOnItemClickListener(this);
+
+        Cursor cursor = databaseHelper
+                .getDataFromTable(DatabaseHelper.TABLE_BADGES);
+        BadgeAdapter badgeAdapter = new BadgeAdapter(ProfileActivity.this, cursor);
+        badgesGridView.setAdapter(badgeAdapter);
+        badgesGridView.setExpanded(true);
+    }
+
+    private void loadProgressBars() {
         RoundCornerProgressBar xpPointsBar = (RoundCornerProgressBar) findViewById(R.id.xpPointsBar);
         RoundCornerProgressBar levelBar = (RoundCornerProgressBar) findViewById(R.id.levelsBar);
         TextView currentLevelLabel = (TextView) findViewById(R.id.currentLevelLabel);
@@ -180,5 +206,20 @@ public class ProfileActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        Cursor cursor = (Cursor) adapterView.getAdapter().getItem(position);
+        cursor.moveToPosition(position);
+        String description = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_BADGE_DESCRIPTION));
+        String badgeName = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_BADGE_NAME));
+        String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_CREATED_ON));
+        if (createdOn != null)
+            description += "\n\nAchieved on: " + createdOn.split("\\s")[0];
+        alertDialogManager.showAlertDialog(ProfileActivity.this, badgeName, description, true);
     }
 }

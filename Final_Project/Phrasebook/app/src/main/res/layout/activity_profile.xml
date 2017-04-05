@@ -7,105 +7,149 @@
     android:layout_height="match_parent"
     tools:context="com.bobbytables.phrasebook.ProfileActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/primary_light"
+        android:focusableInTouchMode="true"
+        android:gravity="center"
+        android:orientation="vertical"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:paddingTop="5dp">
 
-        <com.hanks.htextview.HTextView
-            android:id="@+id/nicknameText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="15dp"
-            android:textAlignment="center"
-            android:textSize="24sp"
-            android:textStyle="bold"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profileImage"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
-            android:layout_below="@id/nicknameText"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="10dp"
-            android:onClick="checkReadPermissions"
-            app:civ_border_color="@color/colorAccent"
-            app:civ_border_width="2dp"/>
+            <com.hanks.htextview.HTextView
+                android:id="@+id/nicknameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="10dp"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent"/>
 
-        <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
-            android:id="@+id/xpPointsBar"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:layout_below="@id/profileImage"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="10dp"
-            app:rcBackgroundColor="@color/colorPrimaryDark"
-            app:rcBackgroundPadding="5dp"
-            app:rcMax="100"
-            app:rcProgress="50"
-            app:rcProgressColor="@color/xpBarProgressBg"
-            app:rcRadius="20dp"
-            app:rcReverse="false"/>
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileImage"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:layout_below="@id/nicknameText"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="10dp"
+                android:onClick="checkReadPermissions"
+                app:civ_border_color="@color/colorAccent"
+                app:civ_border_width="2dp"/>
+        </RelativeLayout>
 
         <TextView
-            android:id="@+id/currentXpLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profileImage"
-            android:textSize="18sp"
-            android:text="1300/2000 XP"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="18dp"
-            android:textColor="@android:color/white"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profileImage"
-            android:layout_toStartOf="@id/xpPointsBar"
-            android:contentDescription="@string/experience_points"
-            android:scaleType="centerCrop"
-            android:src="@drawable/star"/>
-
-        <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
-            android:id="@+id/levelsBar"
-            android:layout_width="220dp"
-            android:layout_height="40dp"
-            android:layout_below="@id/xpPointsBar"
-            android:layout_centerHorizontal="true"
             android:layout_margin="10dp"
-            app:rcBackgroundColor="@color/levelBarBg"
-            app:rcBackgroundPadding="5dp"
-            app:rcMax="100"
-            app:rcProgress="20"
-            app:rcProgressColor="@color/levelBarProgressBg"
-            app:rcRadius="20dp"
-            app:rcReverse="false"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="Your Experience:"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+                android:id="@+id/xpPointsBar"
+                android:layout_width="220dp"
+                android:layout_height="40dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="10dp"
+                app:rcBackgroundColor="@color/colorPrimaryDark"
+                app:rcBackgroundPadding="5dp"
+                app:rcMax="100"
+                app:rcProgress="50"
+                app:rcProgressColor="@color/xpBarProgressBg"
+                app:rcRadius="20dp"
+                app:rcReverse="false"/>
+
+            <TextView
+                android:id="@+id/currentXpLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="18dp"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/xpPointsBar"
+                android:contentDescription="@string/experience_points"
+                android:scaleType="centerCrop"
+                android:src="@drawable/star"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+                android:id="@+id/levelsBar"
+                android:layout_width="220dp"
+                android:layout_height="40dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="10dp"
+                app:rcBackgroundColor="@color/levelBarBg"
+                app:rcBackgroundPadding="5dp"
+                app:rcMax="100"
+                app:rcProgress="20"
+                app:rcProgressColor="@color/levelBarProgressBg"
+                app:rcRadius="20dp"
+                app:rcReverse="false"/>
+
+            <TextView
+                android:id="@+id/currentLevelLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="18dp"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"/>
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:layout_toStartOf="@id/levelsBar"
+                android:contentDescription="@string/experience_points"
+                android:scaleType="centerCrop"
+                android:src="@drawable/level"/>
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/badgeSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="3dp"
+            android:background="@color/colorAccent"/>
 
         <TextView
-            android:id="@+id/currentLevelLabel"
+            android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/xpPointsBar"
-            android:textSize="18sp"
-            android:text="Level 1/10"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="18dp"
-            android:textColor="@android:color/white"/>
+            android:textSize="20sp"
+            android:text="Your Badges:"/>
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_below="@id/xpPointsBar"
-            android:layout_margin="10dp"
-            android:layout_toStartOf="@id/levelsBar"
-            android:contentDescription="@string/experience_points"
-            android:scaleType="centerCrop"
-            android:src="@drawable/level"/>
+        <com.bobbytables.phrasebook.ExpandableHeightGridView
+            android:id="@+id/badgesGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:numColumns="3"/>
 
-    </RelativeLayout>
+    </LinearLayout>
 </ScrollView>

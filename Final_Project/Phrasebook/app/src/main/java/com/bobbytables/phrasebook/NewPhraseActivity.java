@@ -20,6 +20,7 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class NewPhraseActivity extends AppCompatActivity {
 
@@ -29,6 +30,7 @@ public class NewPhraseActivity extends AppCompatActivity {
     private EditText addNewForeignLangPhrase;
     private DatabaseHelper databaseHelper;
     private AlertDialogManager alertDialogManager;
+    private BadgeManager badgeManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class NewPhraseActivity extends AppCompatActivity {
         });
 
         databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
+        badgeManager = BadgeManager.getInstance(getApplicationContext());
         alertDialogManager = new AlertDialogManager();
     }
 
@@ -101,10 +104,18 @@ public class NewPhraseActivity extends AppCompatActivity {
             addNewMotherLangPhrase.setText("");
             Toast.makeText(getApplicationContext(), "New phrase saved!", Toast.LENGTH_SHORT)
                     .show();
+            checkNewBadges();
             return true;
         } catch (Exception e) {
             alertDialogManager.showAlertDialog(NewPhraseActivity.this, "Error!", e.getMessage(), false);
             return false;
+        }
+    }
+
+    private void checkNewBadges() {
+        List<String> achievedBadges = badgeManager.checkNewBadges(BadgeManager.TABLE_PHRASES);
+        if (achievedBadges.size() > 0) {
+            badgeManager.showDialogAchievedBadges(NewPhraseActivity.this, achievedBadges);
         }
     }
 }

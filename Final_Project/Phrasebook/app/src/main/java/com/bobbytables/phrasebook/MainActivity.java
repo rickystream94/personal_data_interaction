@@ -27,7 +27,8 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 import static com.bobbytables.phrasebook.R.id.start;
 import static com.bobbytables.phrasebook.R.id.tabLayout;
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
+        ViewPager.OnPageChangeListener {
 
     private AlertDialogManager alertDialogManager = new AlertDialogManager();
     private SettingsManager settingsManager;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private String foreignLanguage;
     private DatabaseHelper databaseHelper;
     private TabLayout tabLayout;
+    private String[] pagesTitles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        pagesTitles = new String[]{getString(R.string.tab1), getString(R.string
+                .tab2), getString(R.string.tab3)};
 
         initializePager();
         initFloatingActionButton();
@@ -150,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         pager.setAdapter(pagerAdapter);
         //Used for changing selected tab when swiping right/left
         pager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(tabLayout));
+        pager.addOnPageChangeListener(this);
     }
 
     @Override
@@ -218,5 +223,20 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         Toast.makeText(this, "Exported in Downloads/Phrasebook_Exports as JSON file", Toast
                 .LENGTH_SHORT)
                 .show();
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        //Not necessary
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        getSupportActionBar().setTitle(pagesTitles[position]);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        //Not necessary
     }
 }
