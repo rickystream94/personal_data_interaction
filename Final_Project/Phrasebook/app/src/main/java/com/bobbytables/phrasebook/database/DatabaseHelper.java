@@ -428,19 +428,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void exportToJSON(Context context) {
         String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date());
-        JSONObject obj = new JSONObject();
-        try {
-            JSONArray json_phrases = getAllDataFromTable(TABLE_PHRASES);
-            JSONArray json_challenges = getAllDataFromTable(TABLE_CHALLENGES);
-            JSONArray json_badges = getAllDataFromTable(TABLE_BADGES);
-            JSONArray json_user = getUserData(context);
-            obj.put("phrasebook", json_phrases);
-            obj.put("challenges", json_challenges);
-            obj.put("badges", json_badges);
-            obj.put("user", json_user);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        JSONObject obj = createJsonDump();
 
         File savePath;
         String fileName = String.format("PhrasebookDump_%s.json", currentTimeString);
@@ -468,6 +456,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public JSONObject createJsonDump() {
+        JSONObject obj = new JSONObject();
+        try {
+            JSONArray json_phrases = getAllDataFromTable(TABLE_PHRASES);
+            JSONArray json_challenges = getAllDataFromTable(TABLE_CHALLENGES);
+            JSONArray json_badges = getAllDataFromTable(TABLE_BADGES);
+            JSONArray json_user = getUserData(context);
+            obj.put("phrasebook", json_phrases);
+            obj.put("challenges", json_challenges);
+            obj.put("badges", json_badges);
+            obj.put("user", json_user);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return obj;
     }
 
     private JSONArray getUserData(Context context) throws JSONException {

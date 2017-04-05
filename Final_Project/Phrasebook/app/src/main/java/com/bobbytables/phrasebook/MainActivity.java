@@ -1,8 +1,11 @@
 package com.bobbytables.phrasebook;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,12 +23,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
-import static com.bobbytables.phrasebook.R.id.start;
-import static com.bobbytables.phrasebook.R.id.tabLayout;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
         ViewPager.OnPageChangeListener {
@@ -40,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private DatabaseHelper databaseHelper;
     private TabLayout tabLayout;
     private String[] pagesTitles;
+    private RequestQueue requestQueue;
+    private static final String SERVER_URL = "http://www.richmondweb.it/phrasebook/phrasebook.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         initializePager();
         initFloatingActionButton();
+
+        requestQueue = Volley.newRequestQueue(this);
     }
 
     @Override
@@ -118,6 +136,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             case R.id.profile:
                 Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
                 startActivity(i);
+                break;
+            case R.id.upload_data:
+                executeUpload();
+                break;
             default:
                 break;
         }
@@ -210,11 +232,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                     Toast.makeText(this, "Error, permission not granted!", Toast
                             .LENGTH_LONG).show();
                 }
-                return;
+                break;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
@@ -238,5 +257,54 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onPageScrollStateChanged(int state) {
         //Not necessary
+    }
+
+    private void executeUpload() {
+        if (isConnected())
+            uploadDataToServer();
+        else alertDialogManager.showAlertDialog(MainActivity.this, "Error", "You're not " +
+                "connected to any network! Please try again when you have internet " +
+                "connection", false);
+    }
+
+    /**
+     * Checks if phone is connected to network
+     *
+     * @return true if connected, false otherwise
+     */
+    private boolean isConnected() {
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+    public void uploadDataToServer() {
+        final JSONObject jsonObject = databaseHelper.createJsonDump();
+        Request request = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d("Request Response", response);
+                Toast.makeText(MainActivity.this, "Data successfully uploaded!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR RESPONSE", error.toString());
+                Toast.makeText(MainActivity.this, "An error occurred! Please try again...", Toast
+                        .LENGTH_SHORT)
+                        .show();
+            }
+        }) {
+            @Override
+            public Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("data", jsonObject.toString());
+                return params;
+            }
+        };
+
+        // Adding request to request queue
+        requestQueue.add(request);
     }
 }
