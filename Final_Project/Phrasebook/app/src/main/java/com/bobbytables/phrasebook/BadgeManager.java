@@ -102,10 +102,10 @@ public class BadgeManager {
                 "strftime('%M','" + timestamp + "' - " + CREATED_ON + ")<='15'";
 
 
-        //Check Beginner (10 added), Novice (100 added), Expert (250 added)
+        //Check Beginner (30 added), Novice (100 added), Expert (250 added)
         cursor = databaseHelper.performRawQuery(queryCount);
         if (cursor.moveToFirst()) {
-            if (cursor.getInt(0) == 10)
+            if (cursor.getInt(0) == 30)
                 achievedBadgesIds.add(1);
             else if (cursor.getInt(0) == 100)
                 achievedBadgesIds.add(3);
@@ -113,10 +113,10 @@ public class BadgeManager {
                 achievedBadgesIds.add(5);
         }
 
-        //Check added 10 in 1 day
+        //Check Greedy
         cursor = databaseHelper.performRawQuery(queryOneDay);
         if (cursor.moveToFirst()) {
-            if (cursor.getInt(0) == 10)
+            if (cursor.getInt(0) == 20)
                 achievedBadgesIds.add(8);
         }
 
@@ -139,7 +139,7 @@ public class BadgeManager {
         //Check "Sudden inspiration"
         cursor = databaseHelper.performRawQuery(query15Mins);
         if (cursor.moveToFirst()) {
-            if (cursor.getInt(0) == 10)
+            if (cursor.getInt(0) == 15)
                 achievedBadgesIds.add(17);
         }
 
@@ -158,8 +158,8 @@ public class BadgeManager {
                 " strftime('%H'," + CREATED_ON + ") BETWEEN '04' AND '10' AND " +
                 "" + CHALLENGE_CORRECT + "=1";
         String queryNight = queryOneDay + " AND" +
-                " strftime('%H'," + CREATED_ON + ")>= '22' AND strftime('%H',"
-                + DatabaseHelper.KEY_CREATED_ON + ")<='02' AND " + CHALLENGE_CORRECT + "=1";
+                " strftime('%H'," + CREATED_ON + ")>= '19' AND strftime('%H',"
+                + DatabaseHelper.KEY_CREATED_ON + ")<='23' AND " + CHALLENGE_CORRECT + "=1";
         String queryNoSleep = queryOneDay + " AND" +
                 " strftime('%H'," + CREATED_ON + ") BETWEEN '00' AND '06' AND " + CHALLENGE_CORRECT + "=1";
         String query15Mins = "SELECT COUNT(*) FROM " + TABLE_CHALLENGES + " WHERE " +

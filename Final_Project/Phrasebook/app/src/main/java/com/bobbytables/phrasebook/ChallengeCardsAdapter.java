@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +22,6 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 import com.hanks.htextview.HTextView;
 import com.hanks.htextview.HTextViewType;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -166,18 +163,18 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         boolean currentlyArchived = databaseHelper.getArchivedStatus(holder.motherLanguageText.getText
                 ().toString(), correctTranslation);
         if (result && !currentlyArchived) {
-            int xp = XPManager.XP_CHALLENGE_WON;
-            //if(notMaxLevel()) { xpManager.addExperience(xp); } //todo: there will be a bug when maximum level is
-            // reached, because experience is still added! Perform a check to add experience only
-            // if maximum experience is not reached yet
-            xpManager.addExperience(xp);
+            int xp = XPManager.XP_CHALLENGE_WON; //Standard XP amount to add
+            //Add experience only if max XP hasn't been reached
+            if(!(xpManager.getCurrentXp()==xpManager.getXpPerLevel(XPManager.MAX_LEVEL))) {
+                xpManager.addExperience(xp);
+            }
             if (xpManager.checkLevelUp()) {
                 int newLevel = xpManager.levelUp();
                 holder.newLevelText.setVisibility(View.VISIBLE);
                 holder.newLevelText.setAnimateType(HTextViewType.SCALE);
                 holder.newLevelText.animateText("Level " + newLevel + " reached!");
-                xpManager.addExperience(XPManager.XP_BONUS_ARCHIVED);
-                xp += XPManager.XP_BONUS_ARCHIVED;
+                xpManager.addExperience(XPManager.XP_BONUS_LEVEL_UP);
+                xp += XPManager.XP_BONUS_LEVEL_UP;
             }
             holder.xpText.setVisibility(View.VISIBLE);
             holder.xpText.setAnimateType(HTextViewType.ANVIL);

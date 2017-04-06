@@ -18,8 +18,7 @@ public class XPManager {
     private SettingsManager settingsManager;
     private SparseIntArray levelsXP;
     public static final int XP_CHALLENGE_WON = 10;
-    public static final int XP_BONUS_ARCHIVED = 20;
-    private static final int MIN_LEVEL = 0;
+    public static final int XP_BONUS_LEVEL_UP = 20;
     public static final int MAX_LEVEL = 10;
     private static final int LEVEL_1_XP = 50;
     private static final int LEVEL_2_XP = LEVEL_1_XP * 2;
