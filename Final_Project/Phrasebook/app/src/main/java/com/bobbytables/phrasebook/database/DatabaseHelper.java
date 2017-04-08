@@ -250,7 +250,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param dataObject the data object to insert in the DB
      * @return true if a record is found, false otherwise
      */
-    private boolean phraseAlreadyExists(DatabaseModel dataObject) {
+    public boolean phraseAlreadyExists(DatabaseModel dataObject) {
         ContentValues contentValues = dataObject.getContentValues();
         String motherLanguageString = contentValues.getAsString(KEY_MOTHER_LANG_STRING);
         String foreignLanguageString = contentValues.getAsString(KEY_FOREIGN_LANG_STRING);
@@ -340,19 +340,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public boolean updateCorrectCount(String motherLangString, String foreignLangString, boolean
             increment) {
-        String newValue;
-        if (increment)
-            newValue = KEY_CORRECT_COUNT + "+1";
-        else newValue = KEY_CORRECT_COUNT + "-1";
         SQLiteDatabase database = this.getWritableDatabase();
         int previousCorrectCount = getPhraseCorrectCount(motherLangString, foreignLangString);
-        String updateQuery = "UPDATE " + TABLE_PHRASES + " SET " + KEY_CORRECT_COUNT + "=" +
+        int newValue = increment ? previousCorrectCount+1 : previousCorrectCount-1;
+        /*if (increment)
+            newValue = KEY_CORRECT_COUNT + "+1";
+        else newValue = KEY_CORRECT_COUNT + "-1";*/
+        /*String updateQuery = "UPDATE " + TABLE_PHRASES + " SET " + KEY_CORRECT_COUNT + "=" +
                 newValue + "" +
                 " WHERE " +
                 "" + KEY_MOTHER_LANG_STRING + "=? AND " +
                 "" + KEY_FOREIGN_LANG_STRING + "=?";
-        database.execSQL(updateQuery, new Object[]{motherLangString, foreignLangString}); //Always use execSQL with
-        // update statements!
+        database.execSQL(updateQuery, new Object[]{motherLangString, foreignLangString});*/
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_CORRECT_COUNT, newValue);
+        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_MOTHER_LANG_STRING + "=?" +
+                " AND " + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString,
+                foreignLangString});
 
         //Check if correct count has reached the minimum to be archived
         Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " +
@@ -392,15 +396,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void updateArchived(SQLiteDatabase database, String motherLangString, String
             foreignLangString, boolean isArchived) {
         int isArchivedParam = isArchived ? 1 : 0;
-        database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=? " + "WHERE " +
+        /*database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=? " + "WHERE " +
                 KEY_MOTHER_LANG_STRING + "=? AND " +
                 "" + KEY_FOREIGN_LANG_STRING + "=?", new Object[]{isArchivedParam, motherLangString,
-                foreignLangString});
+                foreignLangString});*/
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_ARCHIVED, isArchivedParam);
+        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_MOTHER_LANG_STRING +
+                "=? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString, foreignLangString});
     }
 
-    //Future implementation, allows to edit a currently existing record in the DB
-    //TODO: TO IMPLEMENT
-    public void updatePhrase() {
+    public void updatePhrase(String oldLang1, String oldLang2, String newLang1, String newLang2) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        /*database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_MOTHER_LANG_STRING + "=? AND
+         " +
+                "" + KEY_FOREIGN_LANG_STRING + "=? WHERE " + KEY_MOTHER_LANG_STRING + "=? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=?", new Object[]{newLang1, newLang2, oldLang1,
+                oldLang2});*/
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_MOTHER_LANG_STRING, newLang1);
+        contentValues.put(KEY_FOREIGN_LANG_STRING, newLang2);
+        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_MOTHER_LANG_STRING +
+                "=? AND " +
+                "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{oldLang1, oldLang2});
+    }
+
+    public int deletePhrase(String lang1, String lang2) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        return database.delete(TABLE_PHRASES,KEY_MOTHER_LANG_STRING+"=? AND " +
+                ""+KEY_FOREIGN_LANG_STRING+"=?",new String[]{lang1,lang2});
     }
 
     /**
@@ -643,11 +668,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void updateAchievedBadgeDate(int badgeId) {
         SQLiteDatabase database = this.getReadableDatabase();
         String timestamp = DateUtil.getCurrentTimestamp();
-        String updateQuery = "UPDATE " + TABLE_BADGES + " SET " + KEY_CREATED_ON + "=?" +
+        /*String updateQuery = "UPDATE " + TABLE_BADGES + " SET " + KEY_CREATED_ON + "=?" +
                 " WHERE " +
                 "" + KEY_BADGES_ID + "=?";
-        database.execSQL(updateQuery, new Object[]{timestamp, badgeId}); //Always use execSQL
-        // with update statements!
+        database.execSQL(updateQuery, new Object[]{timestamp, badgeId});*/
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_CREATED_ON,timestamp);
+        int affectedRows = database.update(TABLE_BADGES,contentValues,KEY_BADGES_ID+"="+badgeId,null);
     }
 
     public Cursor performRawQuery(String query) {

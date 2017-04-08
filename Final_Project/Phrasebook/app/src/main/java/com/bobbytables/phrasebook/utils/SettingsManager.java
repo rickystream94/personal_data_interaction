@@ -33,7 +33,7 @@ public class SettingsManager {
     // All Shared Preferences Keys
     private static final String KEY_USER_EXISTS = "userExists";
     private static final String KEY_IS_FIRST_TIME = "isFirstTime"; //might be used for launch
-    // tutorial
+    // tutorial //TODO To implement in future releases
     // User name
     public static final String KEY_NICKNAME = "nickname";
     public static final String KEY_MOTHER_LANGUAGE = "motherLanguage";

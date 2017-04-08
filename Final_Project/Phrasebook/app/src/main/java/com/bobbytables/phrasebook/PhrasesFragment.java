@@ -1,12 +1,14 @@
 package com.bobbytables.phrasebook;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -17,7 +19,7 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PhrasesFragment extends Fragment {
+public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private DatabaseHelper databaseHelper;
     private String motherLanguage;
@@ -79,6 +81,7 @@ public class PhrasesFragment extends Fragment {
         rowCursorAdapter = new DataRowCursorAdapter(getContext(), dataCursor);
         ListView dataListView = (ListView) rootView.findViewById(R.id.dataListView);
         dataListView.setAdapter(rowCursorAdapter);
+        dataListView.setOnItemClickListener(this);
     }
 
     public Cursor getAllPhrases() {
@@ -90,5 +93,25 @@ public class PhrasesFragment extends Fragment {
         // Switch to new cursor and update contents of ListView
         rowCursorAdapter.changeCursor(cursor);
         rowCursorAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        //Perform phrase update if list item is clicked
+        Cursor cursor = (Cursor) adapterView.getAdapter().getItem(position);
+        cursor.moveToPosition(position);
+        String motherLangString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_MOTHER_LANG_STRING));
+        String foreignLangString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_FOREIGN_LANG_STRING));
+        String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_CREATED_ON));
+        Intent intent = new Intent(getActivity(),UpdatePhraseActivity.class);
+        intent.putExtra(DatabaseHelper.KEY_MOTHER_LANG_STRING,motherLangString);
+        intent.putExtra(DatabaseHelper.KEY_FOREIGN_LANG_STRING,foreignLangString);
+        intent.putExtra(DatabaseHelper.KEY_CREATED_ON,createdOn);
+        intent.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE,motherLanguage);
+        intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE,foreignLanguage);
+        startActivity(intent);
     }
 }
