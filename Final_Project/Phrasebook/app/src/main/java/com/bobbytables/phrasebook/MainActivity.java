@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private SettingsManager settingsManager;
     private PagerAdapter pagerAdapter;
     private ViewPager pager;
+    private FloatingActionButton fab;
     public static Handler killerHandler;
     private String motherLanguage;
     private String foreignLanguage;
@@ -233,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
      * Setting floating action button with onClickListener
      */
     private void initFloatingActionButton() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -243,6 +244,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 startActivity(i);
             }
         });
+        fab.hide(); //by default
     }
 
     /**
@@ -265,6 +267,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         pager.setCurrentItem(tab.getPosition());
+        switch (tab.getPosition()) {
+            case 0:
+                fab.hide();
+                break;
+            default:
+                fab.show();
+        }
     }
 
     @Override

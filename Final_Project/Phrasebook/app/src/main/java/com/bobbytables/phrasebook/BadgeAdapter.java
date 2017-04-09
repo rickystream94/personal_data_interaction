@@ -40,8 +40,11 @@ public class BadgeAdapter extends CursorAdapter {
         badgeName.setText(text);
         String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_CREATED_ON));
-        int resource = createdOn != null ? cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper
-                .KEY_BADGE_ICON_RESOURCE)) : R.drawable.badge;
+        //TODO: Change below line when badges icons are ready
+        int resource = createdOn != null ? R.drawable.unlocked : R.drawable.badge;
+        /*int resource = createdOn != null ? cursor.getInt(cursor.getColumnIndexOrThrow
+                (DatabaseHelper
+                .KEY_BADGE_ICON_RESOURCE)) : R.drawable.badge;*/
         badgeIcon.setImageResource(resource);
     }
 }
