@@ -60,7 +60,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Badges Table Columns
     public static final String KEY_BADGES_ID = "id";
-    public static final String KEY_BADGE_ICON_RESOURCE = "badgeIcon";
     public static final String KEY_BADGE_NAME = "badgeName";
     public static final String KEY_BADGE_DESCRIPTION = "badgeDesc";
     //Common columns
@@ -88,7 +87,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "(" +
             KEY_BADGES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
             KEY_BADGE_NAME + " TEXT, " +
-            KEY_BADGE_ICON_RESOURCE + " BLOB, " +
             KEY_CREATED_ON + " TEXT, " +
             KEY_BADGE_DESCRIPTION + " TEXT)";
 
@@ -130,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<String[]> badgesData = csvUtils.readCSV(BADGES_CSV);
         for (String[] data : badgesData) {
             //TODO: replace correct icons in the badges.csv file when populating DB
-            DatabaseModel dataObject = new BadgeModel(data[0], data[1], data[2], TABLE_BADGES);
+            DatabaseModel dataObject = new BadgeModel(data[0], data[1], TABLE_BADGES);
             sqLiteDatabase.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
         }
     }

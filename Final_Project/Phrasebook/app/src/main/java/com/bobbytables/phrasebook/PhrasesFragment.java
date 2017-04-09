@@ -114,4 +114,11 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE,foreignLanguage);
         startActivity(intent);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        rowCursorAdapter.changeCursor(getAllPhrases());
+        rowCursorAdapter.notifyDataSetChanged();
+    }
 }

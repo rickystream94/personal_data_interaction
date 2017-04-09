@@ -9,14 +9,12 @@ import android.content.ContentValues;
 public class BadgeModel implements DatabaseModel {
     private String tableName;
     private String badgeName;
-    private String badgeResource;
     private String description;
 
-    public BadgeModel(String badgeName, String description, String badgeResource, String tableName) {
+    public BadgeModel(String badgeName, String description, String tableName) {
         this.badgeName = badgeName;
         this.tableName = tableName;
         this.description = description;
-        this.badgeResource = badgeResource;
     }
 
     @Override
@@ -24,7 +22,6 @@ public class BadgeModel implements DatabaseModel {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.KEY_BADGE_NAME, this.badgeName);
         contentValues.put(DatabaseHelper.KEY_BADGE_DESCRIPTION, this.description);
-        contentValues.put(DatabaseHelper.KEY_BADGE_ICON_RESOURCE, this.badgeResource);
         return contentValues;
     }
 

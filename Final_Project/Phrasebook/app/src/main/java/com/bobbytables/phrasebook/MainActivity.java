@@ -152,14 +152,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        //Needed to refresh the layout of the fragments and always display the
-        // most up-to-date content
-        initializePager();
-    }
-
-    @Override
     //Remember: this method is invoked just once, exactly when the activity is created!
     //The return value states whether the menu will be active for the activity (true) or not (false)
     public boolean onCreateOptionsMenu(Menu menu) {

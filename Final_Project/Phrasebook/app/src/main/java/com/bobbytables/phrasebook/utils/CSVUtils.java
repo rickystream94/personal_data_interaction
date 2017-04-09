@@ -49,8 +49,7 @@ public class CSVUtils {
                 String[] rowData = csvLine.split(";");
                 String name = rowData[0];
                 String description = rowData[1];
-                String resource = rowData[2];
-                badgesData.add(new String[]{name, description, resource});
+                badgesData.add(new String[]{name, description});
             }
         } catch (IOException e) {
             Log.e("CSV Reader", "IOException:", e);

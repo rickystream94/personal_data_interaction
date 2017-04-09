@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 
+import java.lang.reflect.Field;
+
 /**
  * Created by ricky on 29/03/2017.
  */
@@ -40,11 +42,18 @@ public class BadgeAdapter extends CursorAdapter {
         badgeName.setText(text);
         String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_CREATED_ON));
-        //TODO: Change below line when badges icons are ready
-        int resource = createdOn != null ? R.drawable.unlocked : R.drawable.badge;
-        /*int resource = createdOn != null ? cursor.getInt(cursor.getColumnIndexOrThrow
-                (DatabaseHelper
-                .KEY_BADGE_ICON_RESOURCE)) : R.drawable.badge;*/
-        badgeIcon.setImageResource(resource);
+        int resource = R.drawable.badge; //default initialization value, just not to have null
+        try {
+            int badgeId = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_BADGES_ID));
+            Class res = R.drawable.class;
+            Field field = res.getField("badge" + badgeId);
+            int badgeDrawableId = field.getInt(null);
+            resource = createdOn != null ? badgeDrawableId : R.drawable.badge;
+        } catch (Exception e) {
+            Log.e("BadgeIcon", "Failure to get drawable id.", e);
+            resource = createdOn != null ? R.drawable.unlocked : R.drawable.badge;
+        } finally {
+            badgeIcon.setImageResource(resource);
+        }
     }
 }

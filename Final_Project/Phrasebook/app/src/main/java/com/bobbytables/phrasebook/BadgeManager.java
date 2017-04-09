@@ -98,7 +98,7 @@ public class BadgeManager {
                 "LENGTH(" + DatabaseHelper.KEY_FOREIGN_LANG_STRING + ")>=25";
         String queryNight = queryOneDay +
                 " AND strftime('%H'," + CREATED_ON + ") BETWEEN '00' AND '06'";
-        String query15Mins = "SELECT COUNT(*) FROM " + TABLE_PHRASES + " WHERE " +
+        String query15Mins = queryOneDay + " AND " +
                 "strftime('%M','" + timestamp + "' - " + CREATED_ON + ")<='15'";
 
 
@@ -162,7 +162,7 @@ public class BadgeManager {
                 + DatabaseHelper.KEY_CREATED_ON + ")<='23' AND " + CHALLENGE_CORRECT + "=1";
         String queryNoSleep = queryOneDay + " AND" +
                 " strftime('%H'," + CREATED_ON + ") BETWEEN '00' AND '06' AND " + CHALLENGE_CORRECT + "=1";
-        String query15Mins = "SELECT COUNT(*) FROM " + TABLE_CHALLENGES + " WHERE " +
+        String query15Mins = queryOneDay + " AND " +
                 "strftime('%M','" + timestamp + "' - " + CREATED_ON + ")<='15'";
 
         //Check Doing Good (30 correct), Novice (150 correct), Beacon of light (300 correct)
