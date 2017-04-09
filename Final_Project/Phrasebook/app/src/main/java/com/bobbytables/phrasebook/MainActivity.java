@@ -2,6 +2,7 @@ package com.bobbytables.phrasebook;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -14,6 +15,7 @@ import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -34,10 +36,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
+import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,10 +93,61 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         pagesTitles = new String[]{getString(R.string.tab1), getString(R.string
                 .tab2), getString(R.string.tab3)};
 
+        //Initialize ViewPager
         initializePager();
         initFloatingActionButton();
 
+        //Initialize request queue for Volley
         requestQueue = Volley.newRequestQueue(this);
+
+        //TODO: to be removed after experiment!
+        //Perform check of gamification, to be changed after 10 days
+        if (settingsManager.getPrefStringValue(SettingsManager.KEY_CREATED).equals(""))
+            return;
+        String currentDate = DateUtil.getCurrentTimestamp();
+        String userCreationDate = settingsManager.getPrefStringValue(SettingsManager.KEY_CREATED);
+        try {
+            int daysDiff = DateUtil.daysBetweenDates(userCreationDate, currentDate);
+            boolean hasAlreadySwitchedVersion = settingsManager.getPrefBoolValue(SettingsManager
+                    .KEY_SWITCHED_VERSION);
+            boolean hasPerformedLastUpload = settingsManager.getPrefBoolValue(SettingsManager
+                    .KEY_FINAL_UPLOAD_PERFORMED);
+            if (daysDiff >= 10 && !hasAlreadySwitchedVersion) {
+                try {
+                    //Try to upload data before switching to new version
+                    executeUpload();
+                    boolean gamificationStatus = settingsManager.getPrefBoolValue(SettingsManager
+                            .KEY_GAMIFICATION);
+                    settingsManager.updatePrefValue(SettingsManager.KEY_GAMIFICATION, !gamificationStatus);
+                    settingsManager.updatePrefValue(SettingsManager.KEY_SWITCHED_VERSION, true);
+                    String message = getString(R.string.uiSwitchRootMessage);
+                    if (!gamificationStatus)
+                        message += getString(R.string.uiSwitchGamification);
+                    else
+                        message += getString(R.string.uiSwitchNoGamification);
+                    alertDialogManager.showAlertDialog(MainActivity.this, "Important update!", message,
+                            !gamificationStatus);
+                    return;
+                } catch (Exception e) {
+                    alertDialogManager.showAlertDialog(MainActivity.this, "Error", getString(R.string.uiSwitchErrorConnection), false);
+                }
+            }
+            //perform latest automatic data upload
+            if (daysDiff >= 20 && hasAlreadySwitchedVersion && !hasPerformedLastUpload) {
+                try {
+                    //Try to upload data before switching to new version
+                    executeUpload();
+                    settingsManager.updatePrefValue(SettingsManager.KEY_FINAL_UPLOAD_PERFORMED, true);
+                    alertDialogManager.showAlertDialog(MainActivity.this, "Important update!",
+                            getString(R.string.finalMessage),
+                            true);
+                } catch (Exception e) {
+                    alertDialogManager.showAlertDialog(MainActivity.this, "Error", getString(R.string.uiSwitchErrorConnection), false);
+                }
+            }
+        } catch (ParseException e) {
+            alertDialogManager.showAlertDialog(MainActivity.this, "Error", e.getMessage(), false);
+        }
     }
 
     @Override
@@ -109,6 +164,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
+        //TODO: to be changed after experiment, delete the 2 lines below!
+        MenuItem profileItem = menu.findItem(R.id.profile);
+        profileItem.setVisible(settingsManager.getPrefBoolValue(SettingsManager.KEY_GAMIFICATION));
+        //Developer buttons, enable if needed
+        MenuItem resetXpItem = menu.findItem(R.id.reset_xp);
+        resetXpItem.setVisible(false);
         return true;
     }
 
@@ -117,12 +178,26 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         int id = item.getItemId();
         switch (id) {
             case R.id.delete_data:
-                //ADD CONFIRMATION ALERT DIALOG: Are you sure This will delete all the data!
-                databaseHelper.reset();
-                Toast.makeText(this, "All data successfully deleted!", Toast
-                        .LENGTH_SHORT)
-                        .show();
-                initializePager();
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                alertDialog.setTitle("Are you sure?");
+                alertDialog.setMessage("All the data will be permanently deleted and cannot be " +
+                        "recovered!");
+                alertDialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        databaseHelper.reset();
+                        Toast.makeText(MainActivity.this, "All data successfully deleted!", Toast
+                                .LENGTH_SHORT)
+                                .show();
+                        initializePager();
+                    }
+                });
+                alertDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                alertDialog.show();
                 break;
             case R.id.export_data:
                 checkWritePermissions();
@@ -138,7 +213,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 startActivity(i);
                 break;
             case R.id.upload_data:
-                executeUpload();
+                try {
+                    executeUpload();
+                } catch (Exception e) {
+                    alertDialogManager.showAlertDialog(MainActivity.this, "Error", e.getMessage(), false);
+                }
+                break;
+            case R.id.about:
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;
@@ -259,12 +342,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         //Not necessary
     }
 
-    private void executeUpload() {
+    private void executeUpload() throws Exception {
         if (isConnected())
             uploadDataToServer();
-        else alertDialogManager.showAlertDialog(MainActivity.this, "Error", "You're not " +
+        else throw new Exception("You're not " +
                 "connected to any network! Please try again when you have internet " +
-                "connection", false);
+                "connection");
     }
 
     /**

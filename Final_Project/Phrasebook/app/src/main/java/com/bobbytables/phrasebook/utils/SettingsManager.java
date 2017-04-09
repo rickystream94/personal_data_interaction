@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 /**
@@ -43,6 +44,9 @@ public class SettingsManager {
     public static final String KEY_CREATED = "created";
     //GAMIFICATION INCLUDED OR NOT
     public static final String KEY_GAMIFICATION = "Gamification";
+    //TODO: remove unnecessary keys in future releases
+    public static final String KEY_SWITCHED_VERSION = "hasSwitchedVersion";
+    public static final String KEY_FINAL_UPLOAD_PERFORMED = "lastUploadPerformed";
     public static final String KEY_PROFILE_PIC = "profilePic";
 
     private SettingsManager(Context context) {
@@ -89,7 +93,10 @@ public class SettingsManager {
         editor.putInt(KEY_LEVEL, 0);
         editor.putString(KEY_CREATED, currentTimeString);
         editor.putString(KEY_PROFILE_PIC, "DEFAULT"); //is updated in version 2!
-        editor.putBoolean(KEY_GAMIFICATION, true); //is updated in version 2!
+        //TODO: now is performed randomly, but it will be changed to true after experiment
+        editor.putBoolean(KEY_GAMIFICATION, (Math.random() < 0.5));
+        editor.putBoolean(KEY_SWITCHED_VERSION, false); //TODO: TO BE REMOVED after experiment
+        editor.putBoolean(KEY_FINAL_UPLOAD_PERFORMED, false);
         editor.commit();
     }
 
@@ -145,7 +152,7 @@ public class SettingsManager {
         editor.commit();
     }
 
-    public void updateBoolValue(String key, boolean value) {
+    public void updatePrefValue(String key, boolean value) {
         editor.putBoolean(key, value);
         editor.commit();
     }
@@ -176,6 +183,7 @@ public class SettingsManager {
         userData.put(KEY_LEVEL, getPrefIntValue(KEY_LEVEL));
         userData.put(KEY_TOTAL_XP, getPrefIntValue(KEY_TOTAL_XP));
         userData.put(KEY_GAMIFICATION, getPrefBoolValue(KEY_GAMIFICATION) ? 1 : 0);
+        userData.put(KEY_SWITCHED_VERSION, getPrefBoolValue(KEY_SWITCHED_VERSION) ? 1 : 0);
         return userData;
     }
 

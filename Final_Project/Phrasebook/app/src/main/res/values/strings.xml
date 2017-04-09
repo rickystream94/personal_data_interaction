@@ -23,4 +23,20 @@
     <string name="empty_database_text">Your phrasebook is currently empty!\nStart adding something by pressing the \'+\' button below!</string>
     <string name="search_hint">Search in phrasebook…</string>
     <string name="experience_points">Experience Points</string>
+    <string name="uiSwitchRootMessage">As a main purpose of this experiment, the layout of the
+        application has changed: </string>
+    <string name="uiSwitchGamification">Gamification has been introduced! A whole new layout is now available, check out the top-right menu button in the home screen!</string>
+    <string name="uiSwitchNoGamification">Gamification has been removed. No more experience points, no more levels, no more badges.</string>
+    <string name="uiSwitchErrorConnection">An automatic data upload has been requested at this point of your experience with the app. You don\'t have to do anything but just be sure you\'re connected to a network and re-launch the app.</string>
+    <string name="finalMessage">The final data upload has been performed. The evaluation period has terminated and we (the developers) won\'t collect any more data about your app usage. Thank you for your contribution! If you wish to use again the app with the all the available features, please remember to fill out the final survey and check the relative question!</string>
+    <string name="about_phrasebook">About Phrasebook</string>
+    <string name="about_phrasebook_text">Version 1.1\nThis version has been specifically
+        developed to conduct a research experiment and perform inferential data analysis on
+    the results. The users implicitly agree that the developers are allowed to collect all the data
+        stored by the user including timestamps, nickname, challenges results and phrases.
+        Therefore, we strongly recommend not to store sensitive data such as passwords or
+        similar.\n\nWe kindly ask our users to report any type of issues encountered with
+        the usage of the app that were preventing a pleasant user experience, as well as
+        any type of bugs that should be fixed. Please address any questions or inquiries to
+        the developers and feel free and very welcome to contact them.</string>
 </resources>

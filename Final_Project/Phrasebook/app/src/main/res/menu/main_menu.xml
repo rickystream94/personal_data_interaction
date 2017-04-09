@@ -18,4 +18,7 @@
     <item
         android:id="@+id/reset_xp"
         android:title="Reset XP"/>
+    <item
+        android:id="@+id/about"
+        android:title="About"/>
 </menu>

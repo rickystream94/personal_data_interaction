@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.bobbytables.phrasebook.R;
 import com.bobbytables.phrasebook.utils.CSVUtils;
 import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
@@ -40,6 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = DatabaseHelper.class.getName();
     private Context context;
     private CSVUtils csvUtils;
+    private static final String BADGES_CSV = "badges.csv";
 
     // Table Names
     public static final String TABLE_PHRASES = "phrases";
@@ -127,7 +127,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void populateBadgesTable(SQLiteDatabase sqLiteDatabase) {
-        List<String[]> badgesData = csvUtils.readCSV("badges.csv");
+        List<String[]> badgesData = csvUtils.readCSV(BADGES_CSV);
         for (String[] data : badgesData) {
             //TODO: replace correct icons in the badges.csv file when populating DB
             DatabaseModel dataObject = new BadgeModel(data[0], data[1], data[2], TABLE_BADGES);
@@ -150,8 +150,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion == 1) {
             SettingsManager settingsManager = SettingsManager.getInstance(context);
             settingsManager.updatePrefValue(SettingsManager.KEY_LEVEL, 0);
-            settingsManager.updateBoolValue(SettingsManager.KEY_GAMIFICATION, true);
+            settingsManager.updatePrefValue(SettingsManager.KEY_GAMIFICATION, (Math.random() < 0.5));
             settingsManager.updatePrefValue(SettingsManager.KEY_PROFILE_PIC, "DEFAULT");
+            settingsManager.updatePrefValue(SettingsManager.KEY_SWITCHED_VERSION, false);
+            settingsManager.updatePrefValue(SettingsManager.KEY_FINAL_UPLOAD_PERFORMED, false);
+            settingsManager.updatePrefValue(SettingsManager.KEY_CREATED, DateUtil.getCurrentTimestamp());
         }
 
         Log.e(TAG, "Updating table from " + oldVersion + " to " + newVersion);

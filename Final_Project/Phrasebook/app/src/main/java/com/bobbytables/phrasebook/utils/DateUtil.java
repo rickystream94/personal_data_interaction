@@ -19,7 +19,7 @@ public abstract class DateUtil {
     //1 minute = 60 seconds
     //1 hour = 60 x 60 = 3600
     //1 day = 3600 x 24 = 86400
-    public int daysBetweenDates(String startDateString, String endDateString) throws
+    public static int daysBetweenDates(String startDateString, String endDateString) throws
             ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(SQLITE_DATE_FORMAT);
         Date startDate = simpleDateFormat.parse(startDateString);
