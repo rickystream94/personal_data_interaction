@@ -275,4 +275,12 @@ public class ProgressFragment extends Fragment {
         pieChart.invalidate(); //refresh
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        initChallengesPieChart();
+        initPhrasesPieChart();
+        initActivityBarChart();
+        initChallengesRatioChart();
+    }
 }

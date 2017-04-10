@@ -118,7 +118,9 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public void onResume() {
         super.onResume();
-        rowCursorAdapter.changeCursor(getAllPhrases());
-        rowCursorAdapter.notifyDataSetChanged();
+        if (rowCursorAdapter != null) {
+            rowCursorAdapter.changeCursor(getAllPhrases());
+            rowCursorAdapter.notifyDataSetChanged();
+        }
     }
 }

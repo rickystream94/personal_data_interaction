@@ -127,7 +127,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void populateBadgesTable(SQLiteDatabase sqLiteDatabase) {
         List<String[]> badgesData = csvUtils.readCSV(BADGES_CSV);
         for (String[] data : badgesData) {
-            //TODO: replace correct icons in the badges.csv file when populating DB
             DatabaseModel dataObject = new BadgeModel(data[0], data[1], TABLE_BADGES);
             sqLiteDatabase.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
         }
@@ -153,6 +152,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             settingsManager.updatePrefValue(SettingsManager.KEY_SWITCHED_VERSION, false);
             settingsManager.updatePrefValue(SettingsManager.KEY_FINAL_UPLOAD_PERFORMED, false);
             settingsManager.updatePrefValue(SettingsManager.KEY_CREATED, DateUtil.getCurrentTimestamp());
+            settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
         }
 
         Log.e(TAG, "Updating table from " + oldVersion + " to " + newVersion);

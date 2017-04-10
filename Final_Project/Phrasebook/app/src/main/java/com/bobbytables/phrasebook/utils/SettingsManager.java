@@ -33,8 +33,7 @@ public class SettingsManager {
     private static final String PREF_NAME = "MyPref";
     // All Shared Preferences Keys
     private static final String KEY_USER_EXISTS = "userExists";
-    private static final String KEY_IS_FIRST_TIME = "isFirstTime"; //might be used for launch
-    // tutorial //TODO To implement in future releases
+    public static final String KEY_IS_FIRST_TIME = "isFirstTime";
     // User name
     public static final String KEY_NICKNAME = "nickname";
     public static final String KEY_MOTHER_LANGUAGE = "motherLanguage";
@@ -97,6 +96,7 @@ public class SettingsManager {
         editor.putBoolean(KEY_GAMIFICATION, (Math.random() < 0.5));
         editor.putBoolean(KEY_SWITCHED_VERSION, false); //TODO: TO BE REMOVED after experiment
         editor.putBoolean(KEY_FINAL_UPLOAD_PERFORMED, false);
+        editor.putBoolean(KEY_IS_FIRST_TIME, true);
         editor.commit();
     }
 

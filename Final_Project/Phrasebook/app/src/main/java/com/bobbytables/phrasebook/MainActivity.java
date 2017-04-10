@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -148,6 +149,19 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             }
         } catch (ParseException e) {
             alertDialogManager.showAlertDialog(MainActivity.this, "Error", e.getMessage(), false);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (settingsManager.getPrefBoolValue(SettingsManager.KEY_IS_FIRST_TIME)) {
+            Cursor cursor = databaseHelper.performRawQuery("SELECT * FROM " + DatabaseHelper
+                    .TABLE_PHRASES + " LIMIT 2");
+            if (cursor.getCount() == 1) {
+                settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
+                initializePager();
+            }
         }
     }
 
