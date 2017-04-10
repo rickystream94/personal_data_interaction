@@ -278,9 +278,11 @@ public class ProgressFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        initChallengesPieChart();
-        initPhrasesPieChart();
-        initActivityBarChart();
-        initChallengesRatioChart();
+        if (rootView != null) {
+            initChallengesPieChart();
+            initPhrasesPieChart();
+            initActivityBarChart();
+            initChallengesRatioChart();
+        }
     }
 }
