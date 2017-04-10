@@ -82,7 +82,8 @@ public class SettingsManager {
         MainActivity.killerHandler.sendEmptyMessage(0);
     }
 
-    public void createUser(String nickname, String motherLanguage, String foreignLanguage) {
+    public void createUser(String nickname, String motherLanguage, String foreignLanguage,
+                           boolean gamification) {
         String currentTimeString = DateUtil.getCurrentTimestamp();
         editor.putString(KEY_NICKNAME, nickname);
         editor.putString(KEY_MOTHER_LANGUAGE, motherLanguage.toUpperCase());
@@ -93,7 +94,7 @@ public class SettingsManager {
         editor.putString(KEY_CREATED, currentTimeString);
         editor.putString(KEY_PROFILE_PIC, "DEFAULT"); //is updated in version 2!
         //TODO: now is performed randomly, but it will be changed to true after experiment
-        editor.putBoolean(KEY_GAMIFICATION, (Math.random() < 0.5));
+        editor.putBoolean(KEY_GAMIFICATION, gamification);
         editor.putBoolean(KEY_SWITCHED_VERSION, false); //TODO: TO BE REMOVED after experiment
         editor.putBoolean(KEY_FINAL_UPLOAD_PERFORMED, false);
         editor.putBoolean(KEY_IS_FIRST_TIME, true);
