@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private TabLayout tabLayout;
     private String[] pagesTitles;
     private RequestQueue requestQueue;
-    private static final String SERVER_URL = "http://www.richmondweb.it/phrasebook/phrasebook.php";
+    private static final String SERVER_URL = "http://www.richmondweb.it/phrasebook/upload_data.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
