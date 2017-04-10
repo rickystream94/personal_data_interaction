@@ -2,10 +2,12 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:htext="http://schemas.android.com/apk/res-auto"
     android:id="@+id/challengeCardView"
     android:layout_width="match_parent"
     android:layout_height="300dp"
     android:layout_margin="5dp"
+    android:animateLayoutChanges="true"
     card_view:cardBackgroundColor="@color/primary_light"
     card_view:cardCornerRadius="4dp">
 
@@ -20,7 +22,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
             android:text="@string/translate_this_in"
             android:textSize="18sp"/>
 
@@ -29,7 +30,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/translate_this"
-            android:layout_toRightOf="@id/translate_this"
             android:textSize="18sp"/>
 
         <TextView
@@ -47,10 +47,10 @@
             android:layout_below="@id/motherLanguageText"
             android:layout_marginTop="10dp"
             android:hint="@string/type_the_translation"
+            android:imeOptions="actionDone"
             android:inputType="textCapSentences"
             android:padding="3dp"
-            android:textSize="24sp"
-            android:imeOptions="actionDone"/>
+            android:textSize="24sp"/>
 
         <View
             android:layout_width="match_parent"
@@ -70,6 +70,18 @@
             android:textSize="24sp"
             android:visibility="invisible"/>
 
+        <com.hanks.htextview.HTextView
+            android:id="@+id/newLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/correctTranslation"
+            android:layout_marginTop="10dp"
+            android:padding="3dp"
+            android:textColor="@color/colorAccent"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:visibility="invisible"/>
+
         <Button
             android:id="@+id/checkTranslation"
             style="@style/Widget.AppCompat.Button.Colored"
@@ -77,8 +89,19 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:text="@string/check"/>
+            android:text="@string/check"
+            android:drawableEnd="@drawable/ic_done_white_24dp"/>
+
+        <com.hanks.htextview.HTextView
+            android:id="@+id/xpText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/checkTranslation"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:visibility="invisible"/>
 
         <Button
             android:id="@+id/nextChallenge"
@@ -87,8 +110,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
             android:text="@string/next_challenge"
-            android:visibility="invisible"/>
+            android:visibility="invisible"
+            android:drawableEnd="@drawable/ic_arrow_forward_white_24dp"/>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

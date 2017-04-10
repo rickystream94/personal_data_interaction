@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="com.bobbytables.phrasebook.UpdatePhraseActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Do you want to update/correct/delete this phrase/word in your phrasebook?"
+        android:textAlignment="center"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/updateLang1Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:textSize="16sp"/>
+
+    <EditText
+        android:id="@+id/updateLang1EditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:inputType="textMultiLine"
+        android:maxLength="50"
+        android:maxLines="3"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/updateLang2Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textAlignment="center"
+        android:textSize="16sp"/>
+
+    <EditText
+        android:id="@+id/updateLang2EditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:inputType="textMultiLine"
+        android:maxLength="50"
+        android:maxLines="3"
+        android:textSize="18sp"/>
+
+</LinearLayout>
