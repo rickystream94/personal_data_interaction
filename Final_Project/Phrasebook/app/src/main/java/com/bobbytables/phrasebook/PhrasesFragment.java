@@ -112,7 +112,7 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         intent.putExtra(DatabaseHelper.KEY_CREATED_ON,createdOn);
         intent.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE,motherLanguage);
         intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE,foreignLanguage);
-        startActivity(intent);
+        getActivity().startActivityForResult(intent, 1);
     }
 
     @Override

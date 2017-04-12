@@ -156,10 +156,24 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     protected void onResume() {
         super.onResume();
         if (settingsManager.getPrefBoolValue(SettingsManager.KEY_IS_FIRST_TIME)) {
-            Cursor cursor = databaseHelper.performRawQuery("SELECT * FROM " + DatabaseHelper
-                    .TABLE_PHRASES + " LIMIT 2");
-            if (cursor.getCount() == 1) {
+            Cursor cursor = databaseHelper.performRawQuery("SELECT COUNT(*) FROM " + DatabaseHelper
+                    .TABLE_PHRASES);
+            cursor.moveToFirst();
+            if (cursor.getInt(0) > 0) {
                 settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
+                initializePager();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //Update Phrase Activity request code
+        if (requestCode == 1) {
+            if (resultCode == RESULT_CANCELED) {
+                //It means that the database is empty and we need to refresh the view pager
+                settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
                 initializePager();
             }
         }
