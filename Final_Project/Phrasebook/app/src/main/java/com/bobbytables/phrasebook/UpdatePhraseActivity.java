@@ -84,6 +84,12 @@ public class UpdatePhraseActivity extends AppCompatActivity {
         } else {
             Toast.makeText(UpdatePhraseActivity.this, "Phrase successfully deleted!", Toast
                     .LENGTH_LONG).show();
+            int resultCode;
+            if (databaseHelper.isDatabaseEmpty()) {
+                resultCode = RESULT_CANCELED;
+            } else
+                resultCode = RESULT_OK;
+            setResult(resultCode);
             finish();
         }
     }
