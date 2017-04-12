@@ -193,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         databaseHelper.reset();
+                        settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
                         Toast.makeText(MainActivity.this, "All data successfully deleted!", Toast
                                 .LENGTH_SHORT)
                                 .show();
