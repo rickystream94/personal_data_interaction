@@ -6,6 +6,7 @@ First release for experiment, with full working implementation
 
 **Future releases features**
 * Multiple languages support
+* Notification service
 * Implementation of page scrolling in Phrasebook tab (currently only the last 30 phrases are shown, while it's still possible to look for every phrase with the search bar;
 * Category/tag labeling for phrases
 * Filtering/Sorting in Phrasebook tab
