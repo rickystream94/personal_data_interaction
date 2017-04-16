@@ -9,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
@@ -19,13 +21,15 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener,View.OnClickListener {
 
     private DatabaseHelper databaseHelper;
     private String motherLanguage;
     private String foreignLanguage;
     private DataRowCursorAdapter rowCursorAdapter;
     private View rootView;
+    private int currentOffset = 0;
+    private static final int OFFSET = 10;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +73,10 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         });
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        Button nextPageButton = (Button)rootView.findViewById(R.id.nextPage);
+        Button previousPageButton = (Button)rootView.findViewById(R.id.previousPage);
+        nextPageButton.setOnClickListener(this);
+        previousPageButton.setOnClickListener(this);
 
         //Creating cursor adapter to attach to list view
         initPhrasebookData();
@@ -85,7 +93,7 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     public Cursor getAllPhrases() {
-        return databaseHelper.getDataFromTable(DatabaseHelper.TABLE_PHRASES);
+        return databaseHelper.getDataFromTable(DatabaseHelper.TABLE_PHRASES, currentOffset);
     }
 
     public void searchPhrase(String query) {
@@ -106,12 +114,12 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
                 .KEY_FOREIGN_LANG_STRING));
         String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_CREATED_ON));
-        Intent intent = new Intent(getActivity(),UpdatePhraseActivity.class);
-        intent.putExtra(DatabaseHelper.KEY_MOTHER_LANG_STRING,motherLangString);
-        intent.putExtra(DatabaseHelper.KEY_FOREIGN_LANG_STRING,foreignLangString);
-        intent.putExtra(DatabaseHelper.KEY_CREATED_ON,createdOn);
-        intent.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE,motherLanguage);
-        intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE,foreignLanguage);
+        Intent intent = new Intent(getActivity(), UpdatePhraseActivity.class);
+        intent.putExtra(DatabaseHelper.KEY_MOTHER_LANG_STRING, motherLangString);
+        intent.putExtra(DatabaseHelper.KEY_FOREIGN_LANG_STRING, foreignLangString);
+        intent.putExtra(DatabaseHelper.KEY_CREATED_ON, createdOn);
+        intent.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE, motherLanguage);
+        intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE, foreignLanguage);
         getActivity().startActivityForResult(intent, 1);
     }
 
@@ -122,5 +130,30 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
             rowCursorAdapter.changeCursor(getAllPhrases());
             rowCursorAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.nextPage:
+                Cursor cursor = databaseHelper.performRawQuery("SELECT COUNT(*) FROM " + DatabaseHelper
+                        .TABLE_PHRASES);
+                cursor.moveToFirst();
+                int totalRows = cursor.getInt(0);
+                if (totalRows - currentOffset < OFFSET)
+                    return; //no more rows to display, no need to change page
+                else
+                    currentOffset += OFFSET;
+                break;
+            case R.id.previousPage:
+                if (currentOffset==0)
+                    return; //can't be negative offset, we're at starting point
+                else
+                    currentOffset-=OFFSET;
+                break;
+        }
+        rowCursorAdapter.changeCursor(databaseHelper.getDataFromTable(DatabaseHelper
+                .TABLE_PHRASES, currentOffset));
+        rowCursorAdapter.notifyDataSetChanged();
     }
 }
