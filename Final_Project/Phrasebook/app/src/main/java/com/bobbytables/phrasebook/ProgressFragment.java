@@ -51,6 +51,10 @@ public class ProgressFragment extends Fragment {
 
     private DatabaseHelper databaseHelper;
     private View rootView;
+    private PieChart challengesPieChart;
+    private PieChart phrasesPieChart;
+    private BarChart activityBarChart;
+    private LineChart ratioLineChart;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,7 +79,7 @@ public class ProgressFragment extends Fragment {
 
     private void initChallengesRatioChart() {
         //Get chart
-        LineChart lineChart = (LineChart) rootView.findViewById(R.id.ratioChart);
+        ratioLineChart = (LineChart) rootView.findViewById(R.id.ratioChart);
 
         //Retrieve and set entries
         Cursor cursor = databaseHelper.getChallengesRatio();
@@ -102,27 +106,27 @@ public class ProgressFragment extends Fragment {
 
         //Adding data to the chart
         LineData data = new LineData(dataSet);
-        lineChart.setData(data);
+        ratioLineChart.setData(data);
 
         //Styling chart
-        lineChart.setScaleYEnabled(false);
-        lineChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
-        lineChart.getXAxis().setDrawGridLines(false);
-        lineChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
+        ratioLineChart.setScaleYEnabled(false);
+        ratioLineChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
+        ratioLineChart.getXAxis().setDrawGridLines(false);
+        ratioLineChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
         //lineChart.getXAxis().setGranularity(1f); //TODO: it doesn't work for this chart! Why?
-        lineChart.getAxisRight().setEnabled(false);
+        ratioLineChart.getAxisRight().setEnabled(false);
         Description description = new Description();
         description.setText("");
-        lineChart.setDescription(description);
-        Legend legend = lineChart.getLegend();
+        ratioLineChart.setDescription(description);
+        Legend legend = ratioLineChart.getLegend();
         legend.setTextSize(12f);
         ;
-        lineChart.invalidate();
+        ratioLineChart.invalidate();
     }
 
     private void initActivityBarChart() {
         //Get bar chart from layout
-        BarChart barChart = (BarChart) rootView.findViewById(R.id.activityBarChart);
+        activityBarChart = (BarChart) rootView.findViewById(R.id.activityBarChart);
 
         //Add entries
         Cursor cursor = databaseHelper.getActivityStats();
@@ -151,22 +155,25 @@ public class ProgressFragment extends Fragment {
 
         //Adding the data to the chart
         BarData barData = new BarData(dataSet);
-        barChart.setData(barData);
+        activityBarChart.setData(barData);
 
+        //TODO: Fix below code when charts are refreshed after all entries of a single date have
+        // been deleted (therefore, when dates.size() changes, the app crashes. How is this
+        // possible???
         //Styling bar chart
-        barChart.setScaleYEnabled(false);
-        barChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
-        barChart.getXAxis().setDrawGridLines(false);
-        barChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
-        barChart.getAxisRight().setEnabled(false);
-        barChart.getAxisLeft().setGranularity(1f);
-        barChart.getXAxis().setGranularity(1f);
+        activityBarChart.setScaleYEnabled(false);
+        activityBarChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
+        activityBarChart.getXAxis().setDrawGridLines(false);
+        activityBarChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
+        activityBarChart.getAxisRight().setEnabled(false);
+        activityBarChart.getAxisLeft().setGranularity(1f);
+        activityBarChart.getXAxis().setGranularity(1f);
         Description description = new Description();
         description.setText("");
-        barChart.setDescription(description);
-        Legend legend = barChart.getLegend();
+        activityBarChart.setDescription(description);
+        Legend legend = activityBarChart.getLegend();
         legend.setTextSize(12f);
-        barChart.invalidate();
+        activityBarChart.invalidate();
     }
 
     /**
@@ -193,7 +200,7 @@ public class ProgressFragment extends Fragment {
         int notArchived = total - archived;
 
         //Get pie chart from layout
-        PieChart pieChart = (PieChart) rootView.findViewById(R.id.phrasesPieChart);
+        phrasesPieChart = (PieChart) rootView.findViewById(R.id.phrasesPieChart);
 
         //Add entries
         List<PieEntry> entries = new ArrayList<>();
@@ -218,9 +225,9 @@ public class ProgressFragment extends Fragment {
 
         //Adding the data to the chart
         PieData pieData = new PieData(dataSet);
-        pieChart.setData(pieData);
+        phrasesPieChart.setData(pieData);
 
-        setStandardPieChartStyle(pieChart, "Total Phrases:\n" + total);
+        setStandardPieChartStyle(phrasesPieChart, "Total Phrases:\n" + total);
     }
 
     private void initChallengesPieChart() {
@@ -230,7 +237,7 @@ public class ProgressFragment extends Fragment {
         int lost = total - won;
 
         //Get pie chart from layout
-        PieChart pieChart = (PieChart) rootView.findViewById(R.id.challengePieChart);
+        challengesPieChart = (PieChart) rootView.findViewById(R.id.challengePieChart);
 
         //Add entries
         List<PieEntry> entries = new ArrayList<>();
@@ -255,9 +262,9 @@ public class ProgressFragment extends Fragment {
 
         //Adding the data to the chart
         PieData pieData = new PieData(dataSet);
-        pieChart.setData(pieData);
+        challengesPieChart.setData(pieData);
 
-        setStandardPieChartStyle(pieChart, "Total Challenges:\n" + total);
+        setStandardPieChartStyle(challengesPieChart, "Total Challenges:\n" + total);
     }
 
     private void setStandardPieChartStyle(PieChart pieChart, String centerText) {

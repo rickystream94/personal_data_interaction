@@ -569,14 +569,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param table
      * @return
      */
-    public Cursor getDataFromTable(String table, int offset) {
+    public Cursor getDataFromTable(String table, int limit, int offset) {
         SQLiteDatabase database = this.getReadableDatabase();
         String query;
         switch (table) {
             case TABLE_PHRASES:
-                query = "SELECT ID AS _id,* FROM " + table + " ORDER BY " +
+                query = "SELECT ID AS _id,* FROM " + table + " WHERE ID NOT IN (SELECT ID FROM " +
+                        "" + table + " ORDER BY ID DESC LIMIT " + offset + ") " +
+                        "ORDER BY " +
                         "datetime(" + KEY_CREATED_ON + ")" +
-                        " DESC LIMIT 10 OFFSET "+offset;
+                        " DESC LIMIT " + limit;
                 break;
             case TABLE_BADGES:
                 query = "SELECT ID AS _id,* FROM " + table;

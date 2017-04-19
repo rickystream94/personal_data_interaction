@@ -1,12 +1,14 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.bobbytables.phrasebook.PhrasesFragment">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.bobbytables.phrasebook.PhrasesFragment"
+    android:id="@+id/phrases_scroll_view">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:focusableInTouchMode="true"
         android:orientation="vertical">
 
@@ -58,7 +60,7 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"/>
 
-        <ListView
+        <com.bobbytables.phrasebook.ExpandableHeightListView
             android:id="@+id/dataListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
@@ -73,14 +75,15 @@
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Next Page"/>
+                android:text="@string/next_page"/>
+
             <Button
                 android:id="@+id/previousPage"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Previous Page"/>
+                android:text="@string/previous_page"/>
         </LinearLayout>
     </LinearLayout>
 
-</FrameLayout>
+</ScrollView>
