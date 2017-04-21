@@ -9,9 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
+
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
@@ -19,13 +20,17 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private DatabaseHelper databaseHelper;
     private String motherLanguage;
     private String foreignLanguage;
     private DataRowCursorAdapter rowCursorAdapter;
     private View rootView;
+    private Button nextPageButton;
+    private Button previousPageButton;
+    private int currentOffset = 0;
+    private static final int LIMIT = 20;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +74,11 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         });
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        nextPageButton = (Button) rootView.findViewById(R.id.nextPage);
+        previousPageButton = (Button) rootView.findViewById(R.id.previousPage);
+        nextPageButton.setOnClickListener(this);
+        previousPageButton.setOnClickListener(this);
+        previousPageButton.setVisibility((currentOffset == 0 ? View.INVISIBLE : View.VISIBLE));
 
         //Creating cursor adapter to attach to list view
         initPhrasebookData();
@@ -79,13 +89,14 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
     private void initPhrasebookData() {
         Cursor dataCursor = getAllPhrases();
         rowCursorAdapter = new DataRowCursorAdapter(getContext(), dataCursor);
-        ListView dataListView = (ListView) rootView.findViewById(R.id.dataListView);
+        ExpandableHeightListView dataListView = (ExpandableHeightListView) rootView.findViewById(R.id.dataListView);
         dataListView.setAdapter(rowCursorAdapter);
         dataListView.setOnItemClickListener(this);
+        dataListView.setExpanded(true);
     }
 
     public Cursor getAllPhrases() {
-        return databaseHelper.getDataFromTable(DatabaseHelper.TABLE_PHRASES);
+        return databaseHelper.getDataFromTable(DatabaseHelper.TABLE_PHRASES, LIMIT, currentOffset);
     }
 
     public void searchPhrase(String query) {
@@ -106,12 +117,12 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
                 .KEY_FOREIGN_LANG_STRING));
         String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_CREATED_ON));
-        Intent intent = new Intent(getActivity(),UpdatePhraseActivity.class);
-        intent.putExtra(DatabaseHelper.KEY_MOTHER_LANG_STRING,motherLangString);
-        intent.putExtra(DatabaseHelper.KEY_FOREIGN_LANG_STRING,foreignLangString);
-        intent.putExtra(DatabaseHelper.KEY_CREATED_ON,createdOn);
-        intent.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE,motherLanguage);
-        intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE,foreignLanguage);
+        Intent intent = new Intent(getActivity(), UpdatePhraseActivity.class);
+        intent.putExtra(DatabaseHelper.KEY_MOTHER_LANG_STRING, motherLangString);
+        intent.putExtra(DatabaseHelper.KEY_FOREIGN_LANG_STRING, foreignLangString);
+        intent.putExtra(DatabaseHelper.KEY_CREATED_ON, createdOn);
+        intent.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE, motherLanguage);
+        intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE, foreignLanguage);
         getActivity().startActivityForResult(intent, 1);
     }
 
@@ -122,5 +133,33 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
             rowCursorAdapter.changeCursor(getAllPhrases());
             rowCursorAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.nextPage:
+                Cursor cursor = databaseHelper.performRawQuery("SELECT COUNT(*) FROM " + DatabaseHelper
+                        .TABLE_PHRASES);
+                cursor.moveToFirst();
+                int totalRows = cursor.getInt(0);
+                currentOffset += LIMIT;
+                if (totalRows - currentOffset < LIMIT)
+                    nextPageButton.setVisibility(View.INVISIBLE); //no more rows to display, no need to change page
+                previousPageButton.setVisibility(View.VISIBLE);
+                break;
+            case R.id.previousPage:
+                if (currentOffset == 0)
+                    return; //can't be negative offset, we're at starting point
+                else {
+                    currentOffset -= LIMIT;
+                    previousPageButton.setVisibility((currentOffset == 0 ? View.INVISIBLE : View.VISIBLE));
+                    nextPageButton.setVisibility(View.VISIBLE);
+                }
+                break;
+        }
+        rowCursorAdapter.changeCursor(databaseHelper.getDataFromTable(DatabaseHelper
+                .TABLE_PHRASES, LIMIT, currentOffset));
+        rowCursorAdapter.notifyDataSetChanged();
     }
 }

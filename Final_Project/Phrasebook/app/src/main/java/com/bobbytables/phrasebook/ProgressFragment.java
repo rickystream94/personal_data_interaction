@@ -7,14 +7,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -24,24 +22,18 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.DefaultValueFormatter;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.R.attr.data;
 
 
 /**
@@ -51,6 +43,10 @@ public class ProgressFragment extends Fragment {
 
     private DatabaseHelper databaseHelper;
     private View rootView;
+    private PieChart challengesPieChart;
+    private PieChart phrasesPieChart;
+    private BarChart activityBarChart;
+    private LineChart ratioLineChart;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,7 +71,7 @@ public class ProgressFragment extends Fragment {
 
     private void initChallengesRatioChart() {
         //Get chart
-        LineChart lineChart = (LineChart) rootView.findViewById(R.id.ratioChart);
+        ratioLineChart = (LineChart) rootView.findViewById(R.id.ratioChart);
 
         //Retrieve and set entries
         Cursor cursor = databaseHelper.getChallengesRatio();
@@ -102,27 +98,28 @@ public class ProgressFragment extends Fragment {
 
         //Adding data to the chart
         LineData data = new LineData(dataSet);
-        lineChart.setData(data);
+        ratioLineChart.setData(data);
+
+        //Setting XAxis
+        IAxisValueFormatter xAxisFormatter = new DateXAxisValueFormatter(dates);
+        XAxis xAxis = ratioLineChart.getXAxis();
+        xAxis.setValueFormatter(xAxisFormatter);
+        xAxis.setDrawGridLines(false);
+        xAxis.setPosition(XAxis.XAxisPosition.TOP);
+        xAxis.setGranularity(1f);
 
         //Styling chart
-        lineChart.setScaleYEnabled(false);
-        lineChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
-        lineChart.getXAxis().setDrawGridLines(false);
-        lineChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
-        //lineChart.getXAxis().setGranularity(1f); //TODO: it doesn't work for this chart! Why?
-        lineChart.getAxisRight().setEnabled(false);
-        Description description = new Description();
-        description.setText("");
-        lineChart.setDescription(description);
-        Legend legend = lineChart.getLegend();
-        legend.setTextSize(12f);
-        ;
-        lineChart.invalidate();
+        ratioLineChart.setScaleYEnabled(false);
+        ratioLineChart.getAxisRight().setEnabled(false);
+        ratioLineChart.getDescription().setEnabled(false);
+        ratioLineChart.setDoubleTapToZoomEnabled(false);
+        ratioLineChart.getLegend().setTextSize(12f);
+        ratioLineChart.invalidate();
     }
 
     private void initActivityBarChart() {
         //Get bar chart from layout
-        BarChart barChart = (BarChart) rootView.findViewById(R.id.activityBarChart);
+        activityBarChart = (BarChart) rootView.findViewById(R.id.activityBarChart);
 
         //Add entries
         Cursor cursor = databaseHelper.getActivityStats();
@@ -149,24 +146,27 @@ public class ProgressFragment extends Fragment {
             }
         });
 
+        IAxisValueFormatter xAxisFormatter = new DateXAxisValueFormatter(dates);
+        XAxis xAxis = activityBarChart.getXAxis();
+        xAxis.setValueFormatter(xAxisFormatter);
+        xAxis.setDrawGridLines(false);
+        xAxis.setPosition(XAxis.XAxisPosition.TOP);
+        xAxis.setGranularity(1f);
+
         //Adding the data to the chart
         BarData barData = new BarData(dataSet);
-        barChart.setData(barData);
+        activityBarChart.setData(barData);
 
         //Styling bar chart
-        barChart.setScaleYEnabled(false);
-        barChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
-        barChart.getXAxis().setDrawGridLines(false);
-        barChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
-        barChart.getAxisRight().setEnabled(false);
-        barChart.getAxisLeft().setGranularity(1f);
-        barChart.getXAxis().setGranularity(1f);
-        Description description = new Description();
-        description.setText("");
-        barChart.setDescription(description);
-        Legend legend = barChart.getLegend();
-        legend.setTextSize(12f);
-        barChart.invalidate();
+        activityBarChart.setScaleYEnabled(false);
+        activityBarChart.setDrawBarShadow(false);
+        activityBarChart.setDrawValueAboveBar(true);
+        activityBarChart.getDescription().setEnabled(false);
+        activityBarChart.getAxisRight().setEnabled(false);
+        activityBarChart.getAxisLeft().setGranularity(1f);
+        activityBarChart.setDoubleTapToZoomEnabled(false);
+        activityBarChart.getLegend().setTextSize(12f);
+        activityBarChart.invalidate();
     }
 
     /**
@@ -182,7 +182,9 @@ public class ProgressFragment extends Fragment {
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
             int index = (int) value;
-            return dates.get(index);
+            if (dates.size() > index)
+                return dates.get(index);
+            else return null;
         }
     }
 
@@ -193,7 +195,7 @@ public class ProgressFragment extends Fragment {
         int notArchived = total - archived;
 
         //Get pie chart from layout
-        PieChart pieChart = (PieChart) rootView.findViewById(R.id.phrasesPieChart);
+        phrasesPieChart = (PieChart) rootView.findViewById(R.id.phrasesPieChart);
 
         //Add entries
         List<PieEntry> entries = new ArrayList<>();
@@ -218,9 +220,9 @@ public class ProgressFragment extends Fragment {
 
         //Adding the data to the chart
         PieData pieData = new PieData(dataSet);
-        pieChart.setData(pieData);
+        phrasesPieChart.setData(pieData);
 
-        setStandardPieChartStyle(pieChart, "Total Phrases:\n" + total);
+        setStandardPieChartStyle(phrasesPieChart, "Total Phrases:\n" + total);
     }
 
     private void initChallengesPieChart() {
@@ -230,7 +232,7 @@ public class ProgressFragment extends Fragment {
         int lost = total - won;
 
         //Get pie chart from layout
-        PieChart pieChart = (PieChart) rootView.findViewById(R.id.challengePieChart);
+        challengesPieChart = (PieChart) rootView.findViewById(R.id.challengePieChart);
 
         //Add entries
         List<PieEntry> entries = new ArrayList<>();
@@ -255,9 +257,9 @@ public class ProgressFragment extends Fragment {
 
         //Adding the data to the chart
         PieData pieData = new PieData(dataSet);
-        pieChart.setData(pieData);
+        challengesPieChart.setData(pieData);
 
-        setStandardPieChartStyle(pieChart, "Total Challenges:\n" + total);
+        setStandardPieChartStyle(challengesPieChart, "Total Challenges:\n" + total);
     }
 
     private void setStandardPieChartStyle(PieChart pieChart, String centerText) {
