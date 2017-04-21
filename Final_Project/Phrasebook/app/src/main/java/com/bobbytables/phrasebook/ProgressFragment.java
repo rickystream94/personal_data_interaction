@@ -100,19 +100,20 @@ public class ProgressFragment extends Fragment {
         LineData data = new LineData(dataSet);
         ratioLineChart.setData(data);
 
+        //Setting XAxis
+        IAxisValueFormatter xAxisFormatter = new DateXAxisValueFormatter(dates);
+        XAxis xAxis = ratioLineChart.getXAxis();
+        xAxis.setValueFormatter(xAxisFormatter);
+        xAxis.setDrawGridLines(false);
+        xAxis.setPosition(XAxis.XAxisPosition.TOP);
+        xAxis.setGranularity(1f);
+
         //Styling chart
         ratioLineChart.setScaleYEnabled(false);
-        ratioLineChart.getXAxis().setValueFormatter(new DateXAxisValueFormatter(dates));
-        ratioLineChart.getXAxis().setDrawGridLines(false);
-        ratioLineChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
-        //lineChart.getXAxis().setGranularity(1f); //TODO: it doesn't work for this chart! Why?
         ratioLineChart.getAxisRight().setEnabled(false);
-        Description description = new Description();
-        description.setText("");
-        ratioLineChart.setDescription(description);
-        Legend legend = ratioLineChart.getLegend();
-        legend.setTextSize(12f);
-        ;
+        ratioLineChart.getDescription().setEnabled(false);
+        ratioLineChart.setDoubleTapToZoomEnabled(false);
+        ratioLineChart.getLegend().setTextSize(12f);
         ratioLineChart.invalidate();
     }
 
@@ -163,8 +164,8 @@ public class ProgressFragment extends Fragment {
         activityBarChart.getDescription().setEnabled(false);
         activityBarChart.getAxisRight().setEnabled(false);
         activityBarChart.getAxisLeft().setGranularity(1f);
-        Legend legend = activityBarChart.getLegend();
-        legend.setTextSize(12f);
+        activityBarChart.setDoubleTapToZoomEnabled(false);
+        activityBarChart.getLegend().setTextSize(12f);
         activityBarChart.invalidate();
     }
 
