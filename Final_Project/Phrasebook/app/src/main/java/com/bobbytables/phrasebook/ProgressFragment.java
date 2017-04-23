@@ -7,11 +7,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.bobbytables.phrasebook.utils.DateUtil;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -124,14 +126,30 @@ public class ProgressFragment extends Fragment {
         //Add entries
         Cursor cursor = databaseHelper.getActivityStats();
         List<BarEntry> entries = new ArrayList<>();
-        List<String> dates = new ArrayList<>();
-        int i = 0;
+        List<String> userDates = new ArrayList<>();
+        List<String> allDates = new ArrayList<>();
         if (cursor.moveToFirst()) {
+            //Get all dates of the user and all dates between these days
+            int i = 0;
             do {
-                entries.add(new BarEntry(i, cursor.getInt(1), cursor.getString(0)));
-                dates.add(cursor.getString(0));
+                userDates.add(cursor.getString(0));
                 i++;
             } while (cursor.moveToNext());
+            allDates = DateUtil.getDaysBetweenDates(userDates.get(0), userDates.get
+                    (userDates.size() - 1));
+            cursor.moveToFirst();
+            i = 0;
+            //Populate entries
+            for (String date : allDates) {
+                int frequency;
+                if (userDates.contains(date)) {
+                    frequency = cursor.getInt(1);
+                    cursor.moveToNext();
+                } else
+                    frequency = 0;
+                entries.add(new BarEntry(i, frequency, date));
+                i++;
+            }
         }
         BarDataSet dataSet = new BarDataSet(entries, "Frequency");
 
@@ -142,11 +160,11 @@ public class ProgressFragment extends Fragment {
         dataSet.setValueFormatter(new IValueFormatter() {
             @Override
             public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                return String.valueOf((int) value);
+                return value == 0 ? "" : String.valueOf((int) value);
             }
         });
 
-        IAxisValueFormatter xAxisFormatter = new DateXAxisValueFormatter(dates);
+        IAxisValueFormatter xAxisFormatter = new DateXAxisValueFormatter(allDates);
         XAxis xAxis = activityBarChart.getXAxis();
         xAxis.setValueFormatter(xAxisFormatter);
         xAxis.setDrawGridLines(false);
@@ -174,6 +192,8 @@ public class ProgressFragment extends Fragment {
      */
     private static class DateXAxisValueFormatter implements IAxisValueFormatter {
         private List<String> dates;
+        private String[] months = new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"};
 
         public DateXAxisValueFormatter(List<String> dates) {
             this.dates = dates;
@@ -182,9 +202,60 @@ public class ProgressFragment extends Fragment {
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
             int index = (int) value;
-            if (dates.size() > index)
-                return dates.get(index);
-            else return null;
+            if (dates.size() > index) {
+                String date = dates.get(index);
+                return formatDate(date);
+            } else return null;
+        }
+
+        String formatDate(String date) {
+            String[] dateParts = date.split("-");
+            String year = "'" + dateParts[0].substring(2); //Get only the last two digits of the
+            // year
+            String intMonth = dateParts[1];
+            String day = dateParts[2];
+            String month;
+            switch (intMonth) {
+                case "01":
+                    month = months[0];
+                    break;
+                case "02":
+                    month = months[1];
+                    break;
+                case "03":
+                    month = months[2];
+                    break;
+                case "04":
+                    month = months[3];
+                    break;
+                case "05":
+                    month = months[4];
+                    break;
+                case "06":
+                    month = months[5];
+                    break;
+                case "07":
+                    month = months[6];
+                    break;
+                case "08":
+                    month = months[7];
+                    break;
+                case "09":
+                    month = months[8];
+                    break;
+                case "10":
+                    month = months[9];
+                    break;
+                case "11":
+                    month = months[10];
+                    break;
+                case "12":
+                    month = months[11];
+                    break;
+                default:
+                    month = "";
+            }
+            return day + " " + month + " " + year;
         }
     }
 
