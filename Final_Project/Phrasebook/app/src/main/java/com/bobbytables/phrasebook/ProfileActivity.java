@@ -53,6 +53,10 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         HTextView nicknameText = (HTextView) findViewById(R.id.nicknameText);
         nicknameText.animateText(settingsManager.getPrefStringValue(SettingsManager.KEY_NICKNAME));
 
+        //Set language text
+        TextView myLanguage = (TextView) findViewById(R.id.myLanguage);
+        myLanguage.setText(settingsManager.getPrefStringValue(SettingsManager.KEY_FOREIGN_LANGUAGE));
+
         //Load profile picture
         profileImage = (CircleImageView) findViewById(R.id.profileImage);
         String path = settingsManager.getPrefStringValue(SettingsManager
