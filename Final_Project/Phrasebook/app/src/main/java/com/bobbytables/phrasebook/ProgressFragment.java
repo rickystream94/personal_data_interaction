@@ -202,10 +202,10 @@ public class ProgressFragment extends Fragment {
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
             int index = (int) value;
-            if (dates.size() > index) {
+            if (dates.size() > index && index >= 0) {
                 String date = dates.get(index);
                 return formatDate(date);
-            } else return null;
+            } else return "";
         }
 
         String formatDate(String date) {
