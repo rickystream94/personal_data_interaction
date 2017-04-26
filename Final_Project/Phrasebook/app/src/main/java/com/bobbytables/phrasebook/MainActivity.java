@@ -189,8 +189,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         MenuItem profileItem = menu.findItem(R.id.profile);
         profileItem.setVisible(settingsManager.getPrefBoolValue(SettingsManager.KEY_GAMIFICATION));
         //Developer buttons, enable if needed
-        MenuItem resetXpItem = menu.findItem(R.id.reset_xp);
-        resetXpItem.setVisible(false);
         return true;
     }
 
@@ -225,10 +223,27 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 checkWritePermissions();
                 break;
             case R.id.reset_xp:
-                settingsManager.resetXP();
-                Toast.makeText(this, "Successfully reset!", Toast
-                        .LENGTH_SHORT)
-                        .show();
+                final AlertDialog.Builder resetAlertDialog = new AlertDialog.Builder(MainActivity
+                        .this);
+                resetAlertDialog.setTitle("Are you sure?");
+                resetAlertDialog.setMessage("All the user data (XP points and level) will be " +
+                        "permanently deleted and " +
+                        "cannot be " +
+                        "recovered!");
+                resetAlertDialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        settingsManager.resetXP();
+                        Toast.makeText(MainActivity.this, "Successfully reset user data!", Toast
+                                .LENGTH_SHORT).show();
+                    }
+                });
+                resetAlertDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                resetAlertDialog.show();
                 break;
             case R.id.profile:
                 Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
