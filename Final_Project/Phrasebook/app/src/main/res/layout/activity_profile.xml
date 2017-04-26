@@ -30,9 +30,9 @@
                 android:layout_centerHorizontal="true"
                 android:layout_margin="10dp"
                 android:textAlignment="center"
+                android:textColor="@color/colorAccent"
                 android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorAccent"/>
+                android:textStyle="bold"/>
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profileImage"
@@ -47,11 +47,32 @@
         </RelativeLayout>
 
         <TextView
-            android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:text="Your Experience:"/>
+            android:layout_margin="10dp"
+            android:text="Language:"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/myLanguage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="3dp"
+            android:background="@color/colorAccent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Your Experience:"
+            android:textSize="20sp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -138,11 +159,11 @@
             android:background="@color/colorAccent"/>
 
         <TextView
-            android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:text="Your Badges:"/>
+            android:layout_margin="10dp"
+            android:text="Your Badges:"
+            android:textSize="20sp"/>
 
         <com.bobbytables.phrasebook.ExpandableHeightGridView
             android:id="@+id/badgesGridView"

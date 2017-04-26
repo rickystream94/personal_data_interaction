@@ -46,4 +46,6 @@
         the usage of the app that were preventing a pleasant user experience, as well as
         any type of bugs that should be fixed. Please address any questions or inquiries to
         the developers and feel free and very welcome to contact them.</string>
+    <string name="next_page">Next Page</string>
+    <string name="previous_page">Previous Page</string>
 </resources>
