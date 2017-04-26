@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">Phrasebook</string>
+    <string name="title_activity_main">Phrasebook</string>
+    <string name="title_activity_new_user">New User</string>
+    <string name="tab1">Practice</string>
+    <string name="tab2">Phrasebook</string>
+    <string name="tab3">Progress</string>
+    <string name="translate_this_in">Translate this in:</string>
+    <string name="basic_information">Hello, let\'s start with some basic information:</string>
+    <string name="insert_nickname">Insert your nickname…</string>
+    <string name="mother_language">Your mother language…</string>
+    <string name="foreign_language">Language you are learning…</string>
+    <string name="create_user">Create User</string>
+    <string name="check">Check</string>
+    <string name="next_challenge">Next</string>
+    <string name="type_the_translation">Type the translation…</string>
+    <string name="title_activity_new_phrase">New Phrase</string>
+    <string name="add_new_phrase">Add a new word, phrase or common expression to your phrasebook
+        of:</string>
+    <string name="type_the_phrase_in_your_mother_language">Type the phrase in your mother language…</string>
+    <string name="type_the_phrase_in_the_foreign_language">Type the phrase in the foreign language…</string>
+    <string name="save_and_close">Save and Close</string>
+    <string name="empty_database_text">Your phrasebook is currently empty!\nStart adding something by pressing the \'+\' button below!</string>
+    <string name="search_hint">Search in phrasebook…</string>
+    <string name="experience_points">Experience Points</string>
+    <string name="uiSwitchRootMessage">As a main purpose of this experiment, the layout of the
+        application has changed: </string>
+    <string name="uiSwitchGamification">Gamification has been introduced! A whole new layout is now available, check out the top-right menu button in the home screen!</string>
+    <string name="uiSwitchNoGamification">Gamification has been removed. No more experience points, no more levels, no more badges.</string>
+    <string name="uiSwitchErrorConnection">An automatic data upload has been requested at this point of your experience with the app. You don\'t have to do anything but just be sure you\'re connected to a network and re-launch the app.</string>
+    <string name="finalMessage">The final data upload has been performed. The evaluation period has terminated and we (the developers) won\'t collect any more data about your app usage. Thank you for your contribution! If you wish to use again the app with the all the available features, please remember to fill out the final survey and check the relative question!</string>
+    <string name="about_phrasebook">About Phrasebook</string>
+    <string name="about_phrasebook_text">Version 1.1\nThis version has been specifically
+        developed to conduct a research experiment and perform inferential data analysis on
+    the results. The purpose of the experiment is to evaluate the degree of involvement of the
+        users, measured while experiencing two different user interfaces; therefore, we\'ll be
+        basically testing two different layouts and see how do the users react to one rather
+        than the other. As an official test user, you\'re not asked to do anything specific, but
+        just use the app as much as you want, the way you prefer. The layout switch will be
+        performed automatically after 10 days from the creation of the user profile, and we
+        won\'t reveal here what will actually be affected.\n\nThe users
+        implicitly agree that the developers are allowed to collect all the data
+        stored by the user including timestamps, nickname, challenges results and phrases.
+        Therefore, we strongly recommend not to store sensitive data such as passwords or
+        similar.\n\nWe kindly ask our users to report any type of issues encountered with
+        the usage of the app that were preventing a pleasant user experience, as well as
+        any type of bugs that should be fixed. Please address any questions or inquiries to
+        the developers and feel free and very welcome to contact them.</string>
+    <string name="next_page">Next Page</string>
+    <string name="previous_page">Previous Page</string>
+</resources>
