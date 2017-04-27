@@ -1,0 +1,158 @@
+{
+  "phrasebook": [
+    {
+      "id": 1,
+      "motherLangString": "bicicletta",
+      "foreignLangString": "自転車",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-11 10:14:54"
+    },
+    {
+      "id": 2,
+      "motherLangString": "svegliare qualcuno",
+      "foreignLangString": "起こす",
+      "archived": 0,
+      "correctCount": 1,
+      "createdOn": "2017-04-11 10:15:24"
+    },
+    {
+      "id": 3,
+      "motherLangString": "durante la lezione",
+      "foreignLangString": "授業中（ちゅう）",
+      "archived": 0,
+      "correctCount": -1,
+      "createdOn": "2017-04-11 10:16:39"
+    }
+  ],
+  "challenges": [
+    {
+      "id": 1,
+      "phraseId": 1,
+      "correct": 0,
+      "createdOn": "2017-04-11 10:19:45"
+    },
+    {
+      "id": 2,
+      "phraseId": 1,
+      "correct": 1,
+      "createdOn": "2017-04-11 10:20:08"
+    },
+    {
+      "id": 3,
+      "phraseId": 3,
+      "correct": 0,
+      "createdOn": "2017-04-11 10:20:19"
+    },
+    {
+      "id": 4,
+      "phraseId": 2,
+      "correct": 1,
+      "createdOn": "2017-04-11 10:20:43"
+    }
+  ],
+  "badges": [
+    {
+      "id": 1,
+      "badgeName": "Beginner",
+      "badgeDesc": "Add 30 Phrases to your Phrasebook"
+    },
+    {
+      "id": 2,
+      "badgeName": "Doing Good",
+      "badgeDesc": "30 Correct Guesses in Practice"
+    },
+    {
+      "id": 3,
+      "badgeName": "Novice",
+      "badgeDesc": "Add 100 Phrases to your Phrasebook"
+    },
+    {
+      "id": 4,
+      "badgeName": "Novice",
+      "badgeDesc": "150 Correct Guesses in Practice"
+    },
+    {
+      "id": 5,
+      "badgeName": "Expert",
+      "badgeDesc": "Add 250 Phrases to your Phrasebook"
+    },
+    {
+      "id": 6,
+      "badgeName": "Beacon of Light",
+      "badgeDesc": "300 Correct Guesses in Practice"
+    },
+    {
+      "id": 7,
+      "badgeName": "Keep Going",
+      "badgeDesc": "10 Correct Guesses in Practice in one day"
+    },
+    {
+      "id": 8,
+      "badgeName": "Greedy",
+      "badgeDesc": "Add 20 Phrases in one day"
+    },
+    {
+      "id": 9,
+      "badgeName": "High Fidelity",
+      "badgeDesc": "20 Correct Guesses in Practice in a row"
+    },
+    {
+      "id": 10,
+      "badgeName": "Not Too Shabby",
+      "badgeDesc": "10 Incorrect Guesses in Practice in a row"
+    },
+    {
+      "id": 11,
+      "badgeName": "I Like It Difficult",
+      "badgeDesc": "Add one 25 characters phrase to your Phrasebook"
+    },
+    {
+      "id": 12,
+      "badgeName": "Get On My Level",
+      "badgeDesc": "Add 5 phrases of 25 characters to your Phrasebook"
+    },
+    {
+      "id": 13,
+      "badgeName": "Rise and Shine",
+      "badgeDesc": "5 Correct Guesses in Practice between 04:00 and 10:00"
+    },
+    {
+      "id": 14,
+      "badgeName": "Night Owl",
+      "badgeDesc": "5 Correct Guesses in Practice between 19:00 and 23:00"
+    },
+    {
+      "id": 15,
+      "badgeName": "No Sleep",
+      "badgeDesc": "5 Correct Guesses in Practice between 00:00 and 06:00"
+    },
+    {
+      "id": 16,
+      "badgeName": "Inspiring Dreams",
+      "badgeDesc": "Add 5 Phrases to your Phrasebook between 00:00 and 06:00"
+    },
+    {
+      "id": 17,
+      "badgeName": "Sudden Inspiration",
+      "badgeDesc": "Add 15 Phrases to your Phrasebook within 15 minutes"
+    },
+    {
+      "id": 18,
+      "badgeName": "Extreme Stamina",
+      "badgeDesc": "15 Correct Guesses in Practice within 15 minutes"
+    }
+  ],
+  "user": [
+    {
+      "nickname": "Federico",
+      "motherLanguage": "ITALIAN",
+      "foreignLanguage": "JAPANESE",
+      "created": "2017-04-11 10:13:49",
+      "level": 0,
+      "totalXP": 20,
+      "Gamification": 1,
+      "hasSwitchedVersion": 0
+    }
+  ]
+}
