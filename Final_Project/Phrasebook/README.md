@@ -6,6 +6,7 @@ First release for experiment, with full working implementation
 
 **Future releases features**
 * Multiple languages support
+* Better UI (chart animations and possibility to interact with them, more icons, better profile overview)
 * Notification service
 * Category/tag labeling for phrases
 * Stronger practice challenges logic, with smart challenge selection
