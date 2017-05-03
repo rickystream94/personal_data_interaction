@@ -3,26 +3,94 @@
     {
       "id": 1,
       "motherLangString": "hello",
-      "foreignLangString": "dzien dobry",
+      "foreignLangString": "hej",
       "archived": 0,
-      "correctCount": 0,
+      "correctCount": 2,
       "createdOn": "2017-04-11 15:26:20"
     },
     {
       "id": 2,
       "motherLangString": "how are you?",
-      "foreignLangString": "jak sie czujesz",
+      "foreignLangString": "hvordan går det?",
+      "archived": 0,
+      "correctCount": 1,
+      "createdOn": "2017-04-11 15:27:09"
+    },
+    {
+      "id": 3,
+      "motherLangString": "write",
+      "foreignLangString": "skriver",
       "archived": 0,
       "correctCount": 0,
-      "createdOn": "2017-04-11 15:27:09"
+      "createdOn": "2017-04-22 01:14:11"
+    },
+    {
+      "id": 4,
+      "motherLangString": "do",
+      "foreignLangString": "gør",
+      "archived": 0,
+      "correctCount": 1,
+      "createdOn": "2017-04-22 01:15:39"
+    },
+    {
+      "id": 5,
+      "motherLangString": "what are you doing in your free time",
+      "foreignLangString": "hvad laver du i din fritid?",
+      "archived": 0,
+      "correctCount": 1,
+      "createdOn": "2017-04-22 01:16:17"
+    },
+    {
+      "id": 6,
+      "motherLangString": "of course",
+      "foreignLangString": "selvfølgelig",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-24 21:19:38"
     }
   ],
   "challenges": [
-  {
+    {
       "id": 1,
       "phraseId": 4,
       "correct": 1,
       "createdOn": "2017-04-22 01:16:31"
+    },
+    {
+      "id": 2,
+      "phraseId": 5,
+      "correct": 1,
+      "createdOn": "2017-04-22 01:16:50"
+    },
+    {
+      "id": 3,
+      "phraseId": 2,
+      "correct": 1,
+      "createdOn": "2017-04-22 01:17:00"
+    },
+    {
+      "id": 4,
+      "phraseId": 3,
+      "correct": 0,
+      "createdOn": "2017-04-22 01:17:09"
+    },
+    {
+      "id": 5,
+      "phraseId": 3,
+      "correct": 1,
+      "createdOn": "2017-04-22 01:17:15"
+    },
+    {
+      "id": 6,
+      "phraseId": 1,
+      "correct": 1,
+      "createdOn": "2017-04-22 01:17:20"
+    },
+    {
+      "id": 7,
+      "phraseId": 1,
+      "correct": 1,
+      "createdOn": "2017-04-22 01:17:35"
     }
   ],
   "badges": [
@@ -79,6 +147,7 @@
     {
       "id": 11,
       "badgeName": "I Like It Difficult",
+      "createdOn": "2017-04-22 01:16:17",
       "badgeDesc": "Add one 25 characters phrase to your Phrasebook"
     },
     {
@@ -99,6 +168,7 @@
     {
       "id": 15,
       "badgeName": "No Sleep",
+      "createdOn": "2017-04-22 01:17:20",
       "badgeDesc": "5 Correct Guesses in Practice between 00:00 and 06:00"
     },
     {
@@ -123,10 +193,10 @@
       "motherLanguage": "GREEK",
       "foreignLanguage": "DANISH, POLISH",
       "created": "2017-04-11 15:22:30",
-      "level": 0,
-      "totalXP": 0,
-      "Gamification": 0,
-      "hasSwitchedVersion": 0
+      "level": 1,
+      "totalXP": 80,
+      "Gamification": 1,
+      "hasSwitchedVersion": 1
     }
   ]
 }
