@@ -1,28 +1,52 @@
 {
   "phrasebook": [
     {
-      "id": 1,
-      "motherLangString": "hello",
-      "foreignLangString": "dzien dobry",
+      "id": 2,
+      "motherLangString": "forma",
+      "foreignLangString": "shape",
       "archived": 0,
-      "correctCount": 0,
-      "createdOn": "2017-04-11 15:26:20"
+      "correctCount": 1,
+      "createdOn": "2017-04-23 13:25:00"
     },
     {
-      "id": 2,
-      "motherLangString": "how are you?",
-      "foreignLangString": "jak sie czujesz",
+      "id": 3,
+      "motherLangString": "consapevolezza",
+      "foreignLangString": "awareness",
       "archived": 0,
-      "correctCount": 0,
-      "createdOn": "2017-04-11 15:27:09"
+      "correctCount": 2,
+      "createdOn": "2017-04-23 13:26:25"
     }
   ],
   "challenges": [
-  {
+    {
       "id": 1,
-      "phraseId": 4,
+      "phraseId": 1,
+      "correct": 0,
+      "createdOn": "2017-04-11 19:03:53"
+    },
+    {
+      "id": 2,
+      "phraseId": 1,
       "correct": 1,
-      "createdOn": "2017-04-22 01:16:31"
+      "createdOn": "2017-04-11 19:05:48"
+    },
+    {
+      "id": 3,
+      "phraseId": 2,
+      "correct": 1,
+      "createdOn": "2017-04-23 23:10:42"
+    },
+    {
+      "id": 4,
+      "phraseId": 3,
+      "correct": 1,
+      "createdOn": "2017-04-23 23:10:53"
+    },
+    {
+      "id": 5,
+      "phraseId": 3,
+      "correct": 1,
+      "createdOn": "2017-04-23 23:11:10"
     }
   ],
   "badges": [
@@ -119,14 +143,14 @@
   ],
   "user": [
     {
-      "nickname": "myrto",
-      "motherLanguage": "GREEK",
-      "foreignLanguage": "DANISH, POLISH",
-      "created": "2017-04-11 15:22:30",
+      "nickname": "ARDecre",
+      "motherLanguage": "ITALIANO",
+      "foreignLanguage": "INGLESE",
+      "created": "2017-04-11 18:50:08",
       "level": 0,
-      "totalXP": 0,
+      "totalXP": 10,
       "Gamification": 0,
-      "hasSwitchedVersion": 0
+      "hasSwitchedVersion": 1
     }
   ]
 }

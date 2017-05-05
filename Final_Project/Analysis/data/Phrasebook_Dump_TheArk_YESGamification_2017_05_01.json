@@ -1,0 +1,498 @@
+{
+  "phrasebook": [
+    {
+      "id": 1,
+      "motherLangString": "sforzarsi, lottare",
+      "foreignLangString": "to struggle",
+      "archived": 0,
+      "correctCount": 2,
+      "createdOn": "2017-04-11 08:00:20"
+    },
+    {
+      "id": 2,
+      "motherLangString": "inaspettatamente",
+      "foreignLangString": "unexpectedly",
+      "archived": 0,
+      "correctCount": 2,
+      "createdOn": "2017-04-11 08:19:08"
+    },
+    {
+      "id": 3,
+      "motherLangString": "rimborsare",
+      "foreignLangString": "to refund",
+      "archived": 0,
+      "correctCount": 1,
+      "createdOn": "2017-04-11 08:24:13"
+    },
+    {
+      "id": 4,
+      "motherLangString": "azienda",
+      "foreignLangString": "company",
+      "archived": 0,
+      "correctCount": 1,
+      "createdOn": "2017-04-11 08:28:48"
+    },
+    {
+      "id": 5,
+      "motherLangString": "corridoio",
+      "foreignLangString": "aisle",
+      "archived": 0,
+      "correctCount": 2,
+      "createdOn": "2017-04-11 08:29:55"
+    },
+    {
+      "id": 6,
+      "motherLangString": "grumo di sangue (coagulare)",
+      "foreignLangString": "blood clot",
+      "archived": 0,
+      "correctCount": 2,
+      "createdOn": "2017-04-11 12:02:20"
+    },
+    {
+      "id": 7,
+      "motherLangString": "invio (rimessa di pagamento)",
+      "foreignLangString": "remittance",
+      "archived": 0,
+      "correctCount": 2,
+      "createdOn": "2017-04-14 15:01:34"
+    },
+    {
+      "id": 8,
+      "motherLangString": "verificarsi",
+      "foreignLangString": "to occur",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-14 19:54:44"
+    },
+    {
+      "id": 9,
+      "motherLangString": "danno",
+      "foreignLangString": "harm",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-14 19:56:28"
+    },
+    {
+      "id": 10,
+      "motherLangString": "innocuo",
+      "foreignLangString": "harmless",
+      "archived": 1,
+      "correctCount": 4,
+      "createdOn": "2017-04-14 19:56:40"
+    },
+    {
+      "id": 11,
+      "motherLangString": "lapide",
+      "foreignLangString": "tombstone",
+      "archived": 0,
+      "correctCount": 2,
+      "createdOn": "2017-04-15 18:57:56"
+    },
+    {
+      "id": 12,
+      "motherLangString": "impegno, promessa (anche verbo)",
+      "foreignLangString": "pledge",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-15 19:10:06"
+    },
+    {
+      "id": 13,
+      "motherLangString": "avere senso",
+      "foreignLangString": "to add up",
+      "archived": 0,
+      "correctCount": 1,
+      "createdOn": "2017-04-15 19:18:13"
+    },
+    {
+      "id": 14,
+      "motherLangString": "mocassini",
+      "foreignLangString": "loafers",
+      "archived": 0,
+      "correctCount": 1,
+      "createdOn": "2017-04-15 19:48:55"
+    },
+    {
+      "id": 15,
+      "motherLangString": "seta",
+      "foreignLangString": "silk",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-15 19:49:22"
+    },
+    {
+      "id": 16,
+      "motherLangString": "borsa di studio",
+      "foreignLangString": "scolarship",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-15 19:51:16"
+    },
+    {
+      "id": 17,
+      "motherLangString": "orecchiabile, attraente",
+      "foreignLangString": "catchy",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 14:57:15"
+    },
+    {
+      "id": 18,
+      "motherLangString": "ingannare",
+      "foreignLangString": "to deceive",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-25 23:43:41"
+    },
+    {
+      "id": 19,
+      "motherLangString": "questione, problema",
+      "foreignLangString": "issue",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-27 14:29:13"
+    },
+    {
+      "id": 20,
+      "motherLangString": "carciofo",
+      "foreignLangString": "artichoke",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-27 16:35:21"
+    },
+    {
+      "id": 21,
+      "motherLangString": "fare affidamento",
+      "foreignLangString": "to rely",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-28 15:51:58"
+    },
+    {
+      "id": 22,
+      "motherLangString": "assistere, partecipare",
+      "foreignLangString": "to attend",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-28 15:54:10"
+    },
+    {
+      "id": 23,
+      "motherLangString": "incustodito",
+      "foreignLangString": "unattended",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-28 15:54:34"
+    },
+    {
+      "id": 24,
+      "motherLangString": "oggetti di valore (generici)",
+      "foreignLangString": "valuables",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-28 15:55:44"
+    },
+    {
+      "id": 25,
+      "motherLangString": "equipaggiamento",
+      "foreignLangString": "gear",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-28 15:57:21"
+    },
+    {
+      "id": 26,
+      "motherLangString": "compagno (generale)",
+      "foreignLangString": "fellow",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-28 16:01:17"
+    }
+  ],
+  "challenges": [
+    {
+      "id": 1,
+      "phraseId": 1,
+      "correct": 1,
+      "createdOn": "2017-04-11 08:00:41"
+    },
+    {
+      "id": 2,
+      "phraseId": 7,
+      "correct": 1,
+      "createdOn": "2017-04-14 15:01:51"
+    },
+    {
+      "id": 3,
+      "phraseId": 2,
+      "correct": 1,
+      "createdOn": "2017-04-14 15:02:00"
+    },
+    {
+      "id": 4,
+      "phraseId": 6,
+      "correct": 0,
+      "createdOn": "2017-04-14 15:02:12"
+    },
+    {
+      "id": 5,
+      "phraseId": 3,
+      "correct": 0,
+      "createdOn": "2017-04-14 15:02:23"
+    },
+    {
+      "id": 6,
+      "phraseId": 3,
+      "correct": 1,
+      "createdOn": "2017-04-14 15:02:38"
+    },
+    {
+      "id": 7,
+      "phraseId": 2,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:23:29"
+    },
+    {
+      "id": 8,
+      "phraseId": 1,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:23:39"
+    },
+    {
+      "id": 9,
+      "phraseId": 6,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:23:46"
+    },
+    {
+      "id": 10,
+      "phraseId": 11,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:23:53"
+    },
+    {
+      "id": 11,
+      "phraseId": 3,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:24:01"
+    },
+    {
+      "id": 12,
+      "phraseId": 9,
+      "correct": 0,
+      "createdOn": "2017-04-15 19:24:11"
+    },
+    {
+      "id": 13,
+      "phraseId": 5,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:24:54"
+    },
+    {
+      "id": 14,
+      "phraseId": 6,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:25:00"
+    },
+    {
+      "id": 15,
+      "phraseId": 7,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:25:17"
+    },
+    {
+      "id": 16,
+      "phraseId": 10,
+      "correct": 1,
+      "createdOn": "2017-04-15 19:25:23"
+    },
+    {
+      "id": 17,
+      "phraseId": 12,
+      "correct": 0,
+      "createdOn": "2017-04-15 19:25:42"
+    },
+    {
+      "id": 18,
+      "phraseId": 10,
+      "correct": 1,
+      "createdOn": "2017-04-17 14:33:05"
+    },
+    {
+      "id": 19,
+      "phraseId": 6,
+      "correct": 1,
+      "createdOn": "2017-04-20 14:56:51"
+    },
+    {
+      "id": 20,
+      "phraseId": 11,
+      "correct": 1,
+      "createdOn": "2017-04-20 15:58:44"
+    },
+    {
+      "id": 21,
+      "phraseId": 4,
+      "correct": 1,
+      "createdOn": "2017-04-20 15:58:58"
+    },
+    {
+      "id": 22,
+      "phraseId": 13,
+      "correct": 1,
+      "createdOn": "2017-04-20 15:59:06"
+    },
+    {
+      "id": 23,
+      "phraseId": 12,
+      "correct": 1,
+      "createdOn": "2017-04-20 15:59:20"
+    },
+    {
+      "id": 24,
+      "phraseId": 16,
+      "correct": 1,
+      "createdOn": "2017-04-20 15:59:45"
+    },
+    {
+      "id": 25,
+      "phraseId": 5,
+      "correct": 1,
+      "createdOn": "2017-04-20 15:59:55"
+    },
+    {
+      "id": 26,
+      "phraseId": 10,
+      "correct": 1,
+      "createdOn": "2017-04-20 16:00:02"
+    },
+    {
+      "id": 27,
+      "phraseId": 9,
+      "correct": 1,
+      "createdOn": "2017-04-25 23:43:56"
+    },
+    {
+      "id": 28,
+      "phraseId": 16,
+      "correct": 0,
+      "createdOn": "2017-04-25 23:44:09"
+    },
+    {
+      "id": 29,
+      "phraseId": 14,
+      "correct": 1,
+      "createdOn": "2017-04-27 16:26:19"
+    },
+    {
+      "id": 30,
+      "phraseId": 10,
+      "correct": 1,
+      "createdOn": "2017-04-27 16:26:31"
+    }
+  ],
+  "badges": [
+    {
+      "id": 1,
+      "badgeName": "Beginner",
+      "badgeDesc": "Add 30 Phrases to your Phrasebook"
+    },
+    {
+      "id": 2,
+      "badgeName": "Doing Good",
+      "badgeDesc": "30 Correct Guesses in Practice"
+    },
+    {
+      "id": 3,
+      "badgeName": "Novice",
+      "badgeDesc": "Add 100 Phrases to your Phrasebook"
+    },
+    {
+      "id": 4,
+      "badgeName": "Novice",
+      "badgeDesc": "150 Correct Guesses in Practice"
+    },
+    {
+      "id": 5,
+      "badgeName": "Expert",
+      "badgeDesc": "Add 250 Phrases to your Phrasebook"
+    },
+    {
+      "id": 6,
+      "badgeName": "Beacon of Light",
+      "badgeDesc": "300 Correct Guesses in Practice"
+    },
+    {
+      "id": 7,
+      "badgeName": "Keep Going",
+      "badgeDesc": "10 Correct Guesses in Practice in one day"
+    },
+    {
+      "id": 8,
+      "badgeName": "Greedy",
+      "badgeDesc": "Add 20 Phrases in one day"
+    },
+    {
+      "id": 9,
+      "badgeName": "High Fidelity",
+      "badgeDesc": "20 Correct Guesses in Practice in a row"
+    },
+    {
+      "id": 10,
+      "badgeName": "Not Too Shabby",
+      "badgeDesc": "10 Incorrect Guesses in Practice in a row"
+    },
+    {
+      "id": 11,
+      "badgeName": "I Like It Difficult",
+      "badgeDesc": "Add one 25 characters phrase to your Phrasebook"
+    },
+    {
+      "id": 12,
+      "badgeName": "Get On My Level",
+      "badgeDesc": "Add 5 phrases of 25 characters to your Phrasebook"
+    },
+    {
+      "id": 13,
+      "badgeName": "Rise and Shine",
+      "badgeDesc": "5 Correct Guesses in Practice between 04:00 and 10:00"
+    },
+    {
+      "id": 14,
+      "badgeName": "Night Owl",
+      "badgeDesc": "5 Correct Guesses in Practice between 19:00 and 23:00"
+    },
+    {
+      "id": 15,
+      "badgeName": "No Sleep",
+      "badgeDesc": "5 Correct Guesses in Practice between 00:00 and 06:00"
+    },
+    {
+      "id": 16,
+      "badgeName": "Inspiring Dreams",
+      "badgeDesc": "Add 5 Phrases to your Phrasebook between 00:00 and 06:00"
+    },
+    {
+      "id": 17,
+      "badgeName": "Sudden Inspiration",
+      "badgeDesc": "Add 15 Phrases to your Phrasebook within 15 minutes"
+    },
+    {
+      "id": 18,
+      "badgeName": "Extreme Stamina",
+      "badgeDesc": "15 Correct Guesses in Practice within 15 minutes"
+    }
+  ],
+  "user": [
+    {
+      "nickname": "TheArk",
+      "motherLanguage": "ITALIANO",
+      "foreignLanguage": "ENGLISH",
+      "created": "2017-04-11 07:16:08",
+      "level": 0,
+      "totalXP": 20,
+      "Gamification": 1,
+      "hasSwitchedVersion": 1
+    }
+  ]
+}
