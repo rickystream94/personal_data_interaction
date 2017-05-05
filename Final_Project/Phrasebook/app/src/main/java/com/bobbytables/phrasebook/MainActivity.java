@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                     .KEY_SWITCHED_VERSION);
             boolean hasPerformedLastUpload = settingsManager.getPrefBoolValue(SettingsManager
                     .KEY_FINAL_UPLOAD_PERFORMED);
-            if (daysDiff >= 3 && !hasAlreadySwitchedVersion) {
+            if (daysDiff >= 2 && !hasAlreadySwitchedVersion) {
                 try {
                     //Try to upload data before switching to new version
                     executeUpload();
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 }
             }
             //perform latest automatic data upload
-            if (daysDiff >= 6 && hasAlreadySwitchedVersion && !hasPerformedLastUpload) {
+            if (daysDiff >= 4 && hasAlreadySwitchedVersion && !hasPerformedLastUpload) {
                 try {
                     //Try to upload data before switching to new version
                     executeUpload();
