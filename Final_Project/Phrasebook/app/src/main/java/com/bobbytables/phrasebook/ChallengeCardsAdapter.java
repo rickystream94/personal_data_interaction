@@ -161,36 +161,33 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
             alertDialogManager.showAlertDialog(context, "Error!", e.getMessage(), false);
         }
 
-        //TODO: to be removed after experiment. Gamification will be permanent
-        if (settingsManager.getPrefBoolValue(SettingsManager.KEY_GAMIFICATION)) {
-            //Check XP and Level (gain XP only if not archived!)
-            boolean currentlyArchived = databaseHelper.getArchivedStatus(holder.motherLanguageText.getText
-                    ().toString(), correctTranslation);
-            if (result && !currentlyArchived) {
-                int xp = XPManager.XP_CHALLENGE_WON; //Standard XP amount to add
-                //Add experience only if max XP hasn't been reached
-                if (!(xpManager.getCurrentXp() == xpManager.getXpPerLevel(XPManager.MAX_LEVEL))) {
-                    xpManager.addExperience(xp);
-                }
-                if (xpManager.checkLevelUp()) {
-                    int newLevel = xpManager.levelUp();
-                    holder.newLevelText.setVisibility(View.VISIBLE);
-                    holder.newLevelText.setAnimateType(HTextViewType.SCALE);
-                    holder.newLevelText.animateText("Level " + newLevel + " reached!");
-                    xpManager.addExperience(XPManager.XP_BONUS_LEVEL_UP);
-                    xp += XPManager.XP_BONUS_LEVEL_UP;
-                }
-                holder.xpText.setVisibility(View.VISIBLE);
-                holder.xpText.setAnimateType(HTextViewType.ANVIL);
-                holder.xpText.animateText("+" + xp + "XP!");
-                Log.d("XP DEBUG", "Added XP points, new XP: " + xpManager.getCurrentXp());
+        //Check XP and Level (gain XP only if not archived!)
+        boolean currentlyArchived = databaseHelper.getArchivedStatus(holder.motherLanguageText.getText
+                ().toString(), correctTranslation);
+        if (result && !currentlyArchived) {
+            int xp = XPManager.XP_CHALLENGE_WON; //Standard XP amount to add
+            //Add experience only if max XP hasn't been reached
+            if (!(xpManager.getCurrentXp() == xpManager.getXpPerLevel(XPManager.MAX_LEVEL))) {
+                xpManager.addExperience(xp);
             }
+            if (xpManager.checkLevelUp()) {
+                int newLevel = xpManager.levelUp();
+                holder.newLevelText.setVisibility(View.VISIBLE);
+                holder.newLevelText.setAnimateType(HTextViewType.SCALE);
+                holder.newLevelText.animateText("Level " + newLevel + " reached!");
+                xpManager.addExperience(XPManager.XP_BONUS_LEVEL_UP);
+                xp += XPManager.XP_BONUS_LEVEL_UP;
+            }
+            holder.xpText.setVisibility(View.VISIBLE);
+            holder.xpText.setAnimateType(HTextViewType.ANVIL);
+            holder.xpText.animateText("+" + xp + "XP!");
+            Log.d("XP DEBUG", "Added XP points, new XP: " + xpManager.getCurrentXp());
+        }
 
-            //Check achieved badges
-            List<String> achievedBadges = badgeManager.checkNewBadges(BadgeManager.TABLE_CHALLENGES);
-            if (achievedBadges.size() > 0) {
-                badgeManager.showDialogAchievedBadges(context, achievedBadges);
-            }
+        //Check achieved badges
+        List<String> achievedBadges = badgeManager.checkNewBadges(BadgeManager.TABLE_CHALLENGES);
+        if (achievedBadges.size() > 0) {
+            badgeManager.showDialogAchievedBadges(context, achievedBadges);
         }
 
         //Update UI user feedback

@@ -101,55 +101,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         //Initialize request queue for Volley
         requestQueue = Volley.newRequestQueue(this);
-
-        //TODO: to be removed after experiment!
-        //Perform check of gamification, to be changed after 10 days
-        if (settingsManager.getPrefStringValue(SettingsManager.KEY_CREATED).equals(""))
-            return;
-        String currentDate = DateUtil.getCurrentTimestamp();
-        String userCreationDate = settingsManager.getPrefStringValue(SettingsManager.KEY_CREATED);
-        try {
-            int daysDiff = DateUtil.daysBetweenDates(userCreationDate, currentDate);
-            boolean hasAlreadySwitchedVersion = settingsManager.getPrefBoolValue(SettingsManager
-                    .KEY_SWITCHED_VERSION);
-            boolean hasPerformedLastUpload = settingsManager.getPrefBoolValue(SettingsManager
-                    .KEY_FINAL_UPLOAD_PERFORMED);
-            if (daysDiff >= 2 && !hasAlreadySwitchedVersion) {
-                try {
-                    //Try to upload data before switching to new version
-                    executeUpload();
-                    boolean gamificationStatus = settingsManager.getPrefBoolValue(SettingsManager
-                            .KEY_GAMIFICATION);
-                    settingsManager.updatePrefValue(SettingsManager.KEY_GAMIFICATION, !gamificationStatus);
-                    settingsManager.updatePrefValue(SettingsManager.KEY_SWITCHED_VERSION, true);
-                    String message = getString(R.string.uiSwitchRootMessage);
-                    if (!gamificationStatus)
-                        message += getString(R.string.uiSwitchGamification);
-                    else
-                        message += getString(R.string.uiSwitchNoGamification);
-                    alertDialogManager.showAlertDialog(MainActivity.this, "Important update!", message,
-                            !gamificationStatus);
-                    return;
-                } catch (Exception e) {
-                    alertDialogManager.showAlertDialog(MainActivity.this, "Error", getString(R.string.uiSwitchErrorConnection), false);
-                }
-            }
-            //perform latest automatic data upload
-            if (daysDiff >= 4 && hasAlreadySwitchedVersion && !hasPerformedLastUpload) {
-                try {
-                    //Try to upload data before switching to new version
-                    executeUpload();
-                    settingsManager.updatePrefValue(SettingsManager.KEY_FINAL_UPLOAD_PERFORMED, true);
-                    alertDialogManager.showAlertDialog(MainActivity.this, "Important update!",
-                            getString(R.string.finalMessage),
-                            true);
-                } catch (Exception e) {
-                    alertDialogManager.showAlertDialog(MainActivity.this, "Error", getString(R.string.uiSwitchErrorConnection), false);
-                }
-            }
-        } catch (ParseException e) {
-            alertDialogManager.showAlertDialog(MainActivity.this, "Error", e.getMessage(), false);
-        }
     }
 
     @Override
@@ -185,9 +136,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
-        //TODO: to be changed after experiment, delete the 2 lines below!
-        MenuItem profileItem = menu.findItem(R.id.profile);
-        profileItem.setVisible(settingsManager.getPrefBoolValue(SettingsManager.KEY_GAMIFICATION));
         //Developer buttons, enable if needed
         return true;
     }
@@ -248,13 +196,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             case R.id.profile:
                 Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
                 startActivity(i);
-                break;
-            case R.id.upload_data:
-                try {
-                    executeUpload();
-                } catch (Exception e) {
-                    alertDialogManager.showAlertDialog(MainActivity.this, "Error", e.getMessage(), false);
-                }
                 break;
             case R.id.about:
                 Intent intent = new Intent(MainActivity.this, AboutActivity.class);
@@ -387,14 +328,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         //Not necessary
     }
 
-    private void executeUpload() throws Exception {
-        if (isConnected())
-            uploadDataToServer();
-        else throw new Exception("You're not " +
-                "connected to any network! Please try again when you have internet " +
-                "connection");
-    }
-
     /**
      * Checks if phone is connected to network
      *
@@ -404,35 +337,5 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
-    }
-
-    public void uploadDataToServer() {
-        final JSONObject jsonObject = databaseHelper.createJsonDump();
-        Request request = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d("Request Response", response);
-                Toast.makeText(MainActivity.this, "Data successfully uploaded!", Toast.LENGTH_SHORT)
-                        .show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("ERROR RESPONSE", error.toString());
-                Toast.makeText(MainActivity.this, "An error occurred! Please try again...", Toast
-                        .LENGTH_SHORT)
-                        .show();
-            }
-        }) {
-            @Override
-            public Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("data", jsonObject.toString());
-                return params;
-            }
-        };
-
-        // Adding request to request queue
-        requestQueue.add(request);
     }
 }
