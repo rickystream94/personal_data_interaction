@@ -1,0 +1,224 @@
+{
+  "user": [
+    {
+      "level": 0,
+      "created": "2017-04-11 23:20:42",
+      "nickname": "MarioStefano",
+      "Gamification": 1,
+      "totalXP": 10,
+      "foreignLanguage": "INGLESE",
+      "hasSwitchedVersion": 1,
+      "motherLanguage": "ITALIANO"
+    }
+  ],
+  "badges": [
+    {
+      "id": 1,
+      "badgeName": "Beginner",
+      "badgeDesc": "Add 30 Phrases to your Phrasebook"
+    },
+    {
+      "id": 2,
+      "badgeName": "Doing Good",
+      "badgeDesc": "30 Correct Guesses in Practice"
+    },
+    {
+      "id": 3,
+      "badgeName": "Novice",
+      "badgeDesc": "Add 100 Phrases to your Phrasebook"
+    },
+    {
+      "id": 4,
+      "badgeName": "Novice",
+      "badgeDesc": "150 Correct Guesses in Practice"
+    },
+    {
+      "id": 5,
+      "badgeName": "Expert",
+      "badgeDesc": "Add 250 Phrases to your Phrasebook"
+    },
+    {
+      "id": 6,
+      "badgeName": "Beacon of Light",
+      "badgeDesc": "300 Correct Guesses in Practice"
+    },
+    {
+      "id": 7,
+      "badgeName": "Keep Going",
+      "badgeDesc": "10 Correct Guesses in Practice in one day"
+    },
+    {
+      "id": 8,
+      "badgeName": "Greedy",
+      "badgeDesc": "Add 20 Phrases in one day"
+    },
+    {
+      "id": 9,
+      "badgeName": "High Fidelity",
+      "badgeDesc": "20 Correct Guesses in Practice in a row"
+    },
+    {
+      "id": 10,
+      "badgeName": "Not Too Shabby",
+      "badgeDesc": "10 Incorrect Guesses in Practice in a row"
+    },
+    {
+      "id": 11,
+      "badgeName": "I Like It Difficult",
+      "badgeDesc": "Add one 25 characters phrase to your Phrasebook"
+    },
+    {
+      "id": 12,
+      "badgeName": "Get On My Level",
+      "badgeDesc": "Add 5 phrases of 25 characters to your Phrasebook"
+    },
+    {
+      "id": 13,
+      "badgeName": "Rise and Shine",
+      "badgeDesc": "5 Correct Guesses in Practice between 04:00 and 10:00"
+    },
+    {
+      "id": 14,
+      "badgeName": "Night Owl",
+      "badgeDesc": "5 Correct Guesses in Practice between 19:00 and 23:00"
+    },
+    {
+      "id": 15,
+      "badgeName": "No Sleep",
+      "badgeDesc": "5 Correct Guesses in Practice between 00:00 and 06:00"
+    },
+    {
+      "id": 16,
+      "badgeName": "Inspiring Dreams",
+      "badgeDesc": "Add 5 Phrases to your Phrasebook between 00:00 and 06:00"
+    },
+    {
+      "id": 17,
+      "badgeName": "Sudden Inspiration",
+      "badgeDesc": "Add 15 Phrases to your Phrasebook within 15 minutes"
+    },
+    {
+      "id": 18,
+      "badgeName": "Extreme Stamina",
+      "badgeDesc": "15 Correct Guesses in Practice within 15 minutes"
+    }
+  ],
+  "challenges": [
+    {
+      "createdOn": "2017-04-18 15:49:14",
+      "correct": 1,
+      "phraseId": 2,
+      "id": 1
+    },
+    {
+      "createdOn": "2017-04-18 15:49:28",
+      "correct": 0,
+      "phraseId": 4,
+      "id": 2
+    },
+    {
+      "createdOn": "2017-04-18 15:49:35",
+      "correct": 1,
+      "phraseId": 2,
+      "id": 3
+    },
+    {
+      "createdOn": "2017-04-18 15:49:47",
+      "correct": 0,
+      "phraseId": 4,
+      "id": 4
+    },
+    {
+      "createdOn": "2017-04-18 17:47:35",
+      "correct": 0,
+      "phraseId": 5,
+      "id": 5
+    },
+    {
+      "createdOn": "2017-04-23 15:24:03",
+      "correct": 0,
+      "phraseId": 4,
+      "id": 6
+    },
+    {
+      "createdOn": "2017-04-24 13:19:53",
+      "correct": 1,
+      "phraseId": 3,
+      "id": 7
+    }
+  ],
+  "phrasebook": [
+    {
+      "createdOn": "2017-04-17 18:00:40",
+      "id": 1,
+      "foreignLangString": "speakers",
+      "archived": 0,
+      "correctCount": 0,
+      "motherLangString": "autoparlanti"
+    },
+    {
+      "createdOn": "2017-04-18 15:41:29",
+      "id": 2,
+      "foreignLangString": "bitter",
+      "archived": 0,
+      "correctCount": 2,
+      "motherLangString": "amaro"
+    },
+    {
+      "createdOn": "2017-04-18 15:41:52",
+      "id": 3,
+      "foreignLangString": "malty",
+      "archived": 0,
+      "correctCount": 1,
+      "motherLangString": "maltoso"
+    },
+    {
+      "createdOn": "2017-04-18 15:43:12",
+      "id": 4,
+      "foreignLangString": "earthy",
+      "archived": 0,
+      "correctCount": -3,
+      "motherLangString": "di terra"
+    },
+    {
+      "createdOn": "2017-04-18 15:45:49",
+      "id": 5,
+      "foreignLangString": "deeply",
+      "archived": 0,
+      "correctCount": -1,
+      "motherLangString": "profondamente"
+    },
+    {
+      "createdOn": "2017-04-18 17:48:00",
+      "id": 6,
+      "foreignLangString": "apricot",
+      "archived": 0,
+      "correctCount": 0,
+      "motherLangString": "albicocca"
+    },
+    {
+      "createdOn": "2017-04-18 17:48:21",
+      "id": 7,
+      "foreignLangString": "pleasant",
+      "archived": 0,
+      "correctCount": 0,
+      "motherLangString": "piacevole"
+    },
+    {
+      "createdOn": "2017-04-18 19:18:04",
+      "id": 8,
+      "foreignLangString": "leaves",
+      "archived": 0,
+      "correctCount": 0,
+      "motherLangString": "foglie"
+    },
+    {
+      "createdOn": "2017-04-23 15:23:33",
+      "id": 9,
+      "foreignLangString": "show",
+      "archived": 0,
+      "correctCount": 0,
+      "motherLangString": "mostrare"
+    }
+  ]
+}

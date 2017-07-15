@@ -7,9 +7,6 @@
         android:title="Profile"
         android2:showAsAction="always"/>
     <item
-        android:id="@+id/upload_data"
-        android:title="Upload Data"/>
-    <item
         android:id="@+id/export_data"
         android:title="Export Data"/>
     <item

@@ -147,10 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion == 1) {
             SettingsManager settingsManager = SettingsManager.getInstance(context);
             settingsManager.updatePrefValue(SettingsManager.KEY_LEVEL, 0);
-            settingsManager.updatePrefValue(SettingsManager.KEY_GAMIFICATION, (Math.random() < 0.5));
             settingsManager.updatePrefValue(SettingsManager.KEY_PROFILE_PIC, "DEFAULT");
-            settingsManager.updatePrefValue(SettingsManager.KEY_SWITCHED_VERSION, false);
-            settingsManager.updatePrefValue(SettingsManager.KEY_FINAL_UPLOAD_PERFORMED, false);
             settingsManager.updatePrefValue(SettingsManager.KEY_CREATED, DateUtil.getCurrentTimestamp());
             settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
         }

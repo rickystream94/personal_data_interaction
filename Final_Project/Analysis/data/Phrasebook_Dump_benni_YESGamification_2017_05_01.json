@@ -1,0 +1,294 @@
+{
+  "phrasebook": [
+    {
+      "id": 1,
+      "motherLangString": "postkarte",
+      "foreignLangString": "cartolina",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:07:54"
+    },
+    {
+      "id": 2,
+      "motherLangString": "unterwegs",
+      "foreignLangString": "essere in viaggio/in giro",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:09:10"
+    },
+    {
+      "id": 3,
+      "motherLangString": "jahr",
+      "foreignLangString": "anno",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:09:33"
+    },
+    {
+      "id": 4,
+      "motherLangString": "zeitalter",
+      "foreignLangString": "età/era/tempo",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:10:39"
+    },
+    {
+      "id": 5,
+      "motherLangString": "farbfernsehen",
+      "foreignLangString": "televisione a colori",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:14:11"
+    },
+    {
+      "id": 6,
+      "motherLangString": "erst",
+      "foreignLangString": "primo/all'inizio",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:17:29"
+    },
+    {
+      "id": 7,
+      "motherLangString": "teilweise",
+      "foreignLangString": "parziale",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:17:44"
+    },
+    {
+      "id": 8,
+      "motherLangString": "herztransplantation",
+      "foreignLangString": "trapianto di cuore",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:18:14"
+    },
+    {
+      "id": 9,
+      "motherLangString": "durchgeführt",
+      "foreignLangString": "effettuato",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:18:38"
+    },
+    {
+      "id": 10,
+      "motherLangString": "sterben",
+      "foreignLangString": "morire",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:21:00"
+    },
+    {
+      "id": 11,
+      "motherLangString": "kapsel",
+      "foreignLangString": "capsula",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:21:17"
+    },
+    {
+      "id": 12,
+      "motherLangString": "schicken",
+      "foreignLangString": "spedire",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-20 10:21:48"
+    },
+    {
+      "id": 13,
+      "motherLangString": "gruß",
+      "foreignLangString": "saluto",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:25:42"
+    },
+    {
+      "id": 14,
+      "motherLangString": "küste",
+      "foreignLangString": "costa",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:26:35"
+    },
+    {
+      "id": 15,
+      "motherLangString": "allerdings",
+      "foreignLangString": "ma, però, tuttavia",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:27:32"
+    },
+    {
+      "id": 16,
+      "motherLangString": "schon",
+      "foreignLangString": "già",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:29:34"
+    },
+    {
+      "id": 17,
+      "motherLangString": "genauer",
+      "foreignLangString": "precisamente,esattamente",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:40:06"
+    },
+    {
+      "id": 18,
+      "motherLangString": "beinahe",
+      "foreignLangString": "quasi/circa",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:41:02"
+    },
+    {
+      "id": 19,
+      "motherLangString": "stempeln",
+      "foreignLangString": "timbrare/bollare",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:42:07"
+    },
+    {
+      "id": 20,
+      "motherLangString": "ansprechend",
+      "foreignLangString": "analogamente",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:51:12"
+    },
+    {
+      "id": 21,
+      "motherLangString": "ahnungslos",
+      "foreignLangString": "all'oscuro/ignaro",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:51:50"
+    },
+    {
+      "id": 22,
+      "motherLangString": "erinnern",
+      "foreignLangString": "ricordare",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:57:00"
+    },
+    {
+      "id": 23,
+      "motherLangString": "feier",
+      "foreignLangString": "festa/cerimonia",
+      "archived": 0,
+      "correctCount": 0,
+      "createdOn": "2017-04-22 10:58:01"
+    }
+  ],
+  "challenges": [],
+  "badges": [
+    {
+      "id": 1,
+      "badgeName": "Beginner",
+      "badgeDesc": "Add 30 Phrases to your Phrasebook"
+    },
+    {
+      "id": 2,
+      "badgeName": "Doing Good",
+      "badgeDesc": "30 Correct Guesses in Practice"
+    },
+    {
+      "id": 3,
+      "badgeName": "Novice",
+      "badgeDesc": "Add 100 Phrases to your Phrasebook"
+    },
+    {
+      "id": 4,
+      "badgeName": "Novice",
+      "badgeDesc": "150 Correct Guesses in Practice"
+    },
+    {
+      "id": 5,
+      "badgeName": "Expert",
+      "badgeDesc": "Add 250 Phrases to your Phrasebook"
+    },
+    {
+      "id": 6,
+      "badgeName": "Beacon of Light",
+      "badgeDesc": "300 Correct Guesses in Practice"
+    },
+    {
+      "id": 7,
+      "badgeName": "Keep Going",
+      "badgeDesc": "10 Correct Guesses in Practice in one day"
+    },
+    {
+      "id": 8,
+      "badgeName": "Greedy",
+      "badgeDesc": "Add 20 Phrases in one day"
+    },
+    {
+      "id": 9,
+      "badgeName": "High Fidelity",
+      "badgeDesc": "20 Correct Guesses in Practice in a row"
+    },
+    {
+      "id": 10,
+      "badgeName": "Not Too Shabby",
+      "badgeDesc": "10 Incorrect Guesses in Practice in a row"
+    },
+    {
+      "id": 11,
+      "badgeName": "I Like It Difficult",
+      "createdOn": "2017-04-20 10:09:10",
+      "badgeDesc": "Add one 25 characters phrase to your Phrasebook"
+    },
+    {
+      "id": 12,
+      "badgeName": "Get On My Level",
+      "badgeDesc": "Add 5 phrases of 25 characters to your Phrasebook"
+    },
+    {
+      "id": 13,
+      "badgeName": "Rise and Shine",
+      "badgeDesc": "5 Correct Guesses in Practice between 04:00 and 10:00"
+    },
+    {
+      "id": 14,
+      "badgeName": "Night Owl",
+      "badgeDesc": "5 Correct Guesses in Practice between 19:00 and 23:00"
+    },
+    {
+      "id": 15,
+      "badgeName": "No Sleep",
+      "badgeDesc": "5 Correct Guesses in Practice between 00:00 and 06:00"
+    },
+    {
+      "id": 16,
+      "badgeName": "Inspiring Dreams",
+      "badgeDesc": "Add 5 Phrases to your Phrasebook between 00:00 and 06:00"
+    },
+    {
+      "id": 17,
+      "badgeName": "Sudden Inspiration",
+      "badgeDesc": "Add 15 Phrases to your Phrasebook within 15 minutes"
+    },
+    {
+      "id": 18,
+      "badgeName": "Extreme Stamina",
+      "badgeDesc": "15 Correct Guesses in Practice within 15 minutes"
+    }
+  ],
+  "user": [
+    {
+      "nickname": "benni",
+      "motherLanguage": "ITALIANO",
+      "foreignLanguage": "INGLESE",
+      "created": "2017-04-16 23:56:07",
+      "level": 0,
+      "totalXP": 0,
+      "Gamification": 1,
+      "hasSwitchedVersion": 1
+    }
+  ]
+}

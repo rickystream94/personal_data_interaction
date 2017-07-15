@@ -41,11 +41,6 @@ public class SettingsManager {
     public static final String KEY_TOTAL_XP = "totalXP";
     public static final String KEY_LEVEL = "level";
     public static final String KEY_CREATED = "created";
-    //GAMIFICATION INCLUDED OR NOT
-    public static final String KEY_GAMIFICATION = "Gamification";
-    //TODO: remove unnecessary keys in future releases
-    public static final String KEY_SWITCHED_VERSION = "hasSwitchedVersion";
-    public static final String KEY_FINAL_UPLOAD_PERFORMED = "lastUploadPerformed";
     public static final String KEY_PROFILE_PIC = "profilePic";
 
     private SettingsManager(Context context) {
@@ -82,8 +77,7 @@ public class SettingsManager {
         MainActivity.killerHandler.sendEmptyMessage(0);
     }
 
-    public void createUser(String nickname, String motherLanguage, String foreignLanguage,
-                           boolean gamification) {
+    public void createUser(String nickname, String motherLanguage, String foreignLanguage) {
         String currentTimeString = DateUtil.getCurrentTimestamp();
         editor.putString(KEY_NICKNAME, nickname);
         editor.putString(KEY_MOTHER_LANGUAGE, motherLanguage.toUpperCase());
@@ -93,10 +87,6 @@ public class SettingsManager {
         editor.putInt(KEY_LEVEL, 0);
         editor.putString(KEY_CREATED, currentTimeString);
         editor.putString(KEY_PROFILE_PIC, "DEFAULT"); //is updated in version 2!
-        //TODO: now is performed randomly, but it will be changed to true after experiment
-        editor.putBoolean(KEY_GAMIFICATION, gamification);
-        editor.putBoolean(KEY_SWITCHED_VERSION, false); //TODO: TO BE REMOVED after experiment
-        editor.putBoolean(KEY_FINAL_UPLOAD_PERFORMED, false);
         editor.putBoolean(KEY_IS_FIRST_TIME, true);
         editor.commit();
     }
@@ -183,8 +173,6 @@ public class SettingsManager {
         userData.put(KEY_CREATED, getPrefStringValue(KEY_CREATED));
         userData.put(KEY_LEVEL, getPrefIntValue(KEY_LEVEL));
         userData.put(KEY_TOTAL_XP, getPrefIntValue(KEY_TOTAL_XP));
-        userData.put(KEY_GAMIFICATION, getPrefBoolValue(KEY_GAMIFICATION) ? 1 : 0);
-        userData.put(KEY_SWITCHED_VERSION, getPrefBoolValue(KEY_SWITCHED_VERSION) ? 1 : 0);
         return userData;
     }
 
