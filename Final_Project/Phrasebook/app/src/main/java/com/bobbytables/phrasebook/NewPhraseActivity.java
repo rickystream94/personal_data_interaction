@@ -18,14 +18,12 @@ import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class NewPhraseActivity extends AppCompatActivity {
 
-    private String motherLanguage;
-    private String foreignLanguage;
+    private String lang1;
+    private String lang2;
     private EditText addNewMotherLangPhrase;
     private EditText addNewForeignLangPhrase;
     private DatabaseHelper databaseHelper;
@@ -39,11 +37,11 @@ public class NewPhraseActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent i = getIntent();
-        motherLanguage = i.getExtras().getString(SettingsManager.KEY_MOTHER_LANGUAGE);
-        foreignLanguage = i.getExtras().getString(SettingsManager.KEY_FOREIGN_LANGUAGE);
+        lang1 = i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG1);
+        lang2 = i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG2);
 
         TextView foreignLangTextView = (TextView) findViewById(R.id.textView_new_phrase_language);
-        foreignLangTextView.setText(foreignLanguage);
+        foreignLangTextView.setText(lang1 + " - " + lang2);
         Button saveAddMore = (Button) findViewById(R.id.save_and_add_more);
         addNewMotherLangPhrase = (EditText) findViewById(R.id.add_new_mother_lang);
         addNewForeignLangPhrase = (EditText) findViewById(R.id.add_new_foreign_lang);

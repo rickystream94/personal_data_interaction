@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,12 +38,12 @@ public class UpdatePhraseActivity extends AppCompatActivity {
         TextView lang2Label = (TextView) findViewById(R.id.updateLang2Label);
         lang1EditText = (EditText) findViewById(R.id.updateLang1EditText);
         lang2EditText = (EditText) findViewById(R.id.updateLang2EditText);
-        String motherLang = "Phrase in " + i.getExtras().getString(SettingsManager.KEY_MOTHER_LANGUAGE);
-        String foreignLang = "Phrase in " + i.getExtras().getString(SettingsManager.KEY_FOREIGN_LANGUAGE);
+        String motherLang = "Phrase in " + i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG1);
+        String foreignLang = "Phrase in " + i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG2);
         lang1Label.setText(motherLang);
         lang2Label.setText(foreignLang);
-        oldLang1 = i.getExtras().getString(DatabaseHelper.KEY_MOTHER_LANG_STRING);
-        oldLang2 = i.getExtras().getString(DatabaseHelper.KEY_FOREIGN_LANG_STRING);
+        oldLang1 = i.getExtras().getString(DatabaseHelper.KEY_LANG1_VALUE);
+        oldLang2 = i.getExtras().getString(DatabaseHelper.KEY_LANG2_VALUE);
         lang1EditText.setText(oldLang1);
         lang2EditText.setText(oldLang2);
     }

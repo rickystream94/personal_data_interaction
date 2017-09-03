@@ -2,6 +2,7 @@ package com.bobbytables.phrasebook;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,25 +27,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
-import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
-
-import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
         ViewPager.OnPageChangeListener {
@@ -55,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private ViewPager pager;
     private FloatingActionButton fab;
     public static Handler killerHandler;
-    private String motherLanguage;
-    private String foreignLanguage;
+    private String lang1;
+    private String lang2;
     private DatabaseHelper databaseHelper;
     private TabLayout tabLayout;
     private String[] pagesTitles;
@@ -87,8 +74,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity
         settingsManager.createUserProfile();
-        motherLanguage = settingsManager.getPrefStringValue(SettingsManager.KEY_MOTHER_LANGUAGE);
-        foreignLanguage = settingsManager.getPrefStringValue(SettingsManager.KEY_FOREIGN_LANGUAGE);
+        ContentValues currentLanguages = SettingsManager.getInstance(getApplicationContext()).getCurrentLanguages();
+        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1);
+        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -216,8 +204,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), NewPhraseActivity.class);
-                i.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE, motherLanguage);
-                i.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE, foreignLanguage);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2);
                 startActivity(i);
             }
         });

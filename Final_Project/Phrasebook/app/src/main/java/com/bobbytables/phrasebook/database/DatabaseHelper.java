@@ -35,7 +35,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
     //Database info
     private static final String DATABASE_NAME = "phrasebookDatabase";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3; //Updated to version 3: multi-language support
     private static final String TAG = DatabaseHelper.class.getName();
     private Context context;
     private CSVUtils csvUtils;
@@ -45,18 +45,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_PHRASES = "phrases";
     public static final String TABLE_CHALLENGES = "challenges";
     public static final String TABLE_BADGES = "badges";
+    public static final String TABLE_LANGUAGES = "languages";
 
     // Phrases Table Columns
     private static final String KEY_PHRASE_ID = "id";
-    public static final String KEY_MOTHER_LANG_STRING = "motherLangString";
-    public static final String KEY_FOREIGN_LANG_STRING = "foreignLangString";
-    public static final String KEY_ARCHIVED = "archived";
+    public static final String KEY_LANG1 = "lang1Code";
+    public static final String KEY_LANG2 = "lang1Code";
+    public static final String KEY_LANG1_VALUE = "lang1Value";
+    public static final String KEY_LANG2_VALUE = "lang2Value";
+    public static final String KEY_IS_MASTERED = "isMastered";
     public static final String KEY_CORRECT_COUNT = "correctCount";
+    public static final String KEY_LAST_PRACTICED_ON = "lastPracticedOn";
 
     // Challenges Table Columns
     public static final String KEY_CHALLENGE_ID = "id";
     public static final String KEY_CHALLENGE_PHRASE_ID = "phraseId";
     public static final String KEY_CHALLENGE_CORRECT = "correct";
+
+    //Languages Table Columns
+    private static final String KEY_LANG_ID = "id";
+    private static final String KEY_LANG_NAME = "languageName";
 
     // Badges Table Columns
     public static final String KEY_BADGES_ID = "id";
@@ -69,10 +77,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_PHRASES_TABLE = "CREATE TABLE " + TABLE_PHRASES +
             "(" +
             KEY_PHRASE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
-            KEY_MOTHER_LANG_STRING + " TEXT, " +
-            KEY_FOREIGN_LANG_STRING + " TEXT, " +
-            KEY_ARCHIVED + " INTEGER, " +
+            KEY_LANG1 + " TEXT, " +
+            KEY_LANG2 + " TEXT, " +
+            KEY_LANG1_VALUE + " TEXT, " +
+            KEY_LANG2_VALUE + " TEXT, " +
+            KEY_IS_MASTERED + " INTEGER, " +
             KEY_CORRECT_COUNT + " INTEGER, " +
+            KEY_LAST_PRACTICED_ON + " TEXT, " +
             KEY_CREATED_ON + " TEXT)";
 
     private static final String CREATE_CHALLENGES_TABLE = "CREATE TABLE " + TABLE_CHALLENGES +
@@ -82,6 +93,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // a foreign key
             KEY_CHALLENGE_CORRECT + " INTEGER T, " +
             KEY_CREATED_ON + " TEXT)";
+    private static final String CREATE_LANGUAGES_TABLE = "CREATE TABLE " + TABLE_LANGUAGES +
+            " (" + KEY_LANG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            KEY_LANG_NAME + " TEXT)";
 
     private static final String CREATE_BADGES_TABLE = "CREATE TABLE " + TABLE_BADGES +
             "(" +
@@ -117,6 +131,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_PHRASES_TABLE);
         sqLiteDatabase.execSQL(CREATE_CHALLENGES_TABLE);
         sqLiteDatabase.execSQL(CREATE_BADGES_TABLE);
+        sqLiteDatabase.execSQL(CREATE_LANGUAGES_TABLE);
         try {
             populateBadgesTable(sqLiteDatabase);
         } catch (Exception e) {
@@ -164,6 +179,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         } catch (Exception exception) {
             Log.e(TAG, "Exception running upgrade script:", exception);
+        }
+
+        //Names of language preferences have changed, need to update the names and insert the
+        // languages in the proper table!
+        if (newVersion == 3) {
+            //Get previous languages
+            SettingsManager settingsManager = SettingsManager.getInstance(context);
+            String currentLang1 = settingsManager.getPrefStringValue("motherLanguage");
+            String currentLang2 = settingsManager.getPrefStringValue("foreignLanguage");
+
+            //We need to update the columns in the new phrases table with these two values
+            ContentValues cv1 = new ContentValues();
+            ContentValues cv2 = new ContentValues();
+            cv1.put(KEY_LANG_ID, 1);
+            cv1.put(KEY_LANG_NAME, currentLang1);
+            cv2.put(KEY_LANG_ID, 2);
+            cv2.put(KEY_LANG_NAME, currentLang2);
+            db.insertOrThrow(TABLE_LANGUAGES, null, cv1);
+            db.insertOrThrow(TABLE_LANGUAGES, null, cv2);
+            ContentValues updateCv = new ContentValues();
+            updateCv.put(KEY_LANG1, 1);
+            updateCv.put(KEY_LANG2, 2);
+            int affectedRows = db.update(TABLE_PHRASES, updateCv, KEY_LANG1 +
+                    " IS NULL AND " + KEY_LANG2 + " IS NULL", null);
+            if (affectedRows > 0)
+                Log.d(TAG, "Successfully updated language codes of " + affectedRows + " rows.");
+            else
+                Log.e(TAG, affectedRows + " rows have updated language codes!");
+
+            //Set as default current languages the previous ones
+            settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG1, 1);
+            settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG2, 2);
+
+            //Delete old keys
+            settingsManager.updatePrefValue("motherLanguage", null);
+            settingsManager.updatePrefValue("foreignLanguage", null);
         }
     }
 
@@ -250,12 +301,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public boolean phraseAlreadyExists(DatabaseModel dataObject) {
         ContentValues contentValues = dataObject.getContentValues();
-        String motherLanguageString = contentValues.getAsString(KEY_MOTHER_LANG_STRING);
-        String foreignLanguageString = contentValues.getAsString(KEY_FOREIGN_LANG_STRING);
+        String motherLanguageString = contentValues.getAsString(KEY_LANG1_VALUE);
+        String foreignLanguageString = contentValues.getAsString(KEY_LANG2_VALUE);
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_PHRASES + " WHERE " +
-                        "" + KEY_MOTHER_LANG_STRING + "=? AND " +
-                        "" + KEY_FOREIGN_LANG_STRING + "=?",
+                        "" + KEY_LANG1_VALUE + "=? AND " +
+                        "" + KEY_LANG2_VALUE + "=?",
                 new String[]{motherLanguageString, foreignLanguageString});
         boolean exists = cursor.moveToFirst();
         cursor.close();
@@ -273,8 +324,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean checkIfCorrect(String motherLanguageString, String foreignLangString, String correctTranslation) {
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + " =? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + " =?", new String[]{motherLanguageString,
+                "" + KEY_LANG1_VALUE + " =? AND " +
+                "" + KEY_LANG2_VALUE + " =?", new String[]{motherLanguageString,
                 foreignLangString});
         cursor.moveToFirst();
         boolean result = cursor.getInt(0) > 0;
@@ -292,8 +343,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public String getTranslation(String motherLanguageString) {
         SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT " + KEY_FOREIGN_LANG_STRING + " FROM " +
-                "" + TABLE_PHRASES + " WHERE " + KEY_MOTHER_LANG_STRING + "=? " +
+        Cursor cursor = database.rawQuery("SELECT " + KEY_LANG2_VALUE + " FROM " +
+                "" + TABLE_PHRASES + " WHERE " + KEY_LANG1_VALUE + "=? " +
                 "LIMIT 1", new String[]{motherLanguageString});
         cursor.moveToFirst();
         String translation = cursor.getString(0);
@@ -304,8 +355,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int getPhraseId(String motherLangString, String foreignLangString) {
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT " + KEY_PHRASE_ID + " FROM " +
-                "" + TABLE_PHRASES + " WHERE " + KEY_MOTHER_LANG_STRING + "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=? LIMIT 1", new String[]{motherLangString,
+                "" + TABLE_PHRASES + " WHERE " + KEY_LANG1_VALUE + "=? AND " +
+                "" + KEY_LANG2_VALUE + "=? LIMIT 1", new String[]{motherLangString,
                 foreignLangString});
         cursor.moveToFirst();
         int phraseId = cursor.getInt(0);
@@ -318,8 +369,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " + TABLE_PHRASES
                 + " " +
                 "WHERE " +
-                KEY_MOTHER_LANG_STRING + "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString, foreignLangString});
+                KEY_LANG1_VALUE + "=? AND " +
+                "" + KEY_LANG2_VALUE + "=?", new String[]{motherLangString, foreignLangString});
         cursor.moveToFirst();
         int correctCount = cursor.getInt(0);
         cursor.close();
@@ -340,28 +391,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             increment) {
         SQLiteDatabase database = this.getWritableDatabase();
         int previousCorrectCount = getPhraseCorrectCount(motherLangString, foreignLangString);
-        int newValue = increment ? previousCorrectCount+1 : previousCorrectCount-1;
+        int newValue = increment ? previousCorrectCount + 1 : previousCorrectCount - 1;
         /*if (increment)
             newValue = KEY_CORRECT_COUNT + "+1";
         else newValue = KEY_CORRECT_COUNT + "-1";*/
         /*String updateQuery = "UPDATE " + TABLE_PHRASES + " SET " + KEY_CORRECT_COUNT + "=" +
                 newValue + "" +
                 " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?";
+                "" + KEY_LANG1_VALUE + "=? AND " +
+                "" + KEY_LANG2_VALUE + "=?";
         database.execSQL(updateQuery, new Object[]{motherLangString, foreignLangString});*/
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_CORRECT_COUNT, newValue);
-        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_MOTHER_LANG_STRING + "=?" +
-                " AND " + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString,
+        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_LANG1_VALUE + "=?" +
+                " AND " + KEY_LANG2_VALUE + "=?", new String[]{motherLangString,
                 foreignLangString});
 
         //Check if correct count has reached the minimum to be archived
         Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " +
                 TABLE_PHRASES +
                 " " +
-                "WHERE " + KEY_MOTHER_LANG_STRING + "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString, foreignLangString});
+                "WHERE " + KEY_LANG1_VALUE + "=? AND " +
+                "" + KEY_LANG2_VALUE + "=?", new String[]{motherLangString, foreignLangString});
         boolean isArchived = false;
         if (cursor.moveToFirst()) {
             do {
@@ -394,36 +445,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void updateArchived(SQLiteDatabase database, String motherLangString, String
             foreignLangString, boolean isArchived) {
         int isArchivedParam = isArchived ? 1 : 0;
-        /*database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_ARCHIVED + "=? " + "WHERE " +
-                KEY_MOTHER_LANG_STRING + "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?", new Object[]{isArchivedParam, motherLangString,
+        /*database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_IS_MASTERED + "=? " + "WHERE " +
+                KEY_LANG1_VALUE + "=? AND " +
+                "" + KEY_LANG2_VALUE + "=?", new Object[]{isArchivedParam, motherLangString,
                 foreignLangString});*/
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_ARCHIVED, isArchivedParam);
-        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_MOTHER_LANG_STRING +
+        contentValues.put(KEY_IS_MASTERED, isArchivedParam);
+        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_LANG1_VALUE +
                 "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{motherLangString, foreignLangString});
+                "" + KEY_LANG2_VALUE + "=?", new String[]{motherLangString, foreignLangString});
     }
 
     public void updatePhrase(String oldLang1, String oldLang2, String newLang1, String newLang2) {
         SQLiteDatabase database = this.getReadableDatabase();
-        /*database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_MOTHER_LANG_STRING + "=? AND
+        /*database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_LANG1_VALUE + "=? AND
          " +
-                "" + KEY_FOREIGN_LANG_STRING + "=? WHERE " + KEY_MOTHER_LANG_STRING + "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?", new Object[]{newLang1, newLang2, oldLang1,
+                "" + KEY_LANG2_VALUE + "=? WHERE " + KEY_LANG1_VALUE + "=? AND " +
+                "" + KEY_LANG2_VALUE + "=?", new Object[]{newLang1, newLang2, oldLang1,
                 oldLang2});*/
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_MOTHER_LANG_STRING, newLang1);
-        contentValues.put(KEY_FOREIGN_LANG_STRING, newLang2);
-        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_MOTHER_LANG_STRING +
+        contentValues.put(KEY_LANG1_VALUE, newLang1);
+        contentValues.put(KEY_LANG2_VALUE, newLang2);
+        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_LANG1_VALUE +
                 "=? AND " +
-                "" + KEY_FOREIGN_LANG_STRING + "=?", new String[]{oldLang1, oldLang2});
+                "" + KEY_LANG2_VALUE + "=?", new String[]{oldLang1, oldLang2});
     }
 
     public int deletePhrase(String lang1, String lang2) {
         SQLiteDatabase database = this.getReadableDatabase();
-        return database.delete(TABLE_PHRASES,KEY_MOTHER_LANG_STRING+"=? AND " +
-                ""+KEY_FOREIGN_LANG_STRING+"=?",new String[]{lang1,lang2});
+        return database.delete(TABLE_PHRASES, KEY_LANG1_VALUE + "=? AND " +
+                "" + KEY_LANG2_VALUE + "=?", new String[]{lang1, lang2});
     }
 
     /**
@@ -552,7 +603,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String getRandomChallenge() {
         SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT " + KEY_MOTHER_LANG_STRING + " FROM " +
+        Cursor cursor = database.rawQuery("SELECT " + KEY_LANG1_VALUE + " FROM " +
                 "" + TABLE_PHRASES + " ORDER BY RANDOM() LIMIT 1", null);
         cursor.moveToFirst();
         String result = cursor.getString(0);
@@ -589,7 +640,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor searchPhrase(String query) {
         SQLiteDatabase database = this.getReadableDatabase();
         return database.rawQuery("SELECT ID AS _id,* FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + " LIKE ? OR " + KEY_FOREIGN_LANG_STRING + " " +
+                "" + KEY_LANG1_VALUE + " LIKE ? OR " + KEY_LANG2_VALUE + " " +
                 "LIKE ?", new String[]{"%" + query + "%", "%" + query + "%"});
     }
 
@@ -627,7 +678,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //Get archived phrases
         cursor = database.rawQuery("SELECT count(*) FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_ARCHIVED + "=1", null);
+                "" + KEY_IS_MASTERED + "=1", null);
         cursor.moveToFirst();
         int archived = cursor.getInt(0);
         cursor.close();
@@ -673,8 +724,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "" + KEY_BADGES_ID + "=?";
         database.execSQL(updateQuery, new Object[]{timestamp, badgeId});*/
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_CREATED_ON,timestamp);
-        int affectedRows = database.update(TABLE_BADGES,contentValues,KEY_BADGES_ID+"="+badgeId,null);
+        contentValues.put(KEY_CREATED_ON, timestamp);
+        int affectedRows = database.update(TABLE_BADGES, contentValues, KEY_BADGES_ID + "=" + badgeId, null);
     }
 
     public Cursor performRawQuery(String query) {
@@ -684,11 +735,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean getArchivedStatus(String s1, String s2) {
         SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT " + KEY_ARCHIVED + " FROM " + TABLE_PHRASES + " WHERE " +
-                "" + KEY_MOTHER_LANG_STRING + "=? AND " + KEY_FOREIGN_LANG_STRING + "=?", new String[]{s1,
+        Cursor cursor = database.rawQuery("SELECT " + KEY_IS_MASTERED + " FROM " + TABLE_PHRASES + " WHERE " +
+                "" + KEY_LANG1_VALUE + "=? AND " + KEY_LANG2_VALUE + "=?", new String[]{s1,
                 s2});
         cursor.moveToFirst();
-        boolean result = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ARCHIVED)) == 1;
+        boolean result = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_MASTERED)) == 1;
+        cursor.close();
+        return result;
+    }
+
+    public String getLanguageName(int langCode) {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT " + KEY_LANG_NAME + " FROM " + TABLE_LANGUAGES + " " +
+                "WHERE " + KEY_LANG_ID + "=" + langCode, null);
+        cursor.moveToFirst();
+        String result = cursor.getString(cursor.getColumnIndexOrThrow(KEY_LANG_NAME));
         cursor.close();
         return result;
     }

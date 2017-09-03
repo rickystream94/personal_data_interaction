@@ -1,6 +1,7 @@
 package com.bobbytables.phrasebook;
 
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -23,8 +24,8 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private DatabaseHelper databaseHelper;
-    private String motherLanguage;
-    private String foreignLanguage;
+    private String lang1;
+    private String lang2;
     private DataRowCursorAdapter rowCursorAdapter;
     private View rootView;
     private Button nextPageButton;
@@ -45,14 +46,13 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         layout = R.layout.fragment_phrases;
         rootView = inflater.inflate(layout, container, false);
 
-        motherLanguage = SettingsManager.getInstance(getContext()).getPrefStringValue(SettingsManager
-                .KEY_MOTHER_LANGUAGE);
-        foreignLanguage = SettingsManager.getInstance(getContext()).getPrefStringValue(SettingsManager
-                .KEY_FOREIGN_LANGUAGE);
+        ContentValues currentLanguages = SettingsManager.getInstance(getContext()).getCurrentLanguages();
+        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1);
+        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2);
         TextView lang1 = (TextView) rootView.findViewById(R.id.phrases_lang1);
         TextView lang2 = (TextView) rootView.findViewById(R.id.phrases_lang2);
-        lang1.setText(motherLanguage);
-        lang2.setText(foreignLanguage);
+        lang1.setText(this.lang1);
+        lang2.setText(this.lang2);
 
         // Get the SearchView and set it properly
         SearchView searchView = (SearchView) rootView.findViewById(R.id.search_phrase);
@@ -112,17 +112,17 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         Cursor cursor = (Cursor) adapterView.getAdapter().getItem(position);
         cursor.moveToPosition(position);
         String motherLangString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
-                .KEY_MOTHER_LANG_STRING));
+                .KEY_LANG1_VALUE));
         String foreignLangString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
-                .KEY_FOREIGN_LANG_STRING));
+                .KEY_LANG2_VALUE));
         String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_CREATED_ON));
         Intent intent = new Intent(getActivity(), UpdatePhraseActivity.class);
-        intent.putExtra(DatabaseHelper.KEY_MOTHER_LANG_STRING, motherLangString);
-        intent.putExtra(DatabaseHelper.KEY_FOREIGN_LANG_STRING, foreignLangString);
+        intent.putExtra(DatabaseHelper.KEY_LANG1_VALUE, motherLangString);
+        intent.putExtra(DatabaseHelper.KEY_LANG2_VALUE, foreignLangString);
         intent.putExtra(DatabaseHelper.KEY_CREATED_ON, createdOn);
-        intent.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE, motherLanguage);
-        intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE, foreignLanguage);
+        intent.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1);
+        intent.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2);
         getActivity().startActivityForResult(intent, 1);
     }
 

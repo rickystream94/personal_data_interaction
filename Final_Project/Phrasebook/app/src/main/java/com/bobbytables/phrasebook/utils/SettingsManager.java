@@ -1,23 +1,17 @@
 package com.bobbytables.phrasebook.utils;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.net.Uri;
 
 import com.bobbytables.phrasebook.MainActivity;
 import com.bobbytables.phrasebook.NewUserActivity;
+import com.bobbytables.phrasebook.database.DatabaseHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-import java.util.StringTokenizer;
 
 /**
  * Created by ricky on 15/03/2017.
@@ -36,8 +30,8 @@ public class SettingsManager {
     public static final String KEY_IS_FIRST_TIME = "isFirstTime";
     // User name
     public static final String KEY_NICKNAME = "nickname";
-    public static final String KEY_MOTHER_LANGUAGE = "motherLanguage";
-    public static final String KEY_FOREIGN_LANGUAGE = "foreignLanguage";
+    public static final String KEY_CURRENT_LANG1 = "currentLang1Code";
+    public static final String KEY_CURRENT_LANG2 = "currentLang2Code";
     public static final String KEY_TOTAL_XP = "totalXP";
     public static final String KEY_LEVEL = "level";
     public static final String KEY_CREATED = "created";
@@ -80,8 +74,8 @@ public class SettingsManager {
     public void createUser(String nickname, String motherLanguage, String foreignLanguage) {
         String currentTimeString = DateUtil.getCurrentTimestamp();
         editor.putString(KEY_NICKNAME, nickname);
-        editor.putString(KEY_MOTHER_LANGUAGE, motherLanguage.toUpperCase());
-        editor.putString(KEY_FOREIGN_LANGUAGE, foreignLanguage.toUpperCase());
+        editor.putString(KEY_CURRENT_LANG1, motherLanguage.toUpperCase());
+        editor.putString(KEY_CURRENT_LANG2, foreignLanguage.toUpperCase());
         editor.putBoolean(KEY_USER_EXISTS, true);
         editor.putInt(KEY_TOTAL_XP, 0);
         editor.putInt(KEY_LEVEL, 0);
@@ -99,6 +93,16 @@ public class SettingsManager {
      */
     public String getPrefStringValue(String key) {
         return preferences.getString(key, "");
+    }
+
+    public ContentValues getCurrentLanguages() {
+        DatabaseHelper db = DatabaseHelper.getInstance(context);
+        String lang1 = db.getLanguageName(getPrefIntValue(KEY_CURRENT_LANG1));
+        String lang2 = db.getLanguageName(getPrefIntValue(KEY_CURRENT_LANG2));
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_CURRENT_LANG1, lang1);
+        cv.put(KEY_CURRENT_LANG2, lang2);
+        return cv;
     }
 
     /**
@@ -168,8 +172,8 @@ public class SettingsManager {
     public JSONObject getUserData() throws JSONException {
         JSONObject userData = new JSONObject();
         userData.put(KEY_NICKNAME, getPrefStringValue(KEY_NICKNAME));
-        userData.put(KEY_MOTHER_LANGUAGE, getPrefStringValue(KEY_MOTHER_LANGUAGE));
-        userData.put(KEY_FOREIGN_LANGUAGE, getPrefStringValue(KEY_FOREIGN_LANGUAGE));
+        userData.put(KEY_CURRENT_LANG1, getPrefStringValue(KEY_CURRENT_LANG1));
+        userData.put(KEY_CURRENT_LANG2, getPrefStringValue(KEY_CURRENT_LANG2));
         userData.put(KEY_CREATED, getPrefStringValue(KEY_CREATED));
         userData.put(KEY_LEVEL, getPrefIntValue(KEY_LEVEL));
         userData.put(KEY_TOTAL_XP, getPrefIntValue(KEY_TOTAL_XP));

@@ -95,7 +95,7 @@ public class BadgeManager {
         String queryOneDay = "SELECT COUNT(*) FROM " + TABLE_PHRASES + " WHERE DATE" +
                 "(" + DatabaseHelper.KEY_CREATED_ON + ")='" + today + "'";
         String queryLongPhrase = "SELECT COUNT(*) FROM " + TABLE_PHRASES + " WHERE " +
-                "LENGTH(" + DatabaseHelper.KEY_FOREIGN_LANG_STRING + ")>=25";
+                "LENGTH(" + DatabaseHelper.KEY_LANG2_VALUE + ")>=25";
         String queryNight = queryOneDay +
                 " AND strftime('%H'," + CREATED_ON + ") BETWEEN '00' AND '06'";
         String query15Mins = queryOneDay + " AND " +

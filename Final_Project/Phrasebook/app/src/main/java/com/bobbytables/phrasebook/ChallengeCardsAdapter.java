@@ -1,5 +1,6 @@
 package com.bobbytables.phrasebook;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
@@ -31,8 +32,8 @@ import java.util.List;
 class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.ViewHolder>
         implements View.OnClickListener {
     private final Context context;
-    private String motherLanguage;
-    private String foreignLanguage;
+    private String lang1;
+    private String lang2;
     private ChallengeCard challengeCard;
     private static final int NUMBER_OF_CARDS = 1;
     private DatabaseHelper databaseHelper;
@@ -75,11 +76,10 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         //This is our "dataset" of 1 element (if you want more items, just create a list)
         this.context = context;
         this.settingsManager = SettingsManager.getInstance(context);
-        motherLanguage = settingsManager.getPrefStringValue(SettingsManager
-                .KEY_MOTHER_LANGUAGE);
-        foreignLanguage = settingsManager.getPrefStringValue(SettingsManager
-                .KEY_FOREIGN_LANGUAGE);
-        challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
+        ContentValues currentLanguages = SettingsManager.getInstance(context).getCurrentLanguages();
+        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1);
+        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2);
+        challengeCard = new ChallengeCard(lang1, lang2);
         databaseHelper = DatabaseHelper.getInstance(context);
         alertDialogManager = new AlertDialogManager();
         this.xpManager = XPManager.getInstance(context);
@@ -215,7 +215,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         holder.xpText.setVisibility(View.INVISIBLE);
         holder.xpText.setText("");
         holder.translation.setText("");
-        challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
+        challengeCard = new ChallengeCard(lang1, lang2);
         //notifyItemInserted(getItemCount());
         notifyItemChanged(0);
     }
