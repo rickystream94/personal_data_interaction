@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
     //Database info
     private static final String DATABASE_NAME = "phrasebookDatabase";
-    private static final int DATABASE_VERSION = 3; //Updated to version 3: multi-language support
+    private static final int DATABASE_VERSION = 4; //Updated to version 3: multi-language support
     private static final String TAG = DatabaseHelper.class.getName();
     private Context context;
     private CSVUtils csvUtils;
@@ -46,6 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_CHALLENGES = "challenges";
     public static final String TABLE_BADGES = "badges";
     public static final String TABLE_LANGUAGES = "languages";
+    public static final String TABLE_BOOKS = "books";
 
     // Phrases Table Columns
     private static final String KEY_PHRASE_ID = "id";
@@ -65,6 +67,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Languages Table Columns
     private static final String KEY_LANG_ID = "id";
     private static final String KEY_LANG_NAME = "languageName";
+
+    //Books table columns
+    private static final String KEY_BOOK_ID = "id";
+    private static final String KEY_BOOK_LANG1 = "lang1";
+    private static final String KEY_BOOK_LANG2 = "lang2";
 
     // Badges Table Columns
     public static final String KEY_BADGES_ID = "id";
@@ -93,9 +100,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // a foreign key
             KEY_CHALLENGE_CORRECT + " INTEGER T, " +
             KEY_CREATED_ON + " TEXT)";
+
     private static final String CREATE_LANGUAGES_TABLE = "CREATE TABLE " + TABLE_LANGUAGES +
             " (" + KEY_LANG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             KEY_LANG_NAME + " TEXT)";
+
+    private static final String CREATE_BOOKS_TABLE = "CREATE TABLE " + TABLE_BOOKS +
+            " (" + KEY_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            KEY_BOOK_LANG1 + " INTEGER, " +
+            KEY_BOOK_LANG2 + " INTEGER)";
 
     private static final String CREATE_BADGES_TABLE = "CREATE TABLE " + TABLE_BADGES +
             "(" +
@@ -132,6 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_CHALLENGES_TABLE);
         sqLiteDatabase.execSQL(CREATE_BADGES_TABLE);
         sqLiteDatabase.execSQL(CREATE_LANGUAGES_TABLE);
+        sqLiteDatabase.execSQL(CREATE_BOOKS_TABLE);
         try {
             populateBadgesTable(sqLiteDatabase);
         } catch (Exception e) {
@@ -183,18 +197,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //Names of language preferences have changed, need to update the names and insert the
         // languages in the proper table!
+        SettingsManager settingsManager = SettingsManager.getInstance(context);
         if (newVersion == 3) {
             //Get previous languages
-            SettingsManager settingsManager = SettingsManager.getInstance(context);
             String currentLang1 = settingsManager.getPrefStringValue("motherLanguage");
             String currentLang2 = settingsManager.getPrefStringValue("foreignLanguage");
 
             //We need to update the columns in the new phrases table with these two values
             ContentValues cv1 = new ContentValues();
             ContentValues cv2 = new ContentValues();
-            cv1.put(KEY_LANG_ID, 1);
             cv1.put(KEY_LANG_NAME, currentLang1);
-            cv2.put(KEY_LANG_ID, 2);
             cv2.put(KEY_LANG_NAME, currentLang2);
             db.insertOrThrow(TABLE_LANGUAGES, null, cv1);
             db.insertOrThrow(TABLE_LANGUAGES, null, cv2);
@@ -215,6 +227,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //Delete old keys
             settingsManager.updatePrefValue("motherLanguage", null);
             settingsManager.updatePrefValue("foreignLanguage", null);
+        }
+        //We need to insert the current couple lang1-lang2 as the first row in the BOOKS table
+        if (newVersion == 4) {
+            int currentLang1 = settingsManager.getPrefIntValue(SettingsManager
+                    .KEY_CURRENT_LANG1);
+            int currentLang2 = settingsManager.getPrefIntValue(SettingsManager
+                    .KEY_CURRENT_LANG2);
+            ContentValues cv = new ContentValues();
+            cv.put(KEY_BOOK_LANG1, currentLang1);
+            cv.put(KEY_BOOK_LANG2, currentLang2);
+            db.insertOrThrow(TABLE_BOOKS, null, cv);
         }
     }
 
@@ -752,5 +775,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String result = cursor.getString(cursor.getColumnIndexOrThrow(KEY_LANG_NAME));
         cursor.close();
         return result;
+    }
+
+    /**
+     * This method creates a new phrasebook row in the proper table, and checks if the languages
+     * already exist, otherwise it creates new rows in the languages table.
+     *
+     * @param language1
+     * @param language2
+     * @throws Exception
+     */
+    public void createPhrasebook(String language1, String language2) throws Exception {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        Cursor cursor;
+        String getLangIdQuery = "SELECT " + KEY_LANG_ID + " FROM " + TABLE_LANGUAGES + " WHERE " +
+                "" + KEY_LANG_NAME + "=?";
+        HashMap<String, Integer> langCodes = new HashMap<>();
+        for (String lang : new String[]{language1, language2}) {
+            boolean gotId = false;
+            while (!gotId) {
+                cursor = db.rawQuery(getLangIdQuery, new String[]{lang});
+                if (!cursor.moveToFirst()) {
+                    cv.put(KEY_LANG_NAME, lang);
+                    db.insertOrThrow(TABLE_LANGUAGES, null, cv);
+                } else {
+                    gotId = true;
+                    langCodes.put(lang, cursor.getInt(cursor.getColumnIndexOrThrow(KEY_LANG_ID)));
+                }
+            }
+        }
+
+        cv = new ContentValues();
+        cv.put(KEY_BOOK_LANG1, langCodes.get(language1));
+        cv.put(KEY_BOOK_LANG2, langCodes.get(language2));
+
+        cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKS + " WHERE " + KEY_BOOK_LANG1 + "=" + langCodes.get(language1) +
+                " AND " + KEY_BOOK_LANG2 + "=" + langCodes.get(language2), null);
+        if (cursor.moveToFirst()) {
+            db.insertOrThrow(TABLE_BOOKS, null, cv);
+            cursor.close();
+        } else {
+            cursor.close();
+            throw new Exception("A phrasebook for " + language1 + " - " + language2 + " is already " +
+                    "existing!");
+        }
     }
 }

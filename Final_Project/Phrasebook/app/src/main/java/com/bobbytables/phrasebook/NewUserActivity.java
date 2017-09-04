@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
@@ -46,6 +47,16 @@ public class NewUserActivity extends AppCompatActivity {
         //Otherwise, if everything is fine, proceed
         SettingsManager settingsManager = SettingsManager.getInstance(getApplicationContext());
         settingsManager.createUser(nickname, motherLanguage, foreignLanguage);
+        DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
+        try {
+            db.createPhrasebook(motherLanguage, foreignLanguage);
+        } catch (Exception ex) {
+            //Raised if a phrasebook with the specified languages already exists
+            //(Of course it will never happen when user is created, but we have to catch the
+            // exception anyway)
+            alertDialogManager.showAlertDialog(NewUserActivity.this, "Error!", ex.getMessage(), false);
+            return;
+        }
         Intent i = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(i);
         finish();
