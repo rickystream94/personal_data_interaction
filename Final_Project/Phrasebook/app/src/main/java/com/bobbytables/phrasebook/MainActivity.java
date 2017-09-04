@@ -25,6 +25,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private String lang2;
     private DatabaseHelper databaseHelper;
     private TabLayout tabLayout;
+    private ListView drawerList;
     private String[] pagesTitles;
     private RequestQueue requestQueue;
     private static final String SERVER_URL = "http://www.richmondweb.it/phrasebook/upload_data.php";
@@ -82,6 +85,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setSupportActionBar(toolbar);
         pagesTitles = new String[]{getString(R.string.tab1), getString(R.string
                 .tab2), getString(R.string.tab3)};
+
+        //Initialize drawer
+        String[] allPhrasebooks = databaseHelper.getAllPhrasebooks();
+        drawerList = (ListView) findViewById(R.id.left_drawer);
+        drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item,
+                allPhrasebooks));
+
 
         //Initialize ViewPager
         initializePager();

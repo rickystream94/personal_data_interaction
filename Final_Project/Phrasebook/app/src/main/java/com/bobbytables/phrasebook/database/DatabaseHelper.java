@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -820,5 +821,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             throw new Exception("A phrasebook for " + language1 + " - " + language2 + " is already " +
                     "existing!");
         }
+    }
+
+    /**
+     * Retrieves all phrasebook names with a specific string format (e.g. "ITA - ENG")
+     *
+     * @return
+     */
+    public String[] getAllPhrasebooks() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKS, null);
+        String getLangNameQuery = "SELECT " + KEY_LANG_NAME + " FROM " +
+                TABLE_LANGUAGES + " WHERE " + KEY_LANG_ID + "=";
+        List<String> allPhrasebooks = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                int langId1 = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BOOK_LANG1));
+                Cursor langNameCursor = db.rawQuery(getLangNameQuery + langId1, null);
+                langNameCursor.moveToFirst();
+                String lang1 = langNameCursor.getString(langNameCursor.getColumnIndexOrThrow
+                        (KEY_LANG_NAME));
+                int langId2 = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BOOK_LANG2));
+                langNameCursor = db.rawQuery(getLangNameQuery + langId2, null);
+                langNameCursor.moveToFirst();
+                String lang2 = langNameCursor.getString(langNameCursor.getColumnIndexOrThrow
+                        (KEY_LANG_NAME));
+                allPhrasebooks.add(lang1.substring(0, 3) + " - " + lang2.substring(0, 3));
+                langNameCursor.close();
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        String[] result = new String[allPhrasebooks.size()];
+        result = allPhrasebooks.toArray(result);
+        return result;
     }
 }
