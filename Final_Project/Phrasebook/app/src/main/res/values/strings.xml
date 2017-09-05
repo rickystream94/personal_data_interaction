@@ -48,4 +48,6 @@
         the developers and feel free and very welcome to contact them.</string>
     <string name="next_page">Next Page</string>
     <string name="previous_page">Previous Page</string>
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
 </resources>

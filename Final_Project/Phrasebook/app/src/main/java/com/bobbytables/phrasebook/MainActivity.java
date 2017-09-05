@@ -17,6 +17,8 @@ import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -48,7 +50,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private String lang2;
     private DatabaseHelper databaseHelper;
     private TabLayout tabLayout;
+    private DrawerLayout mDrawerLayout;
     private ListView drawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
     private String[] pagesTitles;
     private RequestQueue requestQueue;
     private static final String SERVER_URL = "http://www.richmondweb.it/phrasebook/upload_data.php";
@@ -83,10 +87,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_drawer);
         pagesTitles = new String[]{getString(R.string.tab1), getString(R.string
                 .tab2), getString(R.string.tab3)};
 
         //Initialize drawer
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this,mDrawerLayout,toolbar,R
+                .string.navigation_drawer_open,R.string.navigation_drawer_close);
+
         String[] allPhrasebooks = databaseHelper.getAllPhrasebooks();
         drawerList = (ListView) findViewById(R.id.left_drawer);
         drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item,
