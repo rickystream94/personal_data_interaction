@@ -71,6 +71,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
+        <activity
+            android:name=".MainActivity2"
+            android:label="@string/title_activity_main2">
+        </activity>
     </application>
 
 </manifest>

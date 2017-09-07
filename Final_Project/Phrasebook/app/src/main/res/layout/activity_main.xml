@@ -7,7 +7,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.bobbytables.phrasebook.MainActivity">
+    tools:context="com.bobbytables.phrasebook.MainActivity"
+    tools:openDrawer="start">
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -17,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay">
-            
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -65,14 +66,22 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <ListView
-        android:id="@+id/left_drawer"
+    <android.support.design.widget.NavigationView
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#FFF"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:padding="10dp"/>
+        app:headerLayout="@layout/nav_header_main">
+
+        <ListView
+            android:layout_marginTop="@dimen/nav_header_height"
+            android:id="@+id/left_drawer"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:background="#d7ccc8"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/holo_red_dark"
+            android:dividerHeight="1dp"
+            android:padding="10dp"
+            app:headerLayout="@layout/nav_header_main"/>
+    </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>
