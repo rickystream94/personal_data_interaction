@@ -12,11 +12,13 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
-import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -37,24 +39,22 @@ import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
-        ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private AlertDialogManager alertDialogManager = new AlertDialogManager();
     private SettingsManager settingsManager;
-    private PagerAdapter pagerAdapter;
-    private ViewPager pager;
     private FloatingActionButton fab;
     public static Handler killerHandler;
     private String lang1;
     private String lang2;
     private DatabaseHelper databaseHelper;
-    private TabLayout tabLayout;
     private DrawerLayout mDrawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-    private String[] pagesTitles;
     private RequestQueue requestQueue;
+    private Fragment fragment;
+    private FragmentManager fragmentManager;
+    private BottomNavigationView navigation;
     private static final String SERVER_URL = "http://www.richmondweb.it/phrasebook/upload_data.php";
 
     @Override
@@ -74,6 +74,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             }
         };
 
+        //Get fragment manager and add default fragment
+        fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
+        fragment = new CardsFragment();
+        transaction.add(R.id.frame_layout, fragment).commit();
+
         databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
 
         //Get settings manager
@@ -87,14 +94,16 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_drawer);
-        pagesTitles = new String[]{getString(R.string.tab1), getString(R.string
-                .tab2), getString(R.string.tab3)};
 
         //Initialize drawer
-        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this,mDrawerLayout,toolbar,R
-                .string.navigation_drawer_open,R.string.navigation_drawer_close);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, toolbar, R
+                .string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        //Initialize bottom navigation
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(this);
+
 
         String[] allPhrasebooks = databaseHelper.getAllPhrasebooks();
         drawerList = (ListView) findViewById(R.id.left_drawer);
@@ -102,8 +111,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 allPhrasebooks));
 
 
-        //Initialize ViewPager
-        initializePager();
+        //Initialize fab
         initFloatingActionButton();
 
         //Initialize request queue for Volley
@@ -119,9 +127,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             cursor.moveToFirst();
             if (cursor.getInt(0) > 0) {
                 settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
-                initializePager();
+                initializeNavigation();
             }
         }
+    }
+
+    /**
+     * Method used to initialize the default navigation fragment when refreshing main activity
+     * content
+     */
+    private void initializeNavigation() {
+        navigation.setSelectedItemId(R.id.navigation_practice);
     }
 
     @Override
@@ -132,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             if (resultCode == RESULT_CANCELED) {
                 //It means that the database is empty and we need to refresh the view pager
                 settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
-                initializePager();
+                initializeNavigation();
             }
         }
     }
@@ -164,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                         Toast.makeText(MainActivity.this, "All data successfully deleted!", Toast
                                 .LENGTH_SHORT)
                                 .show();
-                        initializePager();
+                        initializeNavigation();
                     }
                 });
                 alertDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -231,45 +247,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         fab.hide(); //by default
     }
 
-    /**
-     * Initializes the ViewPager and its adapter
-     */
-    private void initializePager() {
-        // ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        //used to change tab when selected
-        tabLayout.addOnTabSelectedListener(this);
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(pagerAdapter);
-        //Used for changing selected tab when swiping right/left
-        pager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(tabLayout));
-        pager.addOnPageChangeListener(this);
-    }
-
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        pager.setCurrentItem(tab.getPosition());
-        switch (tab.getPosition()) {
-            case 0:
-                fab.hide();
-                break;
-            default:
-                fab.show();
-        }
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-        //Not necessary
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-        //Not necessary
-    }
-
     private void checkWritePermissions() {
 
         if (ActivityCompat.checkSelfPermission(this,
@@ -320,21 +297,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 .show();
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        //Not necessary
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        getSupportActionBar().setTitle(pagesTitles[position]);
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        //Not necessary
-    }
-
     /**
      * Checks if phone is connected to network
      *
@@ -344,5 +306,29 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        String title = item.getTitle().toString();
+        getSupportActionBar().setTitle(title);
+        switch (item.getItemId()) {
+            case R.id.navigation_practice:
+                fragment = new CardsFragment();
+                fab.hide();
+                break;
+            case R.id.navigation_phrasebook:
+                fragment = new PhrasesFragment();
+                fab.show();
+                break;
+            case R.id.navigation_progress:
+                fragment = new ProgressFragment();
+                fab.show();
+                break;
+        }
+        final FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
+        transaction.replace(R.id.frame_layout, fragment).commit();
+        return true;
     }
 }
