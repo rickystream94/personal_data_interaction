@@ -846,7 +846,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 langNameCursor.moveToFirst();
                 String lang2 = langNameCursor.getString(langNameCursor.getColumnIndexOrThrow
                         (KEY_LANG_NAME));
-                allPhrasebooks.add(lang1.substring(0, 3) + " - " + lang2.substring(0, 3));
+                allPhrasebooks.add(lang1 + " - " + lang2);
                 langNameCursor.close();
             } while (cursor.moveToNext());
         }

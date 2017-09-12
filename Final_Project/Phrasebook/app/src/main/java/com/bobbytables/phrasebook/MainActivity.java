@@ -30,6 +30,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //Get fragment manager and add default fragment
         fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         fragment = new CardsFragment();
         transaction.add(R.id.frame_layout, fragment).commit();
 
@@ -326,9 +327,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 fab.show();
                 break;
         }
-        final FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in,
+                android.R.anim.fade_out);
         transaction.replace(R.id.frame_layout, fragment).commit();
         return true;
+    }
+
+    public void closeDrawer(View view) {
+        mDrawerLayout.closeDrawers();
     }
 }

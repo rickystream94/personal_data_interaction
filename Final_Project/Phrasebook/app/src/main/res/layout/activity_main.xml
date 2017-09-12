@@ -29,7 +29,7 @@
                 app:contentInsetRight="0dp"
                 app:contentInsetStart="0dp"
                 app:contentInsetStartWithNavigation="0dp"
-                app:navigationIcon="@drawable/ic_drawer"
+                app:navigationIcon="@drawable/ic_menu_white_24dp"
                 app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
         </android.support.design.widget.AppBarLayout>
@@ -41,7 +41,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
+            app:borderWidth="0dp"
+            android:layout_marginBottom="60dp"
+            android:layout_marginEnd="@dimen/fab_margin"
             app:srcCompat="@drawable/ic_add_white_24dp"/>
 
     </android.support.design.widget.CoordinatorLayout>
@@ -53,6 +55,7 @@
         app:headerLayout="@layout/nav_header_main">
 
         <ListView
+            android:textAlignment="center"
             android:id="@+id/left_drawer"
             android:layout_width="240dp"
             android:layout_height="match_parent"
