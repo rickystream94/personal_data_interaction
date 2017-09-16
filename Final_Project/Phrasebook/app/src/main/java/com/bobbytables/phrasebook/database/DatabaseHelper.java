@@ -53,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Phrases Table Columns
     private static final String KEY_PHRASE_ID = "id";
     public static final String KEY_LANG1 = "lang1Code";
-    public static final String KEY_LANG2 = "lang1Code";
+    public static final String KEY_LANG2 = "lang2Code";
     public static final String KEY_LANG1_VALUE = "lang1Value";
     public static final String KEY_LANG2_VALUE = "lang2Value";
     public static final String KEY_IS_MASTERED = "isMastered";
@@ -813,7 +813,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKS + " WHERE " + KEY_BOOK_LANG1 + "=" + langCodes.get(language1) +
                 " AND " + KEY_BOOK_LANG2 + "=" + langCodes.get(language2), null);
-        if (cursor.moveToFirst()) {
+        if (!cursor.moveToFirst()) {
             db.insertOrThrow(TABLE_BOOKS, null, cv);
             cursor.close();
         } else {

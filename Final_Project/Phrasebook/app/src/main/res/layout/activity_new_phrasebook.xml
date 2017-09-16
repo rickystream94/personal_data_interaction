@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context="com.bobbytables.phrasebook.NewPhrasebookActivity">
+
+    <TextView
+        android:id="@+id/new_phrasebook_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/text_new_phrasebook"
+        android:textAlignment="center"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/new_phrasebook_desc"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/new_phrasebook_lang1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/new_phrasebook_lang1"
+            android:inputType="textCapCharacters"
+            android:maxLength="30"/>
+
+        <EditText
+            android:id="@+id/new_phrasebook_lang2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="@string/new_phrasebook_lang2"
+            android:inputType="textCapCharacters"
+            android:maxLength="30"/>
+
+        <Button
+            android:onClick="createPhrasebook"
+            android:id="@+id/create_phrasebook_button"
+            style="@style/Base.Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/create_phrasebook_button"
+            android:textAlignment="center"/>
+    </LinearLayout>
+</RelativeLayout>

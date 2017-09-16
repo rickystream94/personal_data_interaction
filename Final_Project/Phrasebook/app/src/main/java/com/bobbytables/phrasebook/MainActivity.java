@@ -30,7 +30,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -56,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private BottomNavigationView navigation;
-    private static final String SERVER_URL = "http://www.richmondweb.it/phrasebook/upload_data.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity
         settingsManager.createUserProfile();
-        ContentValues currentLanguages = SettingsManager.getInstance(getApplicationContext()).getCurrentLanguages();
+        ContentValues currentLanguages = settingsManager.getCurrentLanguages();
         lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1);
         lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2);
 
@@ -105,12 +103,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this);
 
-
-        String[] allPhrasebooks = databaseHelper.getAllPhrasebooks();
-        drawerList = (ListView) findViewById(R.id.left_drawer);
-        drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item,
-                allPhrasebooks));
-
+        //Get list of phrasebooks in drawer list
+        refreshPhrasebooks();
 
         //Initialize fab
         initFloatingActionButton();
@@ -128,17 +122,25 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             cursor.moveToFirst();
             if (cursor.getInt(0) > 0) {
                 settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
-                initializeNavigation();
+                refreshUi();
             }
         }
+        refreshPhrasebooks();
     }
 
     /**
      * Method used to initialize the default navigation fragment when refreshing main activity
      * content
      */
-    private void initializeNavigation() {
+    private void refreshUi() {
         navigation.setSelectedItemId(R.id.navigation_practice);
+    }
+
+    private void refreshPhrasebooks() {
+        String[] allPhrasebooks = databaseHelper.getAllPhrasebooks();
+        drawerList = (ListView) findViewById(R.id.left_drawer);
+        drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item,
+                allPhrasebooks));
     }
 
     @Override
@@ -147,9 +149,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //Update Phrase Activity request code
         if (requestCode == 1) {
             if (resultCode == RESULT_CANCELED) {
-                //It means that the database is empty and we need to refresh the view pager
+                //It means that the database is empty and we need to refresh the layout
                 settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
-                initializeNavigation();
+                refreshUi();
             }
         }
     }
@@ -167,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Intent i;
         switch (id) {
             case R.id.delete_data:
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
@@ -181,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         Toast.makeText(MainActivity.this, "All data successfully deleted!", Toast
                                 .LENGTH_SHORT)
                                 .show();
-                        initializeNavigation();
+                        refreshUi();
                     }
                 });
                 alertDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -218,12 +221,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 resetAlertDialog.show();
                 break;
             case R.id.profile:
-                Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
+                i = new Intent(getApplicationContext(), ProfileActivity.class);
                 startActivity(i);
                 break;
             case R.id.about:
-                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
-                startActivity(intent);
+                i = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(i);
+                break;
+            case R.id.new_phrasebook:
+                i = new Intent(getApplicationContext(), NewPhrasebookActivity.class);
+                startActivity(i);
                 break;
             default:
                 break;
