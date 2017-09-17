@@ -23,6 +23,7 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
  */
 public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
+    private static final int ACTIVITY_RESULT_CODE = 1;
     private DatabaseHelper databaseHelper;
     private String lang1;
     private String lang2;
@@ -46,9 +47,9 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         layout = R.layout.fragment_phrases;
         rootView = inflater.inflate(layout, container, false);
 
-        ContentValues currentLanguages = SettingsManager.getInstance(getContext()).getCurrentLanguages();
-        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1);
-        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2);
+        ContentValues currentLanguages = SettingsManager.getInstance(getContext()).getCurrentLanguagesNames();
+        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1_STRING);
+        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2_STRING);
         TextView lang1 = (TextView) rootView.findViewById(R.id.phrases_lang1);
         TextView lang2 = (TextView) rootView.findViewById(R.id.phrases_lang2);
         lang1.setText(this.lang1);
@@ -117,13 +118,13 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
                 .KEY_LANG2_VALUE));
         String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_CREATED_ON));
-        Intent intent = new Intent(getActivity(), UpdatePhraseActivity.class);
+        Intent intent = new Intent(getActivity(), EditPhraseActivity.class);
         intent.putExtra(DatabaseHelper.KEY_LANG1_VALUE, motherLangString);
         intent.putExtra(DatabaseHelper.KEY_LANG2_VALUE, foreignLangString);
         intent.putExtra(DatabaseHelper.KEY_CREATED_ON, createdOn);
         intent.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1);
         intent.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2);
-        getActivity().startActivityForResult(intent, 1);
+        getActivity().startActivityForResult(intent, ACTIVITY_RESULT_CODE);
     }
 
     @Override

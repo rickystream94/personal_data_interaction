@@ -16,7 +16,7 @@ import com.bobbytables.phrasebook.database.PhraseModel;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
-public class UpdatePhraseActivity extends AppCompatActivity {
+public class EditPhraseActivity extends AppCompatActivity {
 
     private EditText lang1EditText;
     private EditText lang2EditText;
@@ -29,7 +29,7 @@ public class UpdatePhraseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_update_phrase);
+        setContentView(R.layout.activity_edit_phrase);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         alertDialogManager = new AlertDialogManager();
@@ -53,7 +53,7 @@ public class UpdatePhraseActivity extends AppCompatActivity {
     //The return value states whether the menu will be active for the activity (true) or not (false)
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.update_phrase_menu, menu);
+        inflater.inflate(R.menu.edit_content_menu, menu);
         return true;
     }
 
@@ -61,10 +61,10 @@ public class UpdatePhraseActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.updatePhrase:
+            case R.id.updateContent:
                 updatePhrase();
                 break;
-            case R.id.deletePhrase:
+            case R.id.deleteContent:
                 deletePhrase();
             default:
                 break;
@@ -77,11 +77,11 @@ public class UpdatePhraseActivity extends AppCompatActivity {
         String lang2 = lang2EditText.getText().toString().trim().toLowerCase();
         int affectedRows = databaseHelper.deletePhrase(lang1, lang2);
         if (affectedRows == 0) {
-            alertDialogManager.showAlertDialog(UpdatePhraseActivity.this, "Error", "You tried to " +
+            alertDialogManager.showAlertDialog(EditPhraseActivity.this, "Error", "You tried to " +
                     "delete a phrase that doesn't exist in your Phrasebook! No changes were " +
                     "applied.", false);
         } else {
-            Toast.makeText(UpdatePhraseActivity.this, "Phrase successfully deleted!", Toast
+            Toast.makeText(EditPhraseActivity.this, "Phrase successfully deleted!", Toast
                     .LENGTH_LONG).show();
             int resultCode;
             if (databaseHelper.isDatabaseEmpty()) {
@@ -99,7 +99,7 @@ public class UpdatePhraseActivity extends AppCompatActivity {
 
         //If no changes were applied, show alert dialog and return
         if (newLang1.equals(oldLang1) && newLang2.equals(oldLang2)) {
-            alertDialogManager.showAlertDialog(UpdatePhraseActivity.this, "Error", "No changes were" +
+            alertDialogManager.showAlertDialog(EditPhraseActivity.this, "Error", "No changes were" +
                     " made!", false);
             return;
         }
@@ -109,12 +109,12 @@ public class UpdatePhraseActivity extends AppCompatActivity {
         DatabaseModel databaseModel = new PhraseModel(newLang1, newLang2, null, DatabaseHelper
                 .TABLE_PHRASES);
         if (databaseHelper.phraseAlreadyExists(databaseModel)) {
-            alertDialogManager.showAlertDialog(UpdatePhraseActivity.this, "Error", "This phrase " +
+            alertDialogManager.showAlertDialog(EditPhraseActivity.this, "Error", "This phrase " +
                     "already exists in your Phrasebook!", false);
             return;
         }
         databaseHelper.updatePhrase(oldLang1, oldLang2, newLang1, newLang2);
-        Toast.makeText(UpdatePhraseActivity.this, "Phrase successfully updated!", Toast
+        Toast.makeText(EditPhraseActivity.this, "Phrase successfully updated!", Toast
                 .LENGTH_LONG).show();
         finish();
     }

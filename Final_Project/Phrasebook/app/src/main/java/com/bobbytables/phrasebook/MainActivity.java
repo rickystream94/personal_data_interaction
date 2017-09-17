@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -38,6 +39,8 @@ import com.android.volley.toolbox.Volley;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -55,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private BottomNavigationView navigation;
+    private List<Phrasebook> allPhrasebooks;
+    private static final int EDIT_PHRASE_REQUEST_CODE = 1;
+    private static final int EDIT_PHRASEBOOK_REQUEST_CODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity
         settingsManager.createUserProfile();
-        ContentValues currentLanguages = settingsManager.getCurrentLanguages();
-        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1);
-        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2);
+        ContentValues currentLanguages = settingsManager.getCurrentLanguagesNames();
+        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1_STRING);
+        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2_STRING);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -134,25 +140,50 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
      */
     private void refreshUi() {
         navigation.setSelectedItemId(R.id.navigation_practice);
+        mDrawerLayout.closeDrawers();
     }
 
     private void refreshPhrasebooks() {
-        String[] allPhrasebooks = databaseHelper.getAllPhrasebooks();
+        allPhrasebooks = databaseHelper.getAllPhrasebooks();
+        String[] names = new String[allPhrasebooks.size()];
+        for (Phrasebook phrasebook : allPhrasebooks)
+            names[allPhrasebooks.indexOf(phrasebook)] = phrasebook.toString();
         drawerList = (ListView) findViewById(R.id.left_drawer);
-        drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item,
-                allPhrasebooks));
+        drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, R.id
+                .drawer_list_item_id, names));
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Phrasebook phrasebook = allPhrasebooks.get(position);
+                switchToPhrasebook(phrasebook);
+            }
+        });
+    }
+
+    private void switchToPhrasebook(Phrasebook phrasebook) {
+        settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG1, phrasebook.getLang1Code());
+        settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG2, phrasebook.getLang2Code
+                ());
+        refreshUi();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //Update Phrase Activity request code
-        if (requestCode == 1) {
-            if (resultCode == RESULT_CANCELED) {
-                //It means that the database is empty and we need to refresh the layout
-                settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
-                refreshUi();
-            }
+        switch (requestCode) {
+            case EDIT_PHRASE_REQUEST_CODE:
+                if (resultCode == RESULT_CANCELED) {
+                    //It means that the database is empty and we need to refresh the layout
+                    settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
+                    refreshUi();
+                }
+                break;
+            case EDIT_PHRASEBOOK_REQUEST_CODE: //TODO: to be implemented when updating/deleting
+                // phrasebook
+                break;
+            default:
+                break;
         }
     }
 
@@ -223,6 +254,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             case R.id.profile:
                 i = new Intent(getApplicationContext(), ProfileActivity.class);
                 startActivity(i);
+                break;
+            case R.id.edit_phrasebook:
+                ContentValues cv = settingsManager.getCurrentLanguagesIds();
+                Intent intent = new Intent(MainActivity.this, EditPhrasebookActivity.class);
+                intent.putExtra(SettingsManager.KEY_CURRENT_LANG1, cv.getAsInteger(SettingsManager
+                        .KEY_CURRENT_LANG1));
+                intent.putExtra(SettingsManager.KEY_CURRENT_LANG2, cv.getAsInteger(SettingsManager.KEY_CURRENT_LANG2));
+                startActivityForResult(intent, EDIT_PHRASEBOOK_REQUEST_CODE);
                 break;
             case R.id.about:
                 i = new Intent(MainActivity.this, AboutActivity.class);

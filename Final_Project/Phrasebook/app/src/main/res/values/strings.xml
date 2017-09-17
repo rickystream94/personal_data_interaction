@@ -54,7 +54,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="my_phrasebooks">My Phrasebooks</string>
-    <string name="nav_header_subtitle">Change Phrasebooks</string>
+    <string name="nav_header_subtitle">Change Phrasebook</string>
     <string name="title_new_phrasebook_activity">New Phrasebook</string>
     <string name="text_new_phrasebook">Here you can create a new Phrasebook: just choose the language you want to use as mother language, and the language you want to improve in the related text fields.</string>
     <string name="new_phrasebook_lang1">Type here your mother language...</string>

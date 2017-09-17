@@ -1,10 +1,10 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/phrases_scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bobbytables.phrasebook.PhrasesFragment"
-    android:id="@+id/phrases_scroll_view">
+    tools:context="com.bobbytables.phrasebook.PhrasesFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +38,8 @@
                     android:layout_width="0dp"
                     android:layout_weight="9"
                     android:textAlignment="center"
-                    android:textSize="18sp"/>
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
 
                 <View
                     android:layout_width="0dp"
@@ -51,7 +52,8 @@
                     android:layout_width="0dp"
                     android:layout_weight="9"
                     android:textAlignment="center"
-                    android:textSize="18sp"/>
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
             </TableRow>
         </TableLayout>
 

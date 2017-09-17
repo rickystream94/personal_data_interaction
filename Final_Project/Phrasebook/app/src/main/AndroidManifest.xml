@@ -64,8 +64,8 @@
                 android:value=".MainActivity"/>
         </activity>
         <activity
-            android:name=".UpdatePhraseActivity"
-            android:label="Update Phrase"
+            android:name=".EditPhraseActivity"
+            android:label="Edit Phrase"
             android:parentActivityName=".MainActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -83,7 +83,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
-        <activity android:name=".UpdatePhrasebookActivity">
+        <activity
+            android:name=".EditPhrasebookActivity"
+            android:label="Edit Phrasebook"
+            android:parentActivityName=".MainActivity">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
         </activity>
     </application>
 

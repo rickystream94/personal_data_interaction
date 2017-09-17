@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.bobbytables.phrasebook.Phrasebook;
 import com.bobbytables.phrasebook.utils.CSVUtils;
 import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
@@ -71,8 +72,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //Books table columns
     private static final String KEY_BOOK_ID = "id";
-    private static final String KEY_BOOK_LANG1 = "lang1";
-    private static final String KEY_BOOK_LANG2 = "lang2";
+    public static final String KEY_BOOK_LANG1 = "lang1";
+    public static final String KEY_BOOK_LANG2 = "lang2";
 
     // Badges Table Columns
     public static final String KEY_BADGES_ID = "id";
@@ -323,6 +324,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param dataObject the data object to insert in the DB
      * @return true if a record is found, false otherwise
      */
+    //TODO: need to change ALL queries and add additional WHERE condition for current language
     public boolean phraseAlreadyExists(DatabaseModel dataObject) {
         ContentValues contentValues = dataObject.getContentValues();
         String motherLanguageString = contentValues.getAsString(KEY_LANG1_VALUE);
@@ -828,31 +830,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @return
      */
-    public String[] getAllPhrasebooks() {
+    public List<Phrasebook> getAllPhrasebooks() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKS, null);
-        String getLangNameQuery = "SELECT " + KEY_LANG_NAME + " FROM " +
-                TABLE_LANGUAGES + " WHERE " + KEY_LANG_ID + "=";
-        List<String> allPhrasebooks = new ArrayList<>();
+        List<Phrasebook> allPhrasebooks = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 int langId1 = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BOOK_LANG1));
-                Cursor langNameCursor = db.rawQuery(getLangNameQuery + langId1, null);
-                langNameCursor.moveToFirst();
-                String lang1 = langNameCursor.getString(langNameCursor.getColumnIndexOrThrow
-                        (KEY_LANG_NAME));
                 int langId2 = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BOOK_LANG2));
-                langNameCursor = db.rawQuery(getLangNameQuery + langId2, null);
-                langNameCursor.moveToFirst();
-                String lang2 = langNameCursor.getString(langNameCursor.getColumnIndexOrThrow
-                        (KEY_LANG_NAME));
-                allPhrasebooks.add(lang1 + " - " + lang2);
-                langNameCursor.close();
+                allPhrasebooks.add(new Phrasebook(langId1, langId2, context));
             } while (cursor.moveToNext());
         }
         cursor.close();
-        String[] result = new String[allPhrasebooks.size()];
-        result = allPhrasebooks.toArray(result);
-        return result;
+        return allPhrasebooks;
     }
 }

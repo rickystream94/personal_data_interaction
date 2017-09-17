@@ -32,6 +32,8 @@ public class SettingsManager {
     public static final String KEY_NICKNAME = "nickname";
     public static final String KEY_CURRENT_LANG1 = "currentLang1Code";
     public static final String KEY_CURRENT_LANG2 = "currentLang2Code";
+    public static final String KEY_CURRENT_LANG1_STRING = "currentLang1String";
+    public static final String KEY_CURRENT_LANG2_STRING = "currentLang2String";
     public static final String KEY_TOTAL_XP = "totalXP";
     public static final String KEY_LEVEL = "level";
     public static final String KEY_CREATED = "created";
@@ -95,13 +97,30 @@ public class SettingsManager {
         return preferences.getString(key, "");
     }
 
-    public ContentValues getCurrentLanguages() {
+    /**
+     * Returns a ContentValues object with the string values of the current languages
+     *
+     * @return
+     */
+    public ContentValues getCurrentLanguagesNames() {
         DatabaseHelper db = DatabaseHelper.getInstance(context);
         String lang1 = db.getLanguageName(getPrefIntValue(KEY_CURRENT_LANG1));
         String lang2 = db.getLanguageName(getPrefIntValue(KEY_CURRENT_LANG2));
         ContentValues cv = new ContentValues();
-        cv.put(KEY_CURRENT_LANG1, lang1);
-        cv.put(KEY_CURRENT_LANG2, lang2);
+        cv.put(KEY_CURRENT_LANG1_STRING, lang1);
+        cv.put(KEY_CURRENT_LANG2_STRING, lang2);
+        return cv;
+    }
+
+    /**
+     * Returns a ContentValues object with the IDs of the current languages
+     *
+     * @return
+     */
+    public ContentValues getCurrentLanguagesIds() {
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_CURRENT_LANG1, getPrefIntValue(KEY_CURRENT_LANG1));
+        cv.put(KEY_CURRENT_LANG2, getPrefIntValue(KEY_CURRENT_LANG2));
         return cv;
     }
 

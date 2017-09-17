@@ -76,9 +76,9 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         //This is our "dataset" of 1 element (if you want more items, just create a list)
         this.context = context;
         this.settingsManager = SettingsManager.getInstance(context);
-        ContentValues currentLanguages = SettingsManager.getInstance(context).getCurrentLanguages();
-        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1);
-        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2);
+        ContentValues currentLanguages = SettingsManager.getInstance(context).getCurrentLanguagesNames();
+        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1_STRING);
+        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2_STRING);
         challengeCard = new ChallengeCard(lang1, lang2);
         databaseHelper = DatabaseHelper.getInstance(context);
         alertDialogManager = new AlertDialogManager();

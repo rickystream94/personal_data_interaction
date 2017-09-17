@@ -52,8 +52,8 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
 
         //Set language text
         TextView myLanguage = (TextView) findViewById(R.id.myLanguage);
-        myLanguage.setText(settingsManager.getCurrentLanguages().getAsString(SettingsManager
-                .KEY_CURRENT_LANG2));
+        myLanguage.setText(settingsManager.getCurrentLanguagesNames().getAsString(SettingsManager
+                .KEY_CURRENT_LANG2_STRING));
 
         //Load profile picture
         profileImage = (CircleImageView) findViewById(R.id.profileImage);
