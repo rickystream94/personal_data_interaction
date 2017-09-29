@@ -48,13 +48,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private SettingsManager settingsManager;
     private FloatingActionButton fab;
     public static Handler killerHandler;
-    private String lang1;
-    private String lang2;
     private DatabaseHelper databaseHelper;
     private DrawerLayout mDrawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-    private RequestQueue requestQueue;
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private BottomNavigationView navigation;
@@ -66,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Get helper classes
+        databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
+        settingsManager = SettingsManager.getInstance(getApplicationContext());
 
         //Initialize the killer handler, such that another activity can kill the current one
         killerHandler = new Handler() {
@@ -79,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             }
         };
 
+        //Check always if it's the first time
+        //Will invoke automatically NewUserActivity
+        settingsManager.createUserProfile();
+
         //Get fragment manager and add default fragment
         fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -86,19 +91,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         fragment = new CardsFragment();
         transaction.add(R.id.frame_layout, fragment).commit();
 
-        databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
-
-        //Get settings manager
-        settingsManager = SettingsManager.getInstance(getApplicationContext());
-        //Check always if it's the first time
-        //Will invoke automatically NewUserActivity
-        settingsManager.createUserProfile();
-        ContentValues currentLanguages = settingsManager.getCurrentLanguagesNames();
-        lang1 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG1_STRING);
-        lang2 = currentLanguages.getAsString(SettingsManager.KEY_CURRENT_LANG2_STRING);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.tab1); //Set app bar title for default fragment
 
         //Initialize drawer
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -114,9 +109,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         //Initialize fab
         initFloatingActionButton();
-
-        //Initialize request queue for Volley
-        requestQueue = Volley.newRequestQueue(this);
     }
 
     @Override
@@ -286,6 +278,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), NewPhraseActivity.class);
+                ContentValues currentLanguages = settingsManager.getCurrentLanguagesNames();
+                String lang1 = currentLanguages.getAsString(SettingsManager
+                        .KEY_CURRENT_LANG1_STRING);
+                String lang2 = currentLanguages.getAsString(SettingsManager
+                        .KEY_CURRENT_LANG2_STRING);
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1);
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2);
                 startActivity(i);
