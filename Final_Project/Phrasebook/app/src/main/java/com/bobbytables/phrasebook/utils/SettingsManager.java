@@ -191,9 +191,9 @@ public class SettingsManager {
     public JSONObject getUserData() throws JSONException {
         JSONObject userData = new JSONObject();
         userData.put(KEY_NICKNAME, getPrefStringValue(KEY_NICKNAME));
-        userData.put(KEY_CURRENT_LANG1, getPrefStringValue(KEY_CURRENT_LANG1));
-        userData.put(KEY_CURRENT_LANG2, getPrefStringValue(KEY_CURRENT_LANG2));
         userData.put(KEY_CREATED, getPrefStringValue(KEY_CREATED));
+        userData.put(KEY_CURRENT_LANG1, getPrefIntValue(KEY_CURRENT_LANG1));
+        userData.put(KEY_CURRENT_LANG2, getPrefIntValue(KEY_CURRENT_LANG2));
         userData.put(KEY_LEVEL, getPrefIntValue(KEY_LEVEL));
         userData.put(KEY_TOTAL_XP, getPrefIntValue(KEY_TOTAL_XP));
         return userData;

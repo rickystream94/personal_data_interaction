@@ -564,8 +564,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             JSONArray json_phrases = getAllDataFromTable(TABLE_PHRASES);
             JSONArray json_challenges = getAllDataFromTable(TABLE_CHALLENGES);
             JSONArray json_badges = getAllDataFromTable(TABLE_BADGES);
+            JSONArray json_phrasebooks = getAllDataFromTable(TABLE_BOOKS);
+            JSONArray json_languages = getAllDataFromTable(TABLE_LANGUAGES);
             JSONArray json_user = getUserData(context);
-            obj.put("phrasebook", json_phrases);
+            obj.put("phrases", json_phrases);
+            obj.put("phrasebooks", json_phrasebooks);
+            obj.put("languages", json_languages);
             obj.put("challenges", json_challenges);
             obj.put("badges", json_badges);
             obj.put("user", json_user);

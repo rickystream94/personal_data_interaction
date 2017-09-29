@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void exportData() {
-        databaseHelper.exportToJSON(getApplicationContext());
+        databaseHelper.exportToJSON(MainActivity.this);
         Toast.makeText(this, "Exported in Downloads/Phrasebook_Exports as JSON file", Toast
                 .LENGTH_SHORT)
                 .show();
