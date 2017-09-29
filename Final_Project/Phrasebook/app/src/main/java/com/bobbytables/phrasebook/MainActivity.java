@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         .KEY_CURRENT_LANG2);
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG1_STRING, lang1Value);
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG2_STRING, lang2Value);
-                i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang1Code);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1Code);
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2Code);
                 startActivity(i);
             }

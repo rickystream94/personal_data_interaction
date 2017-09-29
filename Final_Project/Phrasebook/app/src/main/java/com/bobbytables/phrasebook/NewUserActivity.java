@@ -26,18 +26,18 @@ public class NewUserActivity extends AppCompatActivity {
     public void createUser(View view) {
         String nickname = ((TextView) findViewById(R.id.nicknameText)).getText()
                 .toString();
-        String motherLanguage = ((TextView) findViewById(R.id.lang1Value)).getText()
+        String lang1Value = ((TextView) findViewById(R.id.lang1Value)).getText()
                 .toString();
-        String foreignLanguage = ((TextView) findViewById(R.id.lang2Value)).getText()
+        String lang2Value = ((TextView) findViewById(R.id.lang2Value)).getText()
                 .toString();
         String errorMessage = "";
         if (nickname.length() < NICKNAME_MIN_LENGTH)
             errorMessage += "Nickname too short, it must be long at least " + NICKNAME_MIN_LENGTH + " " +
                     "characters\n";
-        if (motherLanguage.length() < LANG_MIN_LENGTH)
+        if (lang1Value.length() < LANG_MIN_LENGTH)
             errorMessage += "Mother language name too short, it must be long at least " +
                     "" + LANG_MIN_LENGTH + " characters\n";
-        if (foreignLanguage.length() < LANG_MIN_LENGTH)
+        if (lang2Value.length() < LANG_MIN_LENGTH)
             errorMessage += "Foreign language name too short, it must be long at least " +
                     "" + LANG_MIN_LENGTH + " characters\n";
         if (errorMessage.length() > 0) {
@@ -46,10 +46,12 @@ public class NewUserActivity extends AppCompatActivity {
         }
         //Otherwise, if everything is fine, proceed
         SettingsManager settingsManager = SettingsManager.getInstance(getApplicationContext());
-        settingsManager.createUser(nickname, motherLanguage, foreignLanguage);
         DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
         try {
-            db.createPhrasebook(motherLanguage, foreignLanguage);
+            db.createPhrasebook(lang1Value, lang2Value);
+            int lang1Code = db.getLanguageId(lang1Value);
+            int lang2Code = db.getLanguageId(lang2Value);
+            settingsManager.createUser(nickname, lang1Code, lang2Code);
         } catch (Exception ex) {
             //Raised if a phrasebook with the specified languages already exists
             //(Of course it will never happen when user is created, but we have to catch the

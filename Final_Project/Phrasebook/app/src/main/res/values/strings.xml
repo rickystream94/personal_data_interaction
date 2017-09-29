@@ -60,4 +60,5 @@
     <string name="new_phrasebook_lang1">Type here your mother language...</string>
     <string name="new_phrasebook_lang2">Type here the new foreign language...</string>
     <string name="create_phrasebook_button">Create Phrasebook</string>
+    <string name="current_language_profile">Current Language:</string>
 </resources>

@@ -75,8 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         ExpandableHeightGridView badgesGridView = (ExpandableHeightGridView) findViewById(R.id.badgesGridView);
         badgesGridView.setOnItemClickListener(this);
 
-        Cursor cursor = databaseHelper
-                .getDataFromTable(DatabaseHelper.TABLE_BADGES, 0, 0);
+        Cursor cursor = databaseHelper.getAllBadges();
         BadgeAdapter badgeAdapter = new BadgeAdapter(ProfileActivity.this, cursor);
         badgesGridView.setAdapter(badgeAdapter);
         badgesGridView.setExpanded(true);

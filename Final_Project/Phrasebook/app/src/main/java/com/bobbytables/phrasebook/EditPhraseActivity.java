@@ -90,7 +90,7 @@ public class EditPhraseActivity extends AppCompatActivity {
             Toast.makeText(EditPhraseActivity.this, "Phrase successfully deleted!", Toast
                     .LENGTH_LONG).show();
             int resultCode;
-            if (databaseHelper.isDatabaseEmpty()) {
+            if (databaseHelper.isDatabaseEmpty(lang1Code, lang2Code)) {
                 resultCode = RESULT_CANCELED;
             } else
                 resultCode = RESULT_OK;

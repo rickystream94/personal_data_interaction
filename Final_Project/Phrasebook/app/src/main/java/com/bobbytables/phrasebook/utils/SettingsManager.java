@@ -73,11 +73,11 @@ public class SettingsManager {
         MainActivity.killerHandler.sendEmptyMessage(0);
     }
 
-    public void createUser(String nickname, String motherLanguage, String foreignLanguage) {
+    public void createUser(String nickname, int lang1Code, int lang2Code) {
         String currentTimeString = DateUtil.getCurrentTimestamp();
         editor.putString(KEY_NICKNAME, nickname);
-        editor.putString(KEY_CURRENT_LANG1, motherLanguage.toUpperCase());
-        editor.putString(KEY_CURRENT_LANG2, foreignLanguage.toUpperCase());
+        editor.putInt(KEY_CURRENT_LANG1, lang1Code);
+        editor.putInt(KEY_CURRENT_LANG2, lang2Code);
         editor.putBoolean(KEY_USER_EXISTS, true);
         editor.putInt(KEY_TOTAL_XP, 0);
         editor.putInt(KEY_LEVEL, 0);

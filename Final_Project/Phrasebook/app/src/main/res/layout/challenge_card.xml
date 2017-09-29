@@ -26,14 +26,14 @@
             android:textSize="18sp"/>
 
         <TextView
-            android:id="@+id/foreignText"
+            android:id="@+id/challenge_card_lang2_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/translate_this"
             android:textSize="18sp"/>
 
         <TextView
-            android:id="@+id/motherLanguageText"
+            android:id="@+id/challenge_card_lang1_phrase"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/translate_this"
@@ -44,7 +44,7 @@
             android:id="@+id/translation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/motherLanguageText"
+            android:layout_below="@id/challenge_card_lang1_phrase"
             android:layout_marginTop="10dp"
             android:hint="@string/type_the_translation"
             android:imeOptions="actionDone"

@@ -39,7 +39,7 @@ public class NewPhrasebookActivity extends AppCompatActivity {
         if (!lang1.equals("") && !lang2.equals("")) {
             try {
                 databaseHelper.createPhrasebook(lang1.toUpperCase(), lang2.toUpperCase());
-                Toast.makeText(NewPhrasebookActivity.this, "New com.bobbytables.phrasebook.Phrasebook created!", Toast
+                Toast.makeText(NewPhrasebookActivity.this, "New Phrasebook created!", Toast
                         .LENGTH_LONG).show();
                 finish();
             } catch (Exception e) {

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.DateUtil;
+import com.bobbytables.phrasebook.utils.SettingsManager;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -49,14 +50,20 @@ public class ProgressFragment extends Fragment {
     private PieChart phrasesPieChart;
     private BarChart activityBarChart;
     private LineChart ratioLineChart;
+    private int lang1Code;
+    private int lang2Code;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         databaseHelper = DatabaseHelper.getInstance(getContext());
+        SettingsManager settingsManager = SettingsManager.getInstance(getContext());
+        ContentValues contentValues = settingsManager.getCurrentLanguagesIds();
+        lang1Code = contentValues.getAsInteger(SettingsManager.KEY_CURRENT_LANG1);
+        lang2Code = contentValues.getAsInteger(SettingsManager.KEY_CURRENT_LANG2);
         int layout;
         // Inflate the layout for this fragment
-        if (databaseHelper.isDatabaseEmpty()) {
+        if (databaseHelper.isDatabaseEmpty(lang1Code, lang2Code)) {
             layout = R.layout.empty_database;
             return inflater.inflate(layout, container, false);
         }
@@ -76,7 +83,7 @@ public class ProgressFragment extends Fragment {
         ratioLineChart = (LineChart) rootView.findViewById(R.id.ratioChart);
 
         //Retrieve and set entries
-        Cursor cursor = databaseHelper.getChallengesRatio();
+        Cursor cursor = databaseHelper.getChallengesRatio(lang1Code, lang2Code);
         List<Entry> entries = new ArrayList<>();
         List<String> dates = new ArrayList<>();
         int i = 0;
@@ -124,7 +131,7 @@ public class ProgressFragment extends Fragment {
         activityBarChart = (BarChart) rootView.findViewById(R.id.activityBarChart);
 
         //Add entries
-        Cursor cursor = databaseHelper.getActivityStats();
+        Cursor cursor = databaseHelper.getActivityStats(lang1Code, lang2Code);
         List<BarEntry> entries = new ArrayList<>();
         List<String> userDates = new ArrayList<>();
         List<String> allDates = new ArrayList<>();
@@ -260,7 +267,7 @@ public class ProgressFragment extends Fragment {
     }
 
     private void initPhrasesPieChart() {
-        ContentValues values = databaseHelper.getPhrasesStats();
+        ContentValues values = databaseHelper.getPhrasesStats(lang1Code, lang2Code);
         int total = values.getAsInteger("total");
         int archived = values.getAsInteger("archived");
         int notArchived = total - archived;
@@ -297,7 +304,7 @@ public class ProgressFragment extends Fragment {
     }
 
     private void initChallengesPieChart() {
-        ContentValues values = databaseHelper.getChallengesStats();
+        ContentValues values = databaseHelper.getChallengesStats(lang1Code, lang2Code);
         int total = values.getAsInteger("total");
         int won = values.getAsInteger("won");
         int lost = total - won;
