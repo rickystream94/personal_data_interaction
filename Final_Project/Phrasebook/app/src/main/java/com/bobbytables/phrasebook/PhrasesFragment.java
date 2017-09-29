@@ -112,15 +112,19 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         //Perform phrase update if list item is clicked
         Cursor cursor = (Cursor) adapterView.getAdapter().getItem(position);
         cursor.moveToPosition(position);
-        String motherLangString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+        String lang1Value = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_LANG1_VALUE));
-        String foreignLangString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+        String lang2Value = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_LANG2_VALUE));
         String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_CREATED_ON));
+        int lang1Code = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_LANG1));
+        int lang2Code = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_LANG2));
         Intent intent = new Intent(getActivity(), EditPhraseActivity.class);
-        intent.putExtra(DatabaseHelper.KEY_LANG1_VALUE, motherLangString);
-        intent.putExtra(DatabaseHelper.KEY_LANG2_VALUE, foreignLangString);
+        intent.putExtra(DatabaseHelper.KEY_LANG1_VALUE, lang1Value);
+        intent.putExtra(DatabaseHelper.KEY_LANG2_VALUE, lang2Value);
+        intent.putExtra(DatabaseHelper.KEY_LANG1, lang1Code);
+        intent.putExtra(DatabaseHelper.KEY_LANG2, lang2Code);
         intent.putExtra(DatabaseHelper.KEY_CREATED_ON, createdOn);
         intent.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1);
         intent.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2);

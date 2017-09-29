@@ -278,13 +278,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), NewPhraseActivity.class);
-                ContentValues currentLanguages = settingsManager.getCurrentLanguagesNames();
-                String lang1 = currentLanguages.getAsString(SettingsManager
+                ContentValues currentLanguagesNames = settingsManager.getCurrentLanguagesNames();
+                String lang1Value = currentLanguagesNames.getAsString(SettingsManager
                         .KEY_CURRENT_LANG1_STRING);
-                String lang2 = currentLanguages.getAsString(SettingsManager
+                String lang2Value = currentLanguagesNames.getAsString(SettingsManager
                         .KEY_CURRENT_LANG2_STRING);
-                i.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1);
-                i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2);
+                ContentValues currentLanguagesCodes = settingsManager.getCurrentLanguagesIds();
+                int lang1Code = currentLanguagesCodes.getAsInteger(SettingsManager
+                        .KEY_CURRENT_LANG1);
+                int lang2Code = currentLanguagesCodes.getAsInteger(SettingsManager
+                        .KEY_CURRENT_LANG2);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG1_STRING, lang1Value);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG2_STRING, lang2Value);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang1Code);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2Code);
                 startActivity(i);
             }
         });

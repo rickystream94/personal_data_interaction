@@ -26,9 +26,9 @@ public class NewUserActivity extends AppCompatActivity {
     public void createUser(View view) {
         String nickname = ((TextView) findViewById(R.id.nicknameText)).getText()
                 .toString();
-        String motherLanguage = ((TextView) findViewById(R.id.motherLanguage)).getText()
+        String motherLanguage = ((TextView) findViewById(R.id.lang1Value)).getText()
                 .toString();
-        String foreignLanguage = ((TextView) findViewById(R.id.foreignLanguage)).getText()
+        String foreignLanguage = ((TextView) findViewById(R.id.lang2Value)).getText()
                 .toString();
         String errorMessage = "";
         if (nickname.length() < NICKNAME_MIN_LENGTH)

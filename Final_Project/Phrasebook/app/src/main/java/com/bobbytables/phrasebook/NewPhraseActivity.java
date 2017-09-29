@@ -22,8 +22,8 @@ import java.util.List;
 
 public class NewPhraseActivity extends AppCompatActivity {
 
-    private String lang1;
-    private String lang2;
+    private int lang1Code;
+    private int lang2Code;
     private EditText addNewMotherLangPhrase;
     private EditText addNewForeignLangPhrase;
     private DatabaseHelper databaseHelper;
@@ -37,11 +37,13 @@ public class NewPhraseActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent i = getIntent();
-        lang1 = i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG1);
-        lang2 = i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG2);
+        String lang1Value = i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG1_STRING);
+        String lang2Value = i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG2_STRING);
+        lang1Code = i.getExtras().getInt(SettingsManager.KEY_CURRENT_LANG1);
+        lang2Code = i.getExtras().getInt(SettingsManager.KEY_CURRENT_LANG2);
 
         TextView foreignLangTextView = (TextView) findViewById(R.id.textView_new_phrase_language);
-        foreignLangTextView.setText(lang1 + " - " + lang2);
+        foreignLangTextView.setText(lang1Value + " - " + lang2Value);
         Button saveAddMore = (Button) findViewById(R.id.save_and_add_more);
         addNewMotherLangPhrase = (EditText) findViewById(R.id.add_new_mother_lang);
         addNewForeignLangPhrase = (EditText) findViewById(R.id.add_new_foreign_lang);
@@ -96,7 +98,8 @@ public class NewPhraseActivity extends AppCompatActivity {
         try {
             databaseHelper.insertRecord(new PhraseModel(addNewMotherLangPhrase.getText().toString
                     ().trim().toLowerCase(),
-                    addNewForeignLangPhrase.getText().toString().trim().toLowerCase(), currentTimeString,
+                    addNewForeignLangPhrase.getText().toString().trim().toLowerCase(),
+                    lang1Code, lang2Code, currentTimeString,
                     DatabaseHelper.TABLE_PHRASES));
             addNewForeignLangPhrase.setText("");
             addNewMotherLangPhrase.setText("");

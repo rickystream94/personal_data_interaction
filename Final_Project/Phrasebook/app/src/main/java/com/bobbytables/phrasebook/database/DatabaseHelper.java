@@ -327,13 +327,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //TODO: need to change ALL queries and add additional WHERE condition for current language
     public boolean phraseAlreadyExists(DatabaseModel dataObject) {
         ContentValues contentValues = dataObject.getContentValues();
-        String motherLanguageString = contentValues.getAsString(KEY_LANG1_VALUE);
-        String foreignLanguageString = contentValues.getAsString(KEY_LANG2_VALUE);
+        String lang1Value = contentValues.getAsString(KEY_LANG1_VALUE);
+        String lang2Value = contentValues.getAsString(KEY_LANG2_VALUE);
+        int lang1Code = contentValues.getAsInteger(KEY_LANG1);
+        int lang2Code = contentValues.getAsInteger(KEY_LANG2);
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_PHRASES + " WHERE " +
                         "" + KEY_LANG1_VALUE + "=? AND " +
-                        "" + KEY_LANG2_VALUE + "=?",
-                new String[]{motherLanguageString, foreignLanguageString});
+                        "" + KEY_LANG2_VALUE + "=? AND " + KEY_LANG1 + " =" + lang1Code + " AND " +
+                        "" + KEY_LANG2 + " =" + lang2Code,
+                new String[]{lang1Value, lang2Value});
         boolean exists = cursor.moveToFirst();
         cursor.close();
         return exists;
@@ -482,25 +485,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "" + KEY_LANG2_VALUE + "=?", new String[]{motherLangString, foreignLangString});
     }
 
-    public void updatePhrase(String oldLang1, String oldLang2, String newLang1, String newLang2) {
+    public int updatePhrase(int lang1Code, int lang2Code, String oldLang1Value, String
+            oldLang2Value, String
+                                    newLang1Value, String newLang2Value) {
         SQLiteDatabase database = this.getReadableDatabase();
-        /*database.execSQL("UPDATE " + TABLE_PHRASES + " SET " + KEY_LANG1_VALUE + "=? AND
-         " +
-                "" + KEY_LANG2_VALUE + "=? WHERE " + KEY_LANG1_VALUE + "=? AND " +
-                "" + KEY_LANG2_VALUE + "=?", new Object[]{newLang1, newLang2, oldLang1,
-                oldLang2});*/
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_LANG1_VALUE, newLang1);
-        contentValues.put(KEY_LANG2_VALUE, newLang2);
-        int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_LANG1_VALUE +
-                "=? AND " +
-                "" + KEY_LANG2_VALUE + "=?", new String[]{oldLang1, oldLang2});
+        contentValues.put(KEY_LANG1_VALUE, newLang1Value);
+        contentValues.put(KEY_LANG2_VALUE, newLang2Value);
+        return database.update(TABLE_PHRASES, contentValues, KEY_LANG1_VALUE +
+                        "=? AND " + "" + KEY_LANG2_VALUE + "=? AND " + KEY_LANG1 + "=" +
+                        lang1Code + " AND " + KEY_LANG2 + "=" + lang2Code,
+                new String[]{oldLang1Value,
+                        oldLang2Value});
     }
 
-    public int deletePhrase(String lang1, String lang2) {
+    public int deletePhrase(int lang1Code, int lang2Code, String lang1Value, String lang2Value) {
         SQLiteDatabase database = this.getReadableDatabase();
-        return database.delete(TABLE_PHRASES, KEY_LANG1_VALUE + "=? AND " +
-                "" + KEY_LANG2_VALUE + "=?", new String[]{lang1, lang2});
+        return database.delete(TABLE_PHRASES, KEY_LANG1_VALUE + "=? AND " + "" + KEY_LANG2_VALUE + "=? AND " + KEY_LANG1 + "=" + lang1Code + " AND " + KEY_LANG2 + "=" + lang2Code,
+                new String[]{lang1Value, lang2Value});
     }
 
     /**

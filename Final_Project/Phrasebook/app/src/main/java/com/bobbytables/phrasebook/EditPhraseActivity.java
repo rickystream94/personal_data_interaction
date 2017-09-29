@@ -3,6 +3,7 @@ package com.bobbytables.phrasebook;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,8 +21,11 @@ public class EditPhraseActivity extends AppCompatActivity {
 
     private EditText lang1EditText;
     private EditText lang2EditText;
-    private String oldLang1;
-    private String oldLang2;
+    private String oldLang1Value;
+    private String oldLang2Value;
+    private int lang1Code;
+    private int lang2Code;
+    private static String TAG = EditPhraseActivity.class.getName();
 
     private DatabaseHelper databaseHelper;
     private AlertDialogManager alertDialogManager;
@@ -34,6 +38,8 @@ public class EditPhraseActivity extends AppCompatActivity {
         databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         alertDialogManager = new AlertDialogManager();
         Intent i = getIntent();
+        lang1Code = i.getExtras().getInt(DatabaseHelper.KEY_LANG1);
+        lang2Code = i.getExtras().getInt(DatabaseHelper.KEY_LANG2);
         TextView lang1Label = (TextView) findViewById(R.id.updateLang1Label);
         TextView lang2Label = (TextView) findViewById(R.id.updateLang2Label);
         lang1EditText = (EditText) findViewById(R.id.updateLang1EditText);
@@ -42,10 +48,10 @@ public class EditPhraseActivity extends AppCompatActivity {
         String foreignLang = "Phrase in " + i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG2);
         lang1Label.setText(motherLang);
         lang2Label.setText(foreignLang);
-        oldLang1 = i.getExtras().getString(DatabaseHelper.KEY_LANG1_VALUE);
-        oldLang2 = i.getExtras().getString(DatabaseHelper.KEY_LANG2_VALUE);
-        lang1EditText.setText(oldLang1);
-        lang2EditText.setText(oldLang2);
+        oldLang1Value = i.getExtras().getString(DatabaseHelper.KEY_LANG1_VALUE);
+        oldLang2Value = i.getExtras().getString(DatabaseHelper.KEY_LANG2_VALUE);
+        lang1EditText.setText(oldLang1Value);
+        lang2EditText.setText(oldLang2Value);
     }
 
     @Override
@@ -73,9 +79,9 @@ public class EditPhraseActivity extends AppCompatActivity {
     }
 
     private void deletePhrase() {
-        String lang1 = lang1EditText.getText().toString().trim().toLowerCase();
-        String lang2 = lang2EditText.getText().toString().trim().toLowerCase();
-        int affectedRows = databaseHelper.deletePhrase(lang1, lang2);
+        String lang1Value = lang1EditText.getText().toString().trim().toLowerCase();
+        String lang2Value = lang2EditText.getText().toString().trim().toLowerCase();
+        int affectedRows = databaseHelper.deletePhrase(lang1Code, lang2Code, lang1Value, lang2Value);
         if (affectedRows == 0) {
             alertDialogManager.showAlertDialog(EditPhraseActivity.this, "Error", "You tried to " +
                     "delete a phrase that doesn't exist in your Phrasebook! No changes were " +
@@ -94,11 +100,11 @@ public class EditPhraseActivity extends AppCompatActivity {
     }
 
     public void updatePhrase() {
-        String newLang1 = lang1EditText.getText().toString().trim().toLowerCase();
-        String newLang2 = lang2EditText.getText().toString().trim().toLowerCase();
+        String newLang1Value = lang1EditText.getText().toString().trim().toLowerCase();
+        String newLang2Value = lang2EditText.getText().toString().trim().toLowerCase();
 
         //If no changes were applied, show alert dialog and return
-        if (newLang1.equals(oldLang1) && newLang2.equals(oldLang2)) {
+        if (newLang1Value.equals(oldLang1Value) && newLang2Value.equals(oldLang2Value)) {
             alertDialogManager.showAlertDialog(EditPhraseActivity.this, "Error", "No changes were" +
                     " made!", false);
             return;
@@ -106,14 +112,20 @@ public class EditPhraseActivity extends AppCompatActivity {
 
         //If the phrase the user just edited already exists in the phrasebook, show dialog and
         // return
-        DatabaseModel databaseModel = new PhraseModel(newLang1, newLang2, null, DatabaseHelper
-                .TABLE_PHRASES);
+        DatabaseModel databaseModel = new PhraseModel(newLang1Value, newLang2Value, lang1Code, lang2Code, null,
+                DatabaseHelper
+                        .TABLE_PHRASES);
         if (databaseHelper.phraseAlreadyExists(databaseModel)) {
             alertDialogManager.showAlertDialog(EditPhraseActivity.this, "Error", "This phrase " +
                     "already exists in your Phrasebook!", false);
             return;
         }
-        databaseHelper.updatePhrase(oldLang1, oldLang2, newLang1, newLang2);
+        int affectedPhrases = databaseHelper.updatePhrase(lang1Code, lang2Code, oldLang1Value,
+                oldLang2Value, newLang1Value,
+                newLang2Value);
+        if (affectedPhrases != 1) {
+            Log.e(TAG, affectedPhrases + " phrases affected!");
+        }
         Toast.makeText(EditPhraseActivity.this, "Phrase successfully updated!", Toast
                 .LENGTH_LONG).show();
         finish();

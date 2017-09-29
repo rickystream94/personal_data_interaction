@@ -38,7 +38,7 @@
         android:maxLines="1"/>
 
     <EditText
-        android:id="@+id/motherLanguage"
+        android:id="@+id/lang1Value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/nicknameText"
@@ -50,10 +50,10 @@
         android:maxLines="1"/>
 
     <EditText
-        android:id="@+id/foreignLanguage"
+        android:id="@+id/lang2Value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/motherLanguage"
+        android:layout_below="@id/lang1Value"
         android:layout_centerHorizontal="true"
         android:ems="12"
         android:hint="@string/foreign_language"
@@ -65,7 +65,7 @@
         android:id="@+id/createUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/foreignLanguage"
+        android:layout_below="@id/lang2Value"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:onClick="createUser"
