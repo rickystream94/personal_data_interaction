@@ -27,6 +27,7 @@ public class EditPhraseActivity extends AppCompatActivity {
     private int lang1Code;
     private int lang2Code;
     private static String TAG = EditPhraseActivity.class.getName();
+    private static final int NO_ACTION_RESULT_CODE = -2;
 
     private DatabaseHelper databaseHelper;
     private AlertDialogManager alertDialogManager;
@@ -73,10 +74,24 @@ public class EditPhraseActivity extends AppCompatActivity {
                 break;
             case R.id.deleteContent:
                 deletePhrase();
+                break;
+            case android.R.id.home:
+                noAction();
+                break;
             default:
                 break;
         }
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        noAction();
+        super.onBackPressed();
+    }
+
+    private void noAction() {
+        setResult(NO_ACTION_RESULT_CODE);
     }
 
     private void deletePhrase() {

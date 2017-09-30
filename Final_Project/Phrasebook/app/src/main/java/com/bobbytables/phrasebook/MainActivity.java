@@ -159,9 +159,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     refreshUi();
                 }
                 break;
-            case EditPhrasebookActivity.REQUEST_CODE: //TODO: to be implemented when deleting
-                if (resultCode == RESULT_OK) {
-                    refreshUi();
+            case EditPhrasebookActivity.REQUEST_CODE:
+                switch (resultCode) {
+                    case RESULT_OK:
+                        refreshUi();
+                        break;
+                    case RESULT_CANCELED:
+                        //The current phrasebook has just been cancelled, therefore we need to
+                        // switch to another phrasebook
+                        Phrasebook firstPhrasebook = databaseHelper.getAllPhrasebooks().get(0);
+                        switchToPhrasebook(firstPhrasebook);
+                        break;
+                    default:
+                        break;
                 }
                 break;
             case NewPhraseActivity.REQUEST_CODE:

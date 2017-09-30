@@ -30,8 +30,9 @@ public class NewPhraseActivity extends AppCompatActivity {
     private AlertDialogManager alertDialogManager;
     private BadgeManager badgeManager;
     private boolean isPhrasebookEmptyBeforeInsertion;
-    private static final int RESULT_CODE_NORMAL = 0;
+    private static final int NO_ACTION_RESULT_CODE = -2;
     public static final int REQUEST_CODE = 3;
+    private int addedPhrases;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class NewPhraseActivity extends AppCompatActivity {
         badgeManager = BadgeManager.getInstance(getApplicationContext());
         alertDialogManager = new AlertDialogManager();
         isPhrasebookEmptyBeforeInsertion = databaseHelper.isDatabaseEmpty(lang1Code, lang2Code);
+        addedPhrases = 0;
     }
 
     @Override
@@ -72,6 +74,21 @@ public class NewPhraseActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * If we have added at least one phrase with the "Add more" button and then press back, need
+     * to refresh MainActivity UI
+     */
+    @Override
+    public void onBackPressed() {
+        noAction();
+        super.onBackPressed();
+    }
+
+    private void noAction() {
+        //RESULT_OK: Used to inform MainActivity to refresh UI
+        setResult(isPhrasebookEmptyBeforeInsertion && addedPhrases > 0 ? RESULT_OK : NO_ACTION_RESULT_CODE);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -81,9 +98,12 @@ public class NewPhraseActivity extends AppCompatActivity {
                     if (isPhrasebookEmptyBeforeInsertion)
                         setResult(RESULT_OK); //Used to inform MainActivity to refresh UI
                     else
-                        setResult(RESULT_CODE_NORMAL);
+                        setResult(NO_ACTION_RESULT_CODE);
                     finish();
                 }
+                break;
+            case android.R.id.home:
+                noAction();
                 break;
             default:
                 break;
@@ -115,6 +135,7 @@ public class NewPhraseActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "New phrase saved!", Toast.LENGTH_SHORT)
                     .show();
             checkNewBadges();
+            addedPhrases++;
             return true;
         } catch (Exception e) {
             alertDialogManager.showAlertDialog(NewPhraseActivity.this, "Error!", e.getMessage(), false);

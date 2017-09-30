@@ -1,6 +1,8 @@
 package com.bobbytables.phrasebook;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +30,7 @@ public class EditPhrasebookActivity extends AppCompatActivity {
     private EditText lang1ValueEditText;
     private EditText lang2ValueEditText;
     public static final int REQUEST_CODE = 2;
+    public static final int NO_ACTION_RESULT_CODE = -2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,12 +70,31 @@ public class EditPhrasebookActivity extends AppCompatActivity {
                 break;
             case R.id.deleteContent: //TODO: to implement
                 deletePhrasebook();
+                break;
+            case android.R.id.home:
+                noAction();
+                break;
             default:
                 break;
         }
         return false;
     }
 
+    @Override
+    public void onBackPressed() {
+        noAction();
+        super.onBackPressed();
+    }
+
+    private void noAction() {
+        setResult(NO_ACTION_RESULT_CODE);
+    }
+
+    /**
+     * Deletes the current phrasebook, with all data related to it (phrases and challenges). It
+     * doesn't delete the languages from the lang tables. It sets the current phrasebook to the
+     * first phrasebook in the list
+     */
     private void deletePhrasebook() {
         List<Phrasebook> phrasebookList = databaseHelper.getAllPhrasebooks();
         if (phrasebookList.size() == 1) {
@@ -83,9 +105,33 @@ public class EditPhrasebookActivity extends AppCompatActivity {
             return;
         }
 
-        //Inform with dialog
-        databaseHelper.deletePhrasebook(oldLang1Code, oldLang1Code);
-        //Delete all phrases...
+        //Inform with confirmation dialog
+        final AlertDialog.Builder builder = new AlertDialog.Builder(EditPhrasebookActivity.this);
+        builder.setMessage("Are you sure? All data related to this Phrasebook will be " +
+                "irreversibly lost, including phrases and challenges!")
+                .setTitle("Confirm?")
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        try {
+                            databaseHelper.deletePhrasebook(oldLang1Code, oldLang2Code);
+                            Toast.makeText(EditPhrasebookActivity.this, "Phrasebook successfully " +
+                                    "deleted!", Toast.LENGTH_LONG).show();
+                            setResult(RESULT_CANCELED);
+                            finish();
+                        } catch (Exception e) {
+                            alertDialogManager.showAlertDialog(EditPhrasebookActivity.this,
+                                    "Error!", e.getMessage(), false);
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //Do nothing...
+                    }
+                }).show();
     }
 
     /***
@@ -105,15 +151,12 @@ public class EditPhrasebookActivity extends AppCompatActivity {
         }
 
         try {
-            int affectedRows = databaseHelper.updatePhrasebook(oldLang1Code, oldLang2Code,
+            databaseHelper.updatePhrasebook(oldLang1Code, oldLang2Code,
                     newLang1Value,
                     newLang2Value);
-            if (affectedRows != 1) {
-                Log.e(TAG, affectedRows + " phrases affected!");
-            }
             Toast.makeText(EditPhrasebookActivity.this, "Phrasebook successfully updated!", Toast
                     .LENGTH_LONG).show();
-            setResult(RESULT_OK); //MainActivity should always refresh
+            setResult(RESULT_OK); //MainActivity should always refresh if changes were applied
             finish();
         } catch (Exception e) {
             alertDialogManager.showAlertDialog(EditPhrasebookActivity.this, "Error!", e.getMessage

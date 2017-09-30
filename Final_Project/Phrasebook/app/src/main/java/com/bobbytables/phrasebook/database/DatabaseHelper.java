@@ -52,7 +52,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_LANGUAGES = "languages";
     public static final String TABLE_BOOKS = "books";
 
-    // Phrases Table Columns
+    // Phrases Table Columns //TODO: alter table phrases to remove keys lang1/lang2 and use
+    // instead Phrasebook ID, as this contains already lang1/lang2 (foreign key).
     private static final String KEY_PHRASE_ID = "id";
     public static final String KEY_LANG1 = "lang1Code";
     public static final String KEY_LANG2 = "lang2Code";
@@ -912,18 +913,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Updates the current phrasebook with the new languages. Automatically creates new rows for
-     * new languages in the corresponding table
+     * new languages in the corresponding table. It also updates the current languages in
+     * SettingsManager.
      *
      * @param oldLang1
      * @param oldLang2
      * @param newLanguage1
      * @param newLanguage2
      * @return
-     * @throws Exception
+     * @throws Exception if attempting to rename to an already existing phrasebook or if
+     *                   something goes wrong with the update.
      */
-    public int updatePhrasebook(int oldLang1, int oldLang2, String newLanguage1, String
+    public void updatePhrasebook(int oldLang1, int oldLang2, String newLanguage1, String
             newLanguage2) throws Exception {
         SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction();
         HashMap<String, Integer> langCodes = addNewLanguages(newLanguage1, newLanguage2);
 
         ContentValues cvPhrasebookUpdate = new ContentValues();
@@ -935,24 +939,66 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cvPhrasesUpdate.put(KEY_LANG2, langCodes.get(newLanguage2));
 
         if (!phrasebookAlreadyExists(cvPhrasebookUpdate)) {
-            int affectedPhrasebooks = db.update(TABLE_BOOKS, cvPhrasebookUpdate, KEY_BOOK_LANG1 + "=" + oldLang1 + " AND" +
-                    " " +
-                    "" + KEY_BOOK_LANG2 + "=" + oldLang2, null);
-            int affectedPhrases = db.update(TABLE_PHRASES, cvPhrasesUpdate,
-                    KEY_LANG1 + "=" + oldLang1 + " AND " + KEY_LANG2 + "=" + oldLang2, null);
-            //Update current languages before returning
-            SettingsManager settingsManager = SettingsManager.getInstance(context);
-            settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG1, langCodes.get(newLanguage1));
-            settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG2, langCodes.get
-                    (newLanguage2));
-            return affectedPhrasebooks;
+            try {
+                int affectedPhrasebooks = db.update(TABLE_BOOKS, cvPhrasebookUpdate, KEY_BOOK_LANG1 + "=" + oldLang1 + " AND" +
+                        " " +
+                        "" + KEY_BOOK_LANG2 + "=" + oldLang2, null);
+                int affectedPhrases = db.update(TABLE_PHRASES, cvPhrasesUpdate,
+                        KEY_LANG1 + "=" + oldLang1 + " AND " + KEY_LANG2 + "=" + oldLang2, null);
+                Log.d(TAG, affectedPhrasebooks + " phrasebooks edited; " + affectedPhrases + " phrases " +
+                        "updated.");
+                if (affectedPhrasebooks != 1)
+                    throw new Exception("Attempt to update " + affectedPhrasebooks + " phrasebook(s)!" +
+                            " No changes have been performed.");
+
+                //Update current languages before returning
+                SettingsManager settingsManager = SettingsManager.getInstance(context);
+                settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG1, langCodes.get(newLanguage1));
+                settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG2, langCodes.get
+                        (newLanguage2));
+                db.setTransactionSuccessful(); //Everything went fine until this point, so commit
+                // changes
+            } finally {
+                db.endTransaction(); //Closes the transaction
+            }
         } else {
             throw new Exception("A phrasebook for " + newLanguage1 + " - " + newLanguage2 + " is already " +
                     "existing!");
         }
     }
 
-    public void deletePhrasebook(int lang1, int oldLang2) {
+    /**
+     * Deletes a phrasebook and all data related to it, except of the language names
+     *
+     * @param lang1
+     * @param lang2
+     * @throws Exception if the number of deleted phrasebooks is != 1
+     */
+    public void deletePhrasebook(int lang1, int lang2) throws Exception {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction(); //We want to rollback if something goes wrong...
+        try {
+            String languagesWhereCondition = KEY_LANG1 + "=" + lang1 + " AND " +
+                    "" + KEY_LANG2 + "=" + lang2;
+            //Step 1: Delete all challenges
+            int affectedChallenges = db.delete(TABLE_CHALLENGES, KEY_CHALLENGE_PHRASE_ID + " IN (SELECT " +
+                    "" + KEY_PHRASE_ID + " FROM " + TABLE_PHRASES + " WHERE " + languagesWhereCondition + ")", null);
 
+            //Step 2: Delete all phrases
+            int affectedPhrases = db.delete(TABLE_PHRASES, languagesWhereCondition, null);
+
+            //Step 3: Delete phrasebook
+            int affectedPhrasebook = db.delete(TABLE_BOOKS, KEY_BOOK_LANG1 + "=" + lang1 + " AND " +
+                    "" + KEY_BOOK_LANG2 + "=" + lang2, null);
+            Log.d(TAG, affectedChallenges + " challenges deleted; " + affectedPhrases + " phrases deleted; " +
+                    "" + affectedPhrasebook + " phrasebook deleted.");
+            if (affectedPhrasebook != 1) {
+                throw new Exception("Attempt to delete " + affectedPhrasebook + " phrasebook(s)! " +
+                        "Rollback initialized, no data has been affected.");
+            }
+            db.setTransactionSuccessful(); //Transaction commit
+        } finally {
+            db.endTransaction(); //Closes the transaction
+        }
     }
 }
