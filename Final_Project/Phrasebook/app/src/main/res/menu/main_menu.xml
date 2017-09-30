@@ -7,6 +7,13 @@
         android:title="Profile"
         android2:showAsAction="always"/>
     <item
+        android:id="@+id/edit_phrasebook"
+        android:icon="@drawable/ic_mode_edit_white_24dp"
+        android:title="Edit Phrasebook"
+        android2:showAsAction="always">
+
+    </item>
+    <item
         android:id="@+id/export_data"
         android:title="Export Data"/>
     <item

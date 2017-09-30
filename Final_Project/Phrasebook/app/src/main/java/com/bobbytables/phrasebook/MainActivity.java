@@ -2,20 +2,23 @@ package com.bobbytables.phrasebook;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
-import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,49 +27,43 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
-import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
+import com.github.clans.fab.FloatingActionMenu;
 
-import org.json.JSONObject;
+import java.util.List;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
-
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
-        ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private AlertDialogManager alertDialogManager = new AlertDialogManager();
     private SettingsManager settingsManager;
-    private PagerAdapter pagerAdapter;
-    private ViewPager pager;
-    private FloatingActionButton fab;
+    private FloatingActionMenu fabMenu;
+    private com.github.clans.fab.FloatingActionButton fabAddPhrase;
+    private com.github.clans.fab.FloatingActionButton fabCreatePhrasebook;
     public static Handler killerHandler;
-    private String motherLanguage;
-    private String foreignLanguage;
     private DatabaseHelper databaseHelper;
-    private TabLayout tabLayout;
-    private String[] pagesTitles;
-    private RequestQueue requestQueue;
-    private static final String SERVER_URL = "http://www.richmondweb.it/phrasebook/upload_data.php";
+    private DrawerLayout mDrawerLayout;
+    private ListView drawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private Fragment fragment;
+    private FragmentManager fragmentManager;
+    private BottomNavigationView navigation;
+    private List<Phrasebook> allPhrasebooks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Get helper classes
+        databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
+        settingsManager = SettingsManager.getInstance(getApplicationContext());
 
         //Initialize the killer handler, such that another activity can kill the current one
         killerHandler = new Handler() {
@@ -80,53 +77,111 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             }
         };
 
-        databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
-
-        //Get settings manager
-        settingsManager = SettingsManager.getInstance(getApplicationContext());
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity
         settingsManager.createUserProfile();
-        motherLanguage = settingsManager.getPrefStringValue(SettingsManager.KEY_MOTHER_LANGUAGE);
-        foreignLanguage = settingsManager.getPrefStringValue(SettingsManager.KEY_FOREIGN_LANGUAGE);
+
+        //Get fragment manager and add default fragment
+        fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        fragment = new CardsFragment();
+        transaction.add(R.id.frame_layout, fragment).commit();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        pagesTitles = new String[]{getString(R.string.tab1), getString(R.string
-                .tab2), getString(R.string.tab3)};
+        getSupportActionBar().setTitle(R.string.tab1); //Set app bar title for default fragment
 
-        //Initialize ViewPager
-        initializePager();
-        initFloatingActionButton();
+        //Initialize drawer
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, toolbar, R
+                .string.navigation_drawer_open, R.string.navigation_drawer_close);
 
-        //Initialize request queue for Volley
-        requestQueue = Volley.newRequestQueue(this);
+        //Initialize bottom navigation
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(this);
+
+        //Get list of phrasebooks in drawer list
+        refreshPhrasebooks();
+
+        //Initialize fab
+        initFloatingActionButtons();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (settingsManager.getPrefBoolValue(SettingsManager.KEY_IS_FIRST_TIME)) {
-            Cursor cursor = databaseHelper.performRawQuery("SELECT COUNT(*) FROM " + DatabaseHelper
-                    .TABLE_PHRASES);
-            cursor.moveToFirst();
-            if (cursor.getInt(0) > 0) {
-                settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
-                initializePager();
+        refreshPhrasebooks();
+    }
+
+    /**
+     * Method used to initialize the default navigation fragment when refreshing main activity
+     * content
+     */
+    private void refreshUi() {
+        navigation.setSelectedItemId(R.id.navigation_practice);
+        mDrawerLayout.closeDrawers();
+    }
+
+    private void refreshPhrasebooks() {
+        allPhrasebooks = databaseHelper.getAllPhrasebooks();
+        String[] names = new String[allPhrasebooks.size()];
+        for (Phrasebook phrasebook : allPhrasebooks)
+            names[allPhrasebooks.indexOf(phrasebook)] = phrasebook.toString();
+        drawerList = (ListView) findViewById(R.id.left_drawer);
+        drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, R.id
+                .drawer_list_item_id, names));
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Phrasebook phrasebook = allPhrasebooks.get(position);
+                switchToPhrasebook(phrasebook);
             }
-        }
+        });
+    }
+
+    private void switchToPhrasebook(Phrasebook phrasebook) {
+        settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG1, phrasebook.getLang1Code());
+        settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG2, phrasebook.getLang2Code
+                ());
+        refreshUi();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //Update Phrase Activity request code
-        if (requestCode == 1) {
-            if (resultCode == RESULT_CANCELED) {
-                //It means that the database is empty and we need to refresh the view pager
-                settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
-                initializePager();
-            }
+        switch (requestCode) {
+            case EditPhraseActivity.REQUEST_CODE:
+                if (resultCode == RESULT_CANCELED) {
+                    //It means that the database is empty and we need to refresh the layout
+                    refreshUi();
+                }
+                break;
+            case EditPhrasebookActivity.REQUEST_CODE:
+                switch (resultCode) {
+                    case RESULT_OK:
+                        refreshUi();
+                        break;
+                    case RESULT_CANCELED:
+                        //The current phrasebook has just been cancelled, therefore we need to
+                        // switch to another phrasebook
+                        Phrasebook firstPhrasebook = databaseHelper.getAllPhrasebooks().get(0);
+                        switchToPhrasebook(firstPhrasebook);
+                        Toast.makeText(this, "Switched to " + firstPhrasebook.toString() + " " +
+                                "phrasebook", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case NewPhraseActivity.REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    refreshUi(); //It means the phrasebook is no more empty and we need to refresh
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -143,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Intent i;
         switch (id) {
             case R.id.delete_data:
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
@@ -153,11 +209,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         databaseHelper.reset();
-                        settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
                         Toast.makeText(MainActivity.this, "All data successfully deleted!", Toast
                                 .LENGTH_SHORT)
                                 .show();
-                        initializePager();
+                        refreshUi();
                     }
                 });
                 alertDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -194,12 +249,20 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 resetAlertDialog.show();
                 break;
             case R.id.profile:
-                Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
+                i = new Intent(getApplicationContext(), ProfileActivity.class);
                 startActivity(i);
                 break;
+            case R.id.edit_phrasebook:
+                ContentValues cv = settingsManager.getCurrentLanguagesIds();
+                Intent intent = new Intent(MainActivity.this, EditPhrasebookActivity.class);
+                intent.putExtra(SettingsManager.KEY_CURRENT_LANG1, cv.getAsInteger(SettingsManager
+                        .KEY_CURRENT_LANG1));
+                intent.putExtra(SettingsManager.KEY_CURRENT_LANG2, cv.getAsInteger(SettingsManager.KEY_CURRENT_LANG2));
+                startActivityForResult(intent, EditPhrasebookActivity.REQUEST_CODE);
+                break;
             case R.id.about:
-                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
-                startActivity(intent);
+                i = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(i);
                 break;
             default:
                 break;
@@ -210,57 +273,43 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     /**
      * Setting floating action button with onClickListener
      */
-    private void initFloatingActionButton() {
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+    private void initFloatingActionButtons() {
+        fabMenu = (FloatingActionMenu) findViewById(R.id.fab_menu);
+        fabAddPhrase = (com.github.clans.fab.FloatingActionButton) findViewById(R.id
+                .fab_new_phrase);
+        fabCreatePhrasebook = (com.github.clans.fab.FloatingActionButton) findViewById(R.id
+                .fab_new_phrasebook);
+        fabAddPhrase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), NewPhraseActivity.class);
-                i.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE, motherLanguage);
-                i.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE, foreignLanguage);
-                startActivity(i);
+                ContentValues currentLanguagesNames = settingsManager.getCurrentLanguagesNames();
+                String lang1Value = currentLanguagesNames.getAsString(SettingsManager
+                        .KEY_CURRENT_LANG1_STRING);
+                String lang2Value = currentLanguagesNames.getAsString(SettingsManager
+                        .KEY_CURRENT_LANG2_STRING);
+                ContentValues currentLanguagesCodes = settingsManager.getCurrentLanguagesIds();
+                int lang1Code = currentLanguagesCodes.getAsInteger(SettingsManager
+                        .KEY_CURRENT_LANG1);
+                int lang2Code = currentLanguagesCodes.getAsInteger(SettingsManager
+                        .KEY_CURRENT_LANG2);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG1_STRING, lang1Value);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG2_STRING, lang2Value);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1Code);
+                i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2Code);
+                startActivityForResult(i, NewPhraseActivity.REQUEST_CODE);
+                fabMenu.close(true);
             }
         });
-        fab.hide(); //by default
-    }
-
-    /**
-     * Initializes the ViewPager and its adapter
-     */
-    private void initializePager() {
-        // ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        //used to change tab when selected
-        tabLayout.addOnTabSelectedListener(this);
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(pagerAdapter);
-        //Used for changing selected tab when swiping right/left
-        pager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(tabLayout));
-        pager.addOnPageChangeListener(this);
-    }
-
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        pager.setCurrentItem(tab.getPosition());
-        switch (tab.getPosition()) {
-            case 0:
-                fab.hide();
-                break;
-            default:
-                fab.show();
-        }
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-        //Not necessary
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-        //Not necessary
+        fabCreatePhrasebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), NewPhrasebookActivity.class);
+                startActivity(i);
+                fabMenu.close(true);
+            }
+        });
+        fabMenu.hideMenu(false); //by default
     }
 
     private void checkWritePermissions() {
@@ -307,25 +356,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     public void exportData() {
-        databaseHelper.exportToJSON(getApplicationContext());
+        databaseHelper.exportToJSON(MainActivity.this);
         Toast.makeText(this, "Exported in Downloads/Phrasebook_Exports as JSON file", Toast
                 .LENGTH_SHORT)
                 .show();
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        //Not necessary
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        getSupportActionBar().setTitle(pagesTitles[position]);
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        //Not necessary
     }
 
     /**
@@ -337,5 +371,34 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        String title = item.getTitle().toString();
+        getSupportActionBar().setTitle(title);
+        switch (item.getItemId()) {
+            case R.id.navigation_practice:
+                fragment = new CardsFragment();
+                fabMenu.hideMenu(true);
+                break;
+            case R.id.navigation_phrasebook:
+                fragment = new PhrasesFragment();
+                fabMenu.showMenu(true);
+                break;
+            case R.id.navigation_progress:
+                fragment = new ProgressFragment();
+                fabMenu.showMenu(true);
+                break;
+        }
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in,
+                android.R.anim.fade_out);
+        transaction.replace(R.id.frame_layout, fragment).commit();
+        return true;
+    }
+
+    public void closeDrawer(View view) {
+        mDrawerLayout.closeDrawers();
     }
 }

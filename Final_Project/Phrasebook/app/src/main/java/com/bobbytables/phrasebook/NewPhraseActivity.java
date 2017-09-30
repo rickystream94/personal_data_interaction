@@ -18,19 +18,21 @@ import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class NewPhraseActivity extends AppCompatActivity {
 
-    private String motherLanguage;
-    private String foreignLanguage;
+    private int lang1Code;
+    private int lang2Code;
     private EditText addNewMotherLangPhrase;
     private EditText addNewForeignLangPhrase;
     private DatabaseHelper databaseHelper;
     private AlertDialogManager alertDialogManager;
     private BadgeManager badgeManager;
+    private boolean isPhrasebookEmptyBeforeInsertion;
+    private static final int NO_ACTION_RESULT_CODE = -2;
+    public static final int REQUEST_CODE = 3;
+    private int addedPhrases;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +41,13 @@ public class NewPhraseActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent i = getIntent();
-        motherLanguage = i.getExtras().getString(SettingsManager.KEY_MOTHER_LANGUAGE);
-        foreignLanguage = i.getExtras().getString(SettingsManager.KEY_FOREIGN_LANGUAGE);
+        String lang1Value = i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG1_STRING);
+        String lang2Value = i.getExtras().getString(SettingsManager.KEY_CURRENT_LANG2_STRING);
+        lang1Code = i.getExtras().getInt(SettingsManager.KEY_CURRENT_LANG1);
+        lang2Code = i.getExtras().getInt(SettingsManager.KEY_CURRENT_LANG2);
 
         TextView foreignLangTextView = (TextView) findViewById(R.id.textView_new_phrase_language);
-        foreignLangTextView.setText(foreignLanguage);
+        foreignLangTextView.setText(lang1Value + " - " + lang2Value);
         Button saveAddMore = (Button) findViewById(R.id.save_and_add_more);
         addNewMotherLangPhrase = (EditText) findViewById(R.id.add_new_mother_lang);
         addNewForeignLangPhrase = (EditText) findViewById(R.id.add_new_foreign_lang);
@@ -57,6 +61,8 @@ public class NewPhraseActivity extends AppCompatActivity {
         databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         badgeManager = BadgeManager.getInstance(getApplicationContext());
         alertDialogManager = new AlertDialogManager();
+        isPhrasebookEmptyBeforeInsertion = databaseHelper.isDatabaseEmpty(lang1Code, lang2Code);
+        addedPhrases = 0;
     }
 
     @Override
@@ -68,13 +74,36 @@ public class NewPhraseActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * If we have added at least one phrase with the "Add more" button and then press back, need
+     * to refresh MainActivity UI
+     */
+    @Override
+    public void onBackPressed() {
+        noAction();
+        super.onBackPressed();
+    }
+
+    private void noAction() {
+        //RESULT_OK: Used to inform MainActivity to refresh UI
+        setResult(isPhrasebookEmptyBeforeInsertion && addedPhrases > 0 ? RESULT_OK : NO_ACTION_RESULT_CODE);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_save_and_close:
-                if (saveNewPhrase())
+                if (saveNewPhrase()) {
+                    if (isPhrasebookEmptyBeforeInsertion)
+                        setResult(RESULT_OK); //Used to inform MainActivity to refresh UI
+                    else
+                        setResult(NO_ACTION_RESULT_CODE);
                     finish();
+                }
+                break;
+            case android.R.id.home:
+                noAction();
                 break;
             default:
                 break;
@@ -98,13 +127,15 @@ public class NewPhraseActivity extends AppCompatActivity {
         try {
             databaseHelper.insertRecord(new PhraseModel(addNewMotherLangPhrase.getText().toString
                     ().trim().toLowerCase(),
-                    addNewForeignLangPhrase.getText().toString().trim().toLowerCase(), currentTimeString,
+                    addNewForeignLangPhrase.getText().toString().trim().toLowerCase(),
+                    lang1Code, lang2Code, currentTimeString,
                     DatabaseHelper.TABLE_PHRASES));
             addNewForeignLangPhrase.setText("");
             addNewMotherLangPhrase.setText("");
             Toast.makeText(getApplicationContext(), "New phrase saved!", Toast.LENGTH_SHORT)
                     .show();
             checkNewBadges();
+            addedPhrases++;
             return true;
         } catch (Exception e) {
             alertDialogManager.showAlertDialog(NewPhraseActivity.this, "Error!", e.getMessage(), false);

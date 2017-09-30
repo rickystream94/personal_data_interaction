@@ -37,9 +37,9 @@ public class DataRowCursorAdapter extends CursorAdapter {
         TextView textViewLang2 = (TextView) view.findViewById(R.id.datarow_lang2);
         // Extract properties from cursor
         String lang1 = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
-                .KEY_MOTHER_LANG_STRING));
+                .KEY_LANG1_VALUE));
         String lang2 = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
-                .KEY_FOREIGN_LANG_STRING));
+                .KEY_LANG2_VALUE));
         // Populate fields with extracted properties
         textViewLang1.setText(lang1);
         textViewLang2.setText(lang2);

@@ -1,6 +1,7 @@
 package com.bobbytables.phrasebook;
 
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -23,36 +24,42 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private DatabaseHelper databaseHelper;
-    private String motherLanguage;
-    private String foreignLanguage;
+    private String lang1Value;
+    private String lang2Value;
     private DataRowCursorAdapter rowCursorAdapter;
     private View rootView;
     private Button nextPageButton;
     private Button previousPageButton;
     private int currentOffset = 0;
     private static final int LIMIT = 20;
+    private int lang1Code;
+    private int lang2Code;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         databaseHelper = DatabaseHelper.getInstance(getContext());
+        SettingsManager settingsManager = SettingsManager.getInstance(getContext());
+        ContentValues currentLanguagesNames = settingsManager.getCurrentLanguagesNames();
+        ContentValues currentLanguagesCodes = settingsManager.getCurrentLanguagesIds();
+        lang1Value = currentLanguagesNames.getAsString(SettingsManager.KEY_CURRENT_LANG1_STRING);
+        lang2Value = currentLanguagesNames.getAsString(SettingsManager.KEY_CURRENT_LANG2_STRING);
+        lang1Code = currentLanguagesCodes.getAsInteger(SettingsManager.KEY_CURRENT_LANG1);
+        lang2Code = currentLanguagesCodes.getAsInteger(SettingsManager.KEY_CURRENT_LANG2);
+
         int layout;
         // Inflate the layout for this fragment
-        if (databaseHelper.isDatabaseEmpty()) {
+        if (databaseHelper.isDatabaseEmpty(lang1Code, lang2Code)) {
             layout = R.layout.empty_database;
             return inflater.inflate(layout, container, false);
         }
         layout = R.layout.fragment_phrases;
         rootView = inflater.inflate(layout, container, false);
 
-        motherLanguage = SettingsManager.getInstance(getContext()).getPrefStringValue(SettingsManager
-                .KEY_MOTHER_LANGUAGE);
-        foreignLanguage = SettingsManager.getInstance(getContext()).getPrefStringValue(SettingsManager
-                .KEY_FOREIGN_LANGUAGE);
         TextView lang1 = (TextView) rootView.findViewById(R.id.phrases_lang1);
         TextView lang2 = (TextView) rootView.findViewById(R.id.phrases_lang2);
-        lang1.setText(motherLanguage);
-        lang2.setText(foreignLanguage);
+        lang1.setText(this.lang1Value);
+        lang2.setText(this.lang2Value);
 
         // Get the SearchView and set it properly
         SearchView searchView = (SearchView) rootView.findViewById(R.id.search_phrase);
@@ -87,7 +94,7 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     private void initPhrasebookData() {
-        Cursor dataCursor = getAllPhrases();
+        Cursor dataCursor = databaseHelper.getPhrasesList(lang1Code, lang2Code, LIMIT, currentOffset);
         rowCursorAdapter = new DataRowCursorAdapter(getContext(), dataCursor);
         ExpandableHeightListView dataListView = (ExpandableHeightListView) rootView.findViewById(R.id.dataListView);
         dataListView.setAdapter(rowCursorAdapter);
@@ -95,12 +102,8 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         dataListView.setExpanded(true);
     }
 
-    public Cursor getAllPhrases() {
-        return databaseHelper.getDataFromTable(DatabaseHelper.TABLE_PHRASES, LIMIT, currentOffset);
-    }
-
     public void searchPhrase(String query) {
-        Cursor cursor = databaseHelper.searchPhrase(query);
+        Cursor cursor = databaseHelper.searchPhrase(lang1Code, lang2Code, query);
         // Switch to new cursor and update contents of ListView
         rowCursorAdapter.changeCursor(cursor);
         rowCursorAdapter.notifyDataSetChanged();
@@ -111,26 +114,31 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         //Perform phrase update if list item is clicked
         Cursor cursor = (Cursor) adapterView.getAdapter().getItem(position);
         cursor.moveToPosition(position);
-        String motherLangString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
-                .KEY_MOTHER_LANG_STRING));
-        String foreignLangString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
-                .KEY_FOREIGN_LANG_STRING));
+        String lang1Value = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_LANG1_VALUE));
+        String lang2Value = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
+                .KEY_LANG2_VALUE));
         String createdOn = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper
                 .KEY_CREATED_ON));
-        Intent intent = new Intent(getActivity(), UpdatePhraseActivity.class);
-        intent.putExtra(DatabaseHelper.KEY_MOTHER_LANG_STRING, motherLangString);
-        intent.putExtra(DatabaseHelper.KEY_FOREIGN_LANG_STRING, foreignLangString);
+        int lang1Code = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_LANG1));
+        int lang2Code = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.KEY_LANG2));
+        Intent intent = new Intent(getActivity(), EditPhraseActivity.class);
+        intent.putExtra(DatabaseHelper.KEY_LANG1_VALUE, lang1Value);
+        intent.putExtra(DatabaseHelper.KEY_LANG2_VALUE, lang2Value);
+        intent.putExtra(DatabaseHelper.KEY_LANG1, lang1Code);
+        intent.putExtra(DatabaseHelper.KEY_LANG2, lang2Code);
         intent.putExtra(DatabaseHelper.KEY_CREATED_ON, createdOn);
-        intent.putExtra(SettingsManager.KEY_MOTHER_LANGUAGE, motherLanguage);
-        intent.putExtra(SettingsManager.KEY_FOREIGN_LANGUAGE, foreignLanguage);
-        getActivity().startActivityForResult(intent, 1);
+        intent.putExtra(SettingsManager.KEY_CURRENT_LANG1, this.lang1Value);
+        intent.putExtra(SettingsManager.KEY_CURRENT_LANG2, this.lang2Value);
+        getActivity().startActivityForResult(intent, EditPhraseActivity.REQUEST_CODE);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if (rowCursorAdapter != null) {
-            rowCursorAdapter.changeCursor(getAllPhrases());
+            rowCursorAdapter.changeCursor(databaseHelper.getPhrasesList(lang1Code, lang2Code,
+                    LIMIT, currentOffset));
             rowCursorAdapter.notifyDataSetChanged();
         }
     }
@@ -140,7 +148,8 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         switch (view.getId()) {
             case R.id.nextPage:
                 Cursor cursor = databaseHelper.performRawQuery("SELECT COUNT(*) FROM " + DatabaseHelper
-                        .TABLE_PHRASES);
+                        .TABLE_PHRASES + " WHERE " + DatabaseHelper.KEY_LANG1 + "=" + lang1Code + " AND " +
+                        "" + DatabaseHelper.KEY_LANG2 + "=" + lang2Code);
                 cursor.moveToFirst();
                 int totalRows = cursor.getInt(0);
                 currentOffset += LIMIT;
@@ -158,8 +167,8 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
                 }
                 break;
         }
-        rowCursorAdapter.changeCursor(databaseHelper.getDataFromTable(DatabaseHelper
-                .TABLE_PHRASES, LIMIT, currentOffset));
+        rowCursorAdapter.changeCursor(databaseHelper.getPhrasesList(lang1Code, lang2Code, LIMIT,
+                currentOffset));
         rowCursorAdapter.notifyDataSetChanged();
     }
 }

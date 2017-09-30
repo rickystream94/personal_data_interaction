@@ -1,5 +1,6 @@
 package com.bobbytables.phrasebook;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
@@ -31,8 +32,10 @@ import java.util.List;
 class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.ViewHolder>
         implements View.OnClickListener {
     private final Context context;
-    private String motherLanguage;
-    private String foreignLanguage;
+    private String lang1Value;
+    private String lang2Value;
+    private int lang1Code;
+    private int lang2Code;
     private ChallengeCard challengeCard;
     private static final int NUMBER_OF_CARDS = 1;
     private DatabaseHelper databaseHelper;
@@ -46,8 +49,8 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView foreignLanguageText;
-        TextView motherLanguageText;
+        TextView lang2ValueTextView;
+        TextView lang1PhraseTextView;
         TextView correctTranslation;
         HTextView newLevelText;
         EditText translation;
@@ -58,8 +61,8 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
 
         ViewHolder(View itemView) {
             super(itemView);
-            foreignLanguageText = (TextView) itemView.findViewById(R.id.foreignText);
-            motherLanguageText = (TextView) itemView.findViewById(R.id.motherLanguageText);
+            lang2ValueTextView = (TextView) itemView.findViewById(R.id.challenge_card_lang2_name);
+            lang1PhraseTextView = (TextView) itemView.findViewById(R.id.challenge_card_lang1_phrase);
             translation = (EditText) itemView.findViewById(R.id.translation);
             correctTranslation = (TextView) itemView.findViewById(R.id.correctTranslation);
             newLevelText = (HTextView) itemView.findViewById(R.id.newLevel);
@@ -75,11 +78,14 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         //This is our "dataset" of 1 element (if you want more items, just create a list)
         this.context = context;
         this.settingsManager = SettingsManager.getInstance(context);
-        motherLanguage = settingsManager.getPrefStringValue(SettingsManager
-                .KEY_MOTHER_LANGUAGE);
-        foreignLanguage = settingsManager.getPrefStringValue(SettingsManager
-                .KEY_FOREIGN_LANGUAGE);
-        challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
+        ContentValues currentLanguagesNames = SettingsManager.getInstance(context).getCurrentLanguagesNames();
+        ContentValues currentLanguagesCodes = SettingsManager.getInstance(context)
+                .getCurrentLanguagesIds();
+        lang1Value = currentLanguagesNames.getAsString(SettingsManager.KEY_CURRENT_LANG1_STRING);
+        lang2Value = currentLanguagesNames.getAsString(SettingsManager.KEY_CURRENT_LANG2_STRING);
+        lang1Code = currentLanguagesCodes.getAsInteger(SettingsManager.KEY_CURRENT_LANG1);
+        lang2Code = currentLanguagesCodes.getAsInteger(SettingsManager.KEY_CURRENT_LANG2);
+        challengeCard = new ChallengeCard(lang1Value, lang2Value);
         databaseHelper = DatabaseHelper.getInstance(context);
         alertDialogManager = new AlertDialogManager();
         this.xpManager = XPManager.getInstance(context);
@@ -91,7 +97,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     public ChallengeCardsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                                int viewType) {
         int layout;
-        if (databaseHelper.isDatabaseEmpty())
+        if (databaseHelper.isDatabaseEmpty(lang1Code, lang2Code))
             layout = R.layout.empty_database;
         else
             layout = R.layout.challenge_card;
@@ -105,15 +111,15 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-        if (databaseHelper.isDatabaseEmpty())
+        if (databaseHelper.isDatabaseEmpty(lang1Code, lang2Code))
             return;
 
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         this.holder = viewHolder;
         holder.setIsRecyclable(false); //Must be specified since we're using a custom animator
-        holder.foreignLanguageText.setText(challengeCard.getForeignLanguage());
-        holder.motherLanguageText.setText(databaseHelper.getRandomChallenge());
+        holder.lang2ValueTextView.setText(challengeCard.getForeignLanguage());
+        holder.lang1PhraseTextView.setText(databaseHelper.getRandomChallenge(lang1Code, lang2Code));
         holder.checkButton.setOnClickListener(this);
         holder.nextChallenge.setOnClickListener(this);
     }
@@ -140,18 +146,21 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     private void checkTranslation(View view) {
         //Perform check in the DB
         String translation = holder.translation.getText().toString().trim().toLowerCase();
-        String correctTranslation = databaseHelper.getTranslation(holder.motherLanguageText.getText
-                ().toString());
+        String correctTranslation = databaseHelper.getTranslation(lang1Code, lang2Code, holder
+                .lang1PhraseTextView
+                .getText().toString());
         holder.correctTranslation.setText(correctTranslation);
-        boolean result = databaseHelper.checkIfCorrect(holder.motherLanguageText.getText
-                        ().toString(),
+        boolean result = databaseHelper.checkIfCorrect(lang1Code, lang2Code, holder.lang1PhraseTextView
+                        .getText().toString(),
                 translation, correctTranslation);
-        boolean isArchived = databaseHelper.updateCorrectCount(holder.motherLanguageText.getText
-                ().toString(), correctTranslation, result);
+        boolean isArchived = databaseHelper.updateCorrectCount(lang1Code, lang2Code, holder
+                .lang1PhraseTextView
+                .getText
+                        ().toString(), correctTranslation, result);
 
         //Insert new record in DB
         int correct = result ? 1 : 0;
-        int phraseId = databaseHelper.getPhraseId(holder.motherLanguageText.getText
+        int phraseId = databaseHelper.getPhraseId(lang1Code, lang2Code, holder.lang1PhraseTextView.getText
                 ().toString(), correctTranslation);
         String currentTimeString = DateUtil.getCurrentTimestamp();
         try {
@@ -162,8 +171,9 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         }
 
         //Check XP and Level (gain XP only if not archived!)
-        boolean currentlyArchived = databaseHelper.getArchivedStatus(holder.motherLanguageText.getText
-                ().toString(), correctTranslation);
+        boolean currentlyArchived = databaseHelper.getArchivedStatus(lang1Code, lang2Code, holder
+                .lang1PhraseTextView
+                .getText().toString(), correctTranslation);
         if (result && !currentlyArchived) {
             int xp = XPManager.XP_CHALLENGE_WON; //Standard XP amount to add
             //Add experience only if max XP hasn't been reached
@@ -215,7 +225,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         holder.xpText.setVisibility(View.INVISIBLE);
         holder.xpText.setText("");
         holder.translation.setText("");
-        challengeCard = new ChallengeCard(motherLanguage, foreignLanguage);
+        challengeCard = new ChallengeCard(lang1Value, lang2Value);
         //notifyItemInserted(getItemCount());
         notifyItemChanged(0);
     }
