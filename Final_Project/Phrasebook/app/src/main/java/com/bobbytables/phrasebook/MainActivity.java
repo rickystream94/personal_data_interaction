@@ -169,6 +169,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         // switch to another phrasebook
                         Phrasebook firstPhrasebook = databaseHelper.getAllPhrasebooks().get(0);
                         switchToPhrasebook(firstPhrasebook);
+                        Toast.makeText(this, "Switched to " + firstPhrasebook.toString() + " " +
+                                "phrasebook", Toast.LENGTH_SHORT).show();
                         break;
                     default:
                         break;

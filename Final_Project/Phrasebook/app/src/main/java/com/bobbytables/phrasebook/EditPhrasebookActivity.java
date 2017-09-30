@@ -68,7 +68,7 @@ public class EditPhrasebookActivity extends AppCompatActivity {
             case R.id.updateContent:
                 updatePhrasebook();
                 break;
-            case R.id.deleteContent: //TODO: to implement
+            case R.id.deleteContent:
                 deletePhrasebook();
                 break;
             case android.R.id.home:
@@ -117,7 +117,7 @@ public class EditPhrasebookActivity extends AppCompatActivity {
                         try {
                             databaseHelper.deletePhrasebook(oldLang1Code, oldLang2Code);
                             Toast.makeText(EditPhrasebookActivity.this, "Phrasebook successfully " +
-                                    "deleted!", Toast.LENGTH_LONG).show();
+                                    "deleted!", Toast.LENGTH_SHORT).show();
                             setResult(RESULT_CANCELED);
                             finish();
                         } catch (Exception e) {
