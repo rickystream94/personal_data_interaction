@@ -36,15 +36,33 @@
 
         <include layout="@layout/content_main"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/fab_menu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="60dp"
             android:layout_marginEnd="@dimen/fab_margin"
-            app:borderWidth="0dp"
-            app:srcCompat="@drawable/ic_add_white_24dp"/>
+            app:menu_icon="@drawable/ic_add_white_24dp"
+            app:menu_labels_hideAnimation="@anim/fab_scale_down"
+            app:menu_labels_showAnimation="@anim/fab_scale_up">
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_new_phrase"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_note_add_white_24dp"
+                app:borderWidth="0dp"
+                app:fab_label="Add Phrase"/>
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_new_phrasebook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_library_add_white_24dp"
+                app:borderWidth="0dp"
+                app:fab_label="Create New Phrasebook"/>
+        </com.github.clans.fab.FloatingActionMenu>
 
     </android.support.design.widget.CoordinatorLayout>
 

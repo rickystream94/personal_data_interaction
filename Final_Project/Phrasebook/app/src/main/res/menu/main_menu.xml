@@ -25,7 +25,4 @@
     <item
         android:id="@+id/about"
         android:title="About"/>
-    <item
-        android:id="@+id/new_phrasebook"
-        android:title="Add New Phrasebook"/>
 </menu>

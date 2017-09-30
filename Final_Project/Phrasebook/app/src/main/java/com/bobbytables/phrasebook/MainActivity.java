@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,11 +32,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
 
@@ -46,7 +43,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private AlertDialogManager alertDialogManager = new AlertDialogManager();
     private SettingsManager settingsManager;
-    private FloatingActionButton fab;
+    private FloatingActionMenu fabMenu;
+    private com.github.clans.fab.FloatingActionButton fabAddPhrase;
+    private com.github.clans.fab.FloatingActionButton fabCreatePhrasebook;
     public static Handler killerHandler;
     private DatabaseHelper databaseHelper;
     private DrawerLayout mDrawerLayout;
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         refreshPhrasebooks();
 
         //Initialize fab
-        initFloatingActionButton();
+        initFloatingActionButtons();
     }
 
     @Override
@@ -265,10 +264,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 i = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(i);
                 break;
-            case R.id.new_phrasebook:
-                i = new Intent(getApplicationContext(), NewPhrasebookActivity.class);
-                startActivity(i);
-                break;
             default:
                 break;
         }
@@ -278,9 +273,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     /**
      * Setting floating action button with onClickListener
      */
-    private void initFloatingActionButton() {
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+    private void initFloatingActionButtons() {
+        fabMenu = (FloatingActionMenu) findViewById(R.id.fab_menu);
+        fabAddPhrase = (com.github.clans.fab.FloatingActionButton) findViewById(R.id
+                .fab_new_phrase);
+        fabCreatePhrasebook = (com.github.clans.fab.FloatingActionButton) findViewById(R.id
+                .fab_new_phrasebook);
+        fabAddPhrase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), NewPhraseActivity.class);
@@ -299,9 +298,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1Code);
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2Code);
                 startActivityForResult(i, NewPhraseActivity.REQUEST_CODE);
+                fabMenu.close(true);
             }
         });
-        fab.hide(); //by default
+        fabCreatePhrasebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), NewPhrasebookActivity.class);
+                startActivity(i);
+                fabMenu.close(true);
+            }
+        });
+        fabMenu.hideMenu(false); //by default
     }
 
     private void checkWritePermissions() {
@@ -372,15 +380,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         switch (item.getItemId()) {
             case R.id.navigation_practice:
                 fragment = new CardsFragment();
-                fab.hide();
+                fabMenu.hideMenu(true);
                 break;
             case R.id.navigation_phrasebook:
                 fragment = new PhrasesFragment();
-                fab.show();
+                fabMenu.showMenu(true);
                 break;
             case R.id.navigation_progress:
                 fragment = new ProgressFragment();
-                fab.show();
+                fabMenu.showMenu(true);
                 break;
         }
         FragmentTransaction transaction = fragmentManager.beginTransaction();

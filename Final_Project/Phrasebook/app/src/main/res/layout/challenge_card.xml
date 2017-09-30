@@ -30,7 +30,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/translate_this"
-            android:textSize="18sp"/>
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/challenge_card_lang1_phrase"
@@ -89,8 +90,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:text="@string/check"
-            android:drawableEnd="@drawable/ic_done_white_24dp"/>
+            android:drawableEnd="@drawable/ic_done_white_24dp"
+            android:text="@string/check"/>
 
         <com.hanks.htextview.HTextView
             android:id="@+id/xpText"
@@ -110,8 +111,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
+            android:drawableEnd="@drawable/ic_arrow_forward_white_24dp"
             android:text="@string/next_challenge"
-            android:visibility="invisible"
-            android:drawableEnd="@drawable/ic_arrow_forward_white_24dp"/>
+            android:visibility="invisible"/>
     </RelativeLayout>
 </android.support.v7.widget.CardView>
