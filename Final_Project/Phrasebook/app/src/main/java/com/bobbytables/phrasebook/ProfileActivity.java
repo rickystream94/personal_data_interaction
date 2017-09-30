@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -16,8 +15,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +52,8 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
 
         //Set language text
         TextView myLanguage = (TextView) findViewById(R.id.myLanguage);
-        myLanguage.setText(settingsManager.getPrefStringValue(SettingsManager.KEY_FOREIGN_LANGUAGE));
+        myLanguage.setText(settingsManager.getCurrentLanguagesNames().getAsString(SettingsManager
+                .KEY_CURRENT_LANG2_STRING));
 
         //Load profile picture
         profileImage = (CircleImageView) findViewById(R.id.profileImage);
@@ -77,8 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         ExpandableHeightGridView badgesGridView = (ExpandableHeightGridView) findViewById(R.id.badgesGridView);
         badgesGridView.setOnItemClickListener(this);
 
-        Cursor cursor = databaseHelper
-                .getDataFromTable(DatabaseHelper.TABLE_BADGES, 0, 0);
+        Cursor cursor = databaseHelper.getAllBadges();
         BadgeAdapter badgeAdapter = new BadgeAdapter(ProfileActivity.this, cursor);
         badgesGridView.setAdapter(badgeAdapter);
         badgesGridView.setExpanded(true);

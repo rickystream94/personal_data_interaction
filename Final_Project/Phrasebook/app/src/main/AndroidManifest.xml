@@ -9,6 +9,7 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -18,6 +19,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN"/>
@@ -42,6 +44,17 @@
         </activity>
         <!-- A child of the main activity -->
         <activity
+            android:name=".NewPhrasebookActivity"
+            android:label="@string/title_new_phrasebook_activity"
+            android:parentActivityName=".MainActivity">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
+        <!-- A child of the main activity -->
+        <activity
             android:name=".ProfileActivity"
             android:label="Profile"
             android:parentActivityName=".MainActivity">
@@ -52,8 +65,8 @@
                 android:value=".MainActivity"/>
         </activity>
         <activity
-            android:name=".UpdatePhraseActivity"
-            android:label="Update Phrase"
+            android:name=".EditPhraseActivity"
+            android:label="Edit Phrase"
             android:parentActivityName=".MainActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -64,6 +77,16 @@
         <activity
             android:name=".AboutActivity"
             android:label="About"
+            android:parentActivityName=".MainActivity">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
+        <activity
+            android:name=".EditPhrasebookActivity"
+            android:label="Edit Phrasebook"
             android:parentActivityName=".MainActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->

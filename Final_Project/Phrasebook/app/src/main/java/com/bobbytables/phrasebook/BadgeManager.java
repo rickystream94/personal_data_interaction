@@ -95,7 +95,7 @@ public class BadgeManager {
         String queryOneDay = "SELECT COUNT(*) FROM " + TABLE_PHRASES + " WHERE DATE" +
                 "(" + DatabaseHelper.KEY_CREATED_ON + ")='" + today + "'";
         String queryLongPhrase = "SELECT COUNT(*) FROM " + TABLE_PHRASES + " WHERE " +
-                "LENGTH(" + DatabaseHelper.KEY_FOREIGN_LANG_STRING + ")>=25";
+                "LENGTH(" + DatabaseHelper.KEY_LANG2_VALUE + ")>=25";
         String queryNight = queryOneDay +
                 " AND strftime('%H'," + CREATED_ON + ") BETWEEN '00' AND '06'";
         String query15Mins = queryOneDay + " AND " +
@@ -188,17 +188,19 @@ public class BadgeManager {
 
         //Check "High fidelity" and "Not too shabby"
         String queryInRow = "SELECT COUNT(*) FROM (SELECT * FROM " + TABLE_CHALLENGES + " ORDER BY " +
-                "" + CREATED_ON + " DESC LIMIT 10) AS A WHERE A." + CHALLENGE_CORRECT + "=";
-        String queryCorrectInRow = queryInRow + "1";
-        String queryIncorrectInRow = queryInRow + "0";
+                "" + CREATED_ON + " DESC LIMIT %d) AS A WHERE A." + CHALLENGE_CORRECT + "=%d";
+        String queryCorrectInRow = String.format(queryInRow, 20, 1);
+        String queryIncorrectInRow = String.format(queryInRow, 10, 0);
         cursor = databaseHelper.performRawQuery(queryCorrectInRow);
         if (cursor.moveToFirst()) {
-            if (cursor.getInt(0) == 20)
+            int correctInRow = cursor.getInt(0);
+            if (correctInRow == 20)
                 achievedBadgesIds.add(9);
         }
         cursor = databaseHelper.performRawQuery(queryIncorrectInRow);
         if (cursor.moveToFirst()) {
-            if (cursor.getInt(0) == 10)
+            int incorrectInRow = cursor.getInt(0);
+            if (incorrectInRow == 10)
                 achievedBadgesIds.add(10);
         }
 
