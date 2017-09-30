@@ -11,10 +11,48 @@
     tools:context="com.bobbytables.phrasebook.EditPhrasebookActivity">
 
     <TextView
-        android:id="@+id/phrasebook_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        />
+        android:padding="10dp"
+        android:text="Do you want to change the languages of the current phrasebook?"
+        android:textAlignment="center"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:text="@string/edit_phrasebook_mother_language"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/edit_phrasebook_lang1_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:inputType="textCapCharacters"
+        android:maxLength="30"
+        android:maxLines="3"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:text="@string/edit_phrasebook_foreign_language"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/edit_phrasebook_lang2_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:inputType="textCapCharacters"
+        android:maxLength="30"
+        android:maxLines="3"
+        android:textSize="18sp"/>
 </LinearLayout>

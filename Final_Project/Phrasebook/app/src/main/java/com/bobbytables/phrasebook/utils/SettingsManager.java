@@ -27,7 +27,6 @@ public class SettingsManager {
     private static final String PREF_NAME = "MyPref";
     // All Shared Preferences Keys
     private static final String KEY_USER_EXISTS = "userExists";
-    public static final String KEY_IS_FIRST_TIME = "isFirstTime";
     // User name
     public static final String KEY_NICKNAME = "nickname";
     public static final String KEY_CURRENT_LANG1 = "currentLang1Code";
@@ -83,7 +82,6 @@ public class SettingsManager {
         editor.putInt(KEY_LEVEL, 0);
         editor.putString(KEY_CREATED, currentTimeString);
         editor.putString(KEY_PROFILE_PIC, "DEFAULT"); //is updated in version 2!
-        editor.putBoolean(KEY_IS_FIRST_TIME, true);
         editor.commit();
     }
 

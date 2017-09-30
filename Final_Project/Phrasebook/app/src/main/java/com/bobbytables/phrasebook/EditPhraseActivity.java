@@ -19,6 +19,7 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
 
 public class EditPhraseActivity extends AppCompatActivity {
 
+    public static final int REQUEST_CODE = 1;
     private EditText lang1EditText;
     private EditText lang2EditText;
     private String oldLang1Value;

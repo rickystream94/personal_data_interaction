@@ -23,7 +23,6 @@ import com.bobbytables.phrasebook.utils.SettingsManager;
  */
 public class PhrasesFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
-    private static final int ACTIVITY_RESULT_CODE = 1;
     private DatabaseHelper databaseHelper;
     private String lang1Value;
     private String lang2Value;
@@ -131,7 +130,7 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         intent.putExtra(DatabaseHelper.KEY_CREATED_ON, createdOn);
         intent.putExtra(SettingsManager.KEY_CURRENT_LANG1, this.lang1Value);
         intent.putExtra(SettingsManager.KEY_CURRENT_LANG2, this.lang2Value);
-        getActivity().startActivityForResult(intent, ACTIVITY_RESULT_CODE);
+        getActivity().startActivityForResult(intent, EditPhraseActivity.REQUEST_CODE);
     }
 
     @Override
@@ -149,7 +148,8 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         switch (view.getId()) {
             case R.id.nextPage:
                 Cursor cursor = databaseHelper.performRawQuery("SELECT COUNT(*) FROM " + DatabaseHelper
-                        .TABLE_PHRASES);
+                        .TABLE_PHRASES + " WHERE " + DatabaseHelper.KEY_LANG1 + "=" + lang1Code + " AND " +
+                        "" + DatabaseHelper.KEY_LANG2 + "=" + lang2Code);
                 cursor.moveToFirst();
                 int totalRows = cursor.getInt(0);
                 currentOffset += LIMIT;

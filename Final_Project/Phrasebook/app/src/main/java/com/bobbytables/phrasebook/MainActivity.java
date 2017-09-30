@@ -56,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private FragmentManager fragmentManager;
     private BottomNavigationView navigation;
     private List<Phrasebook> allPhrasebooks;
-    private static final int EDIT_PHRASE_REQUEST_CODE = 1;
-    private static final int EDIT_PHRASEBOOK_REQUEST_CODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,15 +112,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onResume() {
         super.onResume();
-        if (settingsManager.getPrefBoolValue(SettingsManager.KEY_IS_FIRST_TIME)) {
-            Cursor cursor = databaseHelper.performRawQuery("SELECT COUNT(*) FROM " + DatabaseHelper
-                    .TABLE_PHRASES);
-            cursor.moveToFirst();
-            if (cursor.getInt(0) > 0) {
-                settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
-                refreshUi();
-            }
-        }
         refreshPhrasebooks();
     }
 
@@ -164,15 +153,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onActivityResult(requestCode, resultCode, data);
         //Update Phrase Activity request code
         switch (requestCode) {
-            case EDIT_PHRASE_REQUEST_CODE:
+            case EditPhraseActivity.REQUEST_CODE:
                 if (resultCode == RESULT_CANCELED) {
                     //It means that the database is empty and we need to refresh the layout
-                    settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
                     refreshUi();
                 }
                 break;
-            case EDIT_PHRASEBOOK_REQUEST_CODE: //TODO: to be implemented when updating/deleting
-                // phrasebook
+            case EditPhrasebookActivity.REQUEST_CODE: //TODO: to be implemented when deleting
+                if (resultCode == RESULT_OK) {
+                    refreshUi();
+                }
+                break;
+            case NewPhraseActivity.REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    refreshUi(); //It means the phrasebook is no more empty and we need to refresh
+                }
                 break;
             default:
                 break;
@@ -203,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         databaseHelper.reset();
-                        settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, true);
                         Toast.makeText(MainActivity.this, "All data successfully deleted!", Toast
                                 .LENGTH_SHORT)
                                 .show();
@@ -253,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 intent.putExtra(SettingsManager.KEY_CURRENT_LANG1, cv.getAsInteger(SettingsManager
                         .KEY_CURRENT_LANG1));
                 intent.putExtra(SettingsManager.KEY_CURRENT_LANG2, cv.getAsInteger(SettingsManager.KEY_CURRENT_LANG2));
-                startActivityForResult(intent, EDIT_PHRASEBOOK_REQUEST_CODE);
+                startActivityForResult(intent, EditPhrasebookActivity.REQUEST_CODE);
                 break;
             case R.id.about:
                 i = new Intent(MainActivity.this, AboutActivity.class);
@@ -292,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG2_STRING, lang2Value);
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG1, lang1Code);
                 i.putExtra(SettingsManager.KEY_CURRENT_LANG2, lang2Code);
-                startActivity(i);
+                startActivityForResult(i, NewPhraseActivity.REQUEST_CODE);
             }
         });
         fab.hide(); //by default

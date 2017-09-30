@@ -61,4 +61,7 @@
     <string name="new_phrasebook_lang2">Type here the new foreign language...</string>
     <string name="create_phrasebook_button">Create Phrasebook</string>
     <string name="current_language_profile">Current Language:</string>
+    <string name="edit_phrase_activity_text">Do you want to update/correct/delete this phrase/word in your phrasebook?</string>
+    <string name="edit_phrasebook_mother_language">Mother Language:</string>
+    <string name="edit_phrasebook_foreign_language">Foreign Language:</string>
 </resources>

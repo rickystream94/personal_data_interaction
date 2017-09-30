@@ -29,6 +29,9 @@ public class NewPhraseActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private AlertDialogManager alertDialogManager;
     private BadgeManager badgeManager;
+    private boolean isPhrasebookEmptyBeforeInsertion;
+    private static final int RESULT_CODE_NORMAL = 0;
+    public static final int REQUEST_CODE = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,7 @@ public class NewPhraseActivity extends AppCompatActivity {
         databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         badgeManager = BadgeManager.getInstance(getApplicationContext());
         alertDialogManager = new AlertDialogManager();
+        isPhrasebookEmptyBeforeInsertion = databaseHelper.isDatabaseEmpty(lang1Code, lang2Code);
     }
 
     @Override
@@ -73,8 +77,13 @@ public class NewPhraseActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.menu_save_and_close:
-                if (saveNewPhrase())
+                if (saveNewPhrase()) {
+                    if (isPhrasebookEmptyBeforeInsertion)
+                        setResult(RESULT_OK); //Used to inform MainActivity to refresh UI
+                    else
+                        setResult(RESULT_CODE_NORMAL);
                     finish();
+                }
                 break;
             default:
                 break;

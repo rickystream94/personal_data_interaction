@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.bobbytables.phrasebook.EditPhrasebookActivity;
 import com.bobbytables.phrasebook.Phrasebook;
 import com.bobbytables.phrasebook.utils.CSVUtils;
 import com.bobbytables.phrasebook.utils.DateUtil;
@@ -180,7 +181,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             settingsManager.updatePrefValue(SettingsManager.KEY_LEVEL, 0);
             settingsManager.updatePrefValue(SettingsManager.KEY_PROFILE_PIC, "DEFAULT");
             settingsManager.updatePrefValue(SettingsManager.KEY_CREATED, DateUtil.getCurrentTimestamp());
-            settingsManager.updatePrefValue(SettingsManager.KEY_IS_FIRST_TIME, false);
         }
 
         Log.e(TAG, "Updating table from " + oldVersion + " to " + newVersion);
@@ -677,8 +677,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         return database.rawQuery("SELECT ID AS _id,* FROM " + TABLE_PHRASES + " WHERE " + KEY_LANG1 + "=" + lang1Code + " AND " +
                 "" + KEY_LANG2 + "=" + lang2Code + " AND " +
-                "" + KEY_LANG1_VALUE + " LIKE ? OR " + KEY_LANG2_VALUE + " " +
-                "LIKE ?", new String[]{"%" + query + "%", "%" + query + "%"});
+                "(" + KEY_LANG1_VALUE + " LIKE ? OR " + KEY_LANG2_VALUE + " " +
+                "LIKE ?)", new String[]{"%" + query + "%", "%" + query + "%"});
     }
 
     public ContentValues getChallengesStats(int lang1Code, int lang2Code) {
@@ -815,21 +815,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * This method creates a new phrasebook row in the proper table, and checks if the languages
-     * already exist, otherwise it creates new rows in the languages table.
+     * When creating a new phrasebook or editing an existing one, we need to check if the
+     * specified languages already exist or not in the TABLE_LANGUAGES, and eventually include
+     * them in order to get their language codes.
      *
      * @param language1
      * @param language2
-     * @throws Exception
+     * @return hash map with key-value pairs of type language_name - language_code
      */
-    public void createPhrasebook(String language1, String language2) throws Exception {
+    public HashMap<String, Integer> addNewLanguages(String language1, String language2) {
+        ContentValues cv;
         SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues cv = new ContentValues();
+        HashMap<String, Integer> langCodes = new HashMap<>();
         Cursor cursor;
         String getLangIdQuery = "SELECT " + KEY_LANG_ID + " FROM " + TABLE_LANGUAGES + " WHERE " +
                 "" + KEY_LANG_NAME + "=?";
-        HashMap<String, Integer> langCodes = new HashMap<>();
         for (String lang : new String[]{language1, language2}) {
+            cv = new ContentValues();
             boolean gotId = false;
             while (!gotId) {
                 cursor = db.rawQuery(getLangIdQuery, new String[]{lang});
@@ -840,23 +842,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     gotId = true;
                     langCodes.put(lang, cursor.getInt(cursor.getColumnIndexOrThrow(KEY_LANG_ID)));
                 }
+                cursor.close();
             }
         }
+        return langCodes;
+    }
 
-        cv = new ContentValues();
+    /**
+     * This method creates a new phrasebook row in the proper table, and checks if the languages
+     * already exist, otherwise it creates new rows in the languages table.
+     *
+     * @param language1
+     * @param language2
+     * @throws Exception If trying to add an already existing phrasebook
+     */
+    public void createPhrasebook(String language1, String language2) throws Exception {
+        SQLiteDatabase db = this.getReadableDatabase();
+        HashMap<String, Integer> langCodes = addNewLanguages(language1, language2);
+
+        ContentValues cv = new ContentValues();
         cv.put(KEY_BOOK_LANG1, langCodes.get(language1));
         cv.put(KEY_BOOK_LANG2, langCodes.get(language2));
 
-        cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKS + " WHERE " + KEY_BOOK_LANG1 + "=" + langCodes.get(language1) +
-                " AND " + KEY_BOOK_LANG2 + "=" + langCodes.get(language2), null);
-        if (!cursor.moveToFirst()) {
+        if (!phrasebookAlreadyExists(cv)) {
             db.insertOrThrow(TABLE_BOOKS, null, cv);
-            cursor.close();
         } else {
-            cursor.close();
             throw new Exception("A phrasebook for " + language1 + " - " + language2 + " is already " +
                     "existing!");
         }
+    }
+
+    /**
+     * Checks if a phrasebook specified by the languages in the ContentValues object is already
+     * existing in the DB. Keys refer to column names
+     *
+     * @param cv
+     * @return
+     */
+    public boolean phrasebookAlreadyExists(ContentValues cv) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKS + " WHERE " + KEY_BOOK_LANG1 +
+                "=" + cv.getAsInteger(KEY_BOOK_LANG1) +
+                " AND " + KEY_BOOK_LANG2 + "=" + cv.getAsInteger(KEY_BOOK_LANG2), null);
+        boolean result;
+        result = cursor.moveToFirst();
+        cursor.close();
+        return result;
     }
 
     /**
@@ -877,5 +908,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return allPhrasebooks;
+    }
+
+    /**
+     * Updates the current phrasebook with the new languages. Automatically creates new rows for
+     * new languages in the corresponding table
+     *
+     * @param oldLang1
+     * @param oldLang2
+     * @param newLanguage1
+     * @param newLanguage2
+     * @return
+     * @throws Exception
+     */
+    public int updatePhrasebook(int oldLang1, int oldLang2, String newLanguage1, String
+            newLanguage2) throws Exception {
+        SQLiteDatabase db = this.getReadableDatabase();
+        HashMap<String, Integer> langCodes = addNewLanguages(newLanguage1, newLanguage2);
+
+        ContentValues cvPhrasebookUpdate = new ContentValues();
+        cvPhrasebookUpdate.put(KEY_BOOK_LANG1, langCodes.get(newLanguage1));
+        cvPhrasebookUpdate.put(KEY_BOOK_LANG2, langCodes.get(newLanguage2));
+
+        ContentValues cvPhrasesUpdate = new ContentValues();
+        cvPhrasesUpdate.put(KEY_LANG1, langCodes.get(newLanguage1));
+        cvPhrasesUpdate.put(KEY_LANG2, langCodes.get(newLanguage2));
+
+        if (!phrasebookAlreadyExists(cvPhrasebookUpdate)) {
+            int affectedPhrasebooks = db.update(TABLE_BOOKS, cvPhrasebookUpdate, KEY_BOOK_LANG1 + "=" + oldLang1 + " AND" +
+                    " " +
+                    "" + KEY_BOOK_LANG2 + "=" + oldLang2, null);
+            int affectedPhrases = db.update(TABLE_PHRASES, cvPhrasesUpdate,
+                    KEY_LANG1 + "=" + oldLang1 + " AND " + KEY_LANG2 + "=" + oldLang2, null);
+            //Update current languages before returning
+            SettingsManager settingsManager = SettingsManager.getInstance(context);
+            settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG1, langCodes.get(newLanguage1));
+            settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG2, langCodes.get
+                    (newLanguage2));
+            return affectedPhrasebooks;
+        } else {
+            throw new Exception("A phrasebook for " + newLanguage1 + " - " + newLanguage2 + " is already " +
+                    "existing!");
+        }
+    }
+
+    public void deletePhrasebook(int lang1, int oldLang2) {
+
     }
 }
