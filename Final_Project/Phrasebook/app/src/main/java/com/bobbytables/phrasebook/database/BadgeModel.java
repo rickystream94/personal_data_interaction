@@ -21,21 +21,16 @@ public class BadgeModel implements DatabaseModel {
         this.createdOn = "";
     }
 
-    public BadgeModel(int badgeId, String badgeName, String description, String createdOn, String
-            tableName) {
+    public BadgeModel(int badgeId, String createdOn, String tableName) {
         this.badgeId = badgeId;
         this.createdOn = createdOn;
-        this.badgeName = badgeName;
         this.tableName = tableName;
-        this.description = description;
+        this.badgeName = "";
+        this.description = "";
     }
 
-    public BadgeModel(int badgeId, String badgeName, String description, String tableName) {
-        this.createdOn = "";
-        this.badgeId = badgeId;
-        this.badgeName = badgeName;
-        this.tableName = tableName;
-        this.description = description;
+    public int getBadgeId() {
+        return this.badgeId;
     }
 
     @Override
@@ -45,8 +40,10 @@ public class BadgeModel implements DatabaseModel {
             contentValues.put(DatabaseHelper.KEY_BADGES_ID, this.badgeId);
         if (!this.createdOn.equals(""))
             contentValues.put(DatabaseHelper.KEY_CREATED_ON, this.createdOn);
-        contentValues.put(DatabaseHelper.KEY_BADGE_NAME, this.badgeName);
-        contentValues.put(DatabaseHelper.KEY_BADGE_DESCRIPTION, this.description);
+        if (!this.badgeName.equals(""))
+            contentValues.put(DatabaseHelper.KEY_BADGE_NAME, this.badgeName);
+        if (!this.description.equals(""))
+            contentValues.put(DatabaseHelper.KEY_BADGE_DESCRIPTION, this.description);
         return contentValues;
     }
 

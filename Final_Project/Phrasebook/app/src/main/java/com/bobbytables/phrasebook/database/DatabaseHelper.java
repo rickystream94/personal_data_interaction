@@ -81,8 +81,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_PHRASES_TABLE = "CREATE TABLE " + TABLE_PHRASES +
             "(" +
             KEY_PHRASE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
-            KEY_LANG1 + " TEXT, " +
-            KEY_LANG2 + " TEXT, " +
+            KEY_LANG1 + " INTEGER, " +
+            KEY_LANG2 + " INTEGER, " +
             KEY_LANG1_VALUE + " TEXT, " +
             KEY_LANG2_VALUE + " TEXT, " +
             KEY_IS_MASTERED + " INTEGER, " +
@@ -95,19 +95,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             KEY_CHALLENGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
             KEY_CHALLENGE_PHRASE_ID + " INTEGER REFERENCES " + TABLE_PHRASES + ", " + // Define
             // a foreign key
-            KEY_CHALLENGE_CORRECT + " INTEGER T, " +
+            KEY_CHALLENGE_CORRECT + " INTEGER, " +
             KEY_CREATED_ON + " TEXT)";
 
-    private static final String CREATE_LANGUAGES_TABLE = "CREATE TABLE " + TABLE_LANGUAGES +
+    private static final String CREATE_LANGUAGES_TABLE = "CREATE TABLE IF NOT EXISTS " +
+            TABLE_LANGUAGES +
             " (" + KEY_LANG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             KEY_LANG_NAME + " TEXT)";
 
-    private static final String CREATE_BOOKS_TABLE = "CREATE TABLE " + TABLE_BOOKS +
+    private static final String CREATE_BOOKS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BOOKS +
             " (" + KEY_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             KEY_BOOK_LANG1 + " INTEGER, " +
             KEY_BOOK_LANG2 + " INTEGER)";
 
-    private static final String CREATE_BADGES_TABLE = "CREATE TABLE " + TABLE_BADGES +
+    private static final String CREATE_BADGES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BADGES +
             "(" +
             KEY_BADGES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
             KEY_BADGE_NAME + " TEXT, " +
@@ -194,16 +195,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Names of language preferences have changed, need to update the names and insert the
         // languages in the proper table!
         SettingsManager settingsManager = SettingsManager.getInstance(context);
-        if (newVersion == 3) {
+        if (newVersion >= 3) {
             //Get previous languages
-            String currentLang1 = settingsManager.getPrefStringValue("motherLanguage");
-            String currentLang2 = settingsManager.getPrefStringValue("foreignLanguage");
+            String currentLang1String = settingsManager.getPrefStringValue("motherLanguage");
+            String currentLang2String = settingsManager.getPrefStringValue("foreignLanguage");
 
             //We need to update the columns in the new phrases table with these two values
             ContentValues cv1 = new ContentValues();
             ContentValues cv2 = new ContentValues();
-            cv1.put(KEY_LANG_NAME, currentLang1);
-            cv2.put(KEY_LANG_NAME, currentLang2);
+            cv1.put(KEY_LANG_NAME, currentLang1String);
+            cv2.put(KEY_LANG_NAME, currentLang2String);
             db.insertOrThrow(TABLE_LANGUAGES, null, cv1);
             db.insertOrThrow(TABLE_LANGUAGES, null, cv2);
             ContentValues updateCv = new ContentValues();
@@ -223,9 +224,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //Delete old keys
             settingsManager.updatePrefValue("motherLanguage", null);
             settingsManager.updatePrefValue("foreignLanguage", null);
-        }
-        //We need to insert the current couple lang1-lang2 as the first row in the BOOKS table
-        if (newVersion == 4) {
+
+            //We need to insert the current couple lang1-lang2 as the first row in the BOOKS table
             int currentLang1 = settingsManager.getPrefIntValue(SettingsManager
                     .KEY_CURRENT_LANG1);
             int currentLang2 = settingsManager.getPrefIntValue(SettingsManager
@@ -303,10 +303,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @throws Exception if the data row already exists in the DB
      */
     public void insertRow(DatabaseModel dataObject) throws Exception {
-        if (dataObject.getTableName().equals(TABLE_PHRASES))
+        SQLiteDatabase database = this.getWritableDatabase();
+        if (dataObject.getTableName().equals(TABLE_PHRASES)) {
             if (phraseAlreadyExists(dataObject))
                 throw new Exception("Error! Record already existing!");
-        SQLiteDatabase database = this.getWritableDatabase();
+        }
+        if (dataObject.getTableName().equals(TABLE_BADGES)) {
+            database.update(TABLE_BADGES, dataObject.getContentValues(),
+                    KEY_BADGES_ID + "=" + ((BadgeModel) dataObject).getBadgeId(), null);
+            Log.d(TAG, "Updated existing record in table " + dataObject.getTableName());
+            return;
+        }
         long id = database.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
         Log.d(TAG, String.format("Saved new record in table " + dataObject.getTableName() + " " +
                 "with ID: %d", id));
@@ -526,9 +533,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PHRASES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BADGES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHALLENGES);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LANGUAGES);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKS);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_LANGUAGES);
         onCreate(db);
+    }
+
+    public void deleteFromTable(String table) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + table);
     }
 
     public JSONArray getAllDataFromTable(String tableName) {

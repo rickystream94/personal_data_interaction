@@ -142,8 +142,10 @@ public class FileManager {
         JSONArray json_badges = jsonBackup.getJSONArray(DatabaseHelper.TABLE_BADGES);
         JSONArray json_languages = jsonBackup.getJSONArray(DatabaseHelper.TABLE_LANGUAGES);
         JSONArray json_phrasebooks = jsonBackup.getJSONArray(DatabaseHelper.TABLE_BOOKS);
+        JSONArray json_user = jsonBackup.getJSONArray("user");
 
         //Restore Phrases
+        Log.d(TAG, "Restoring phrases...");
         for (int i = 0; i < json_phrases.length(); i++) {
             JSONObject obj = json_phrases.getJSONObject(i);
             String lang1Value = obj.getString(DatabaseHelper.KEY_LANG1_VALUE);
@@ -160,6 +162,7 @@ public class FileManager {
         }
 
         //Restore challenges
+        Log.d(TAG, "Restoring challenges...");
         for (int i = 0; i < json_challenges.length(); i++) {
             JSONObject obj = json_challenges.getJSONObject(i);
             int phraseId = obj.getInt(DatabaseHelper.KEY_CHALLENGE_PHRASE_ID);
@@ -172,23 +175,22 @@ public class FileManager {
         }
 
         //Restore badges
+        Log.d(TAG, "Restoring badges...");
         for (int i = 0; i < json_badges.length(); i++) {
             JSONObject obj = json_badges.getJSONObject(i);
             int badgeId = obj.getInt(DatabaseHelper.KEY_BADGES_ID);
-            String badgeName = obj.getString(DatabaseHelper.KEY_BADGE_NAME);
-            String badgeDesc = obj.getString(DatabaseHelper.KEY_BADGE_DESCRIPTION);
             String createdOn = obj.has(DatabaseHelper.KEY_CREATED_ON) ? obj.getString
                     (DatabaseHelper.KEY_CREATED_ON) : null;
             DatabaseModel databaseModel;
-            if (createdOn != null)
-                databaseModel = new BadgeModel(badgeId, badgeName, badgeDesc, createdOn, DatabaseHelper.TABLE_BADGES);
-            else
-                databaseModel = new BadgeModel(badgeId, badgeName, badgeDesc, DatabaseHelper
-                        .TABLE_BADGES);
-            databaseHelper.insertRow(databaseModel);
+            if (createdOn != null) {
+                databaseModel = new BadgeModel(badgeId, createdOn, DatabaseHelper.TABLE_BADGES);
+                databaseHelper.insertRow(databaseModel);
+            }
         }
 
         //Restore languages
+        Log.d(TAG, "Restoring languages...");
+        databaseHelper.deleteFromTable(DatabaseHelper.TABLE_LANGUAGES);
         for (int i = 0; i < json_languages.length(); i++) {
             JSONObject obj = json_languages.getJSONObject(i);
             int langId = obj.getInt(DatabaseHelper.KEY_LANG_ID);
@@ -198,7 +200,9 @@ public class FileManager {
             databaseHelper.insertRow(databaseModel);
         }
 
-        //Restore languages
+        //Restore phrasebooks
+        Log.d(TAG, "Restoring phrasebooks...");
+        databaseHelper.deleteFromTable(DatabaseHelper.TABLE_BOOKS);
         for (int i = 0; i < json_phrasebooks.length(); i++) {
             JSONObject obj = json_phrasebooks.getJSONObject(i);
             int bookId = obj.getInt(DatabaseHelper.KEY_BOOK_ID);
@@ -208,6 +212,21 @@ public class FileManager {
                     .TABLE_BOOKS);
             databaseHelper.insertRow(databaseModel);
         }
+
+        //Restore user data
+        Log.d(TAG, "Restoring user data...");
+        JSONObject obj = json_user.getJSONObject(0); //There will always be only one JsonObject
+        String nickname = obj.getString(SettingsManager.KEY_NICKNAME);
+        String createdOn = obj.getString(SettingsManager.KEY_CREATED);
+        int level = obj.getInt(SettingsManager.KEY_LEVEL);
+        int totalXp = obj.getInt(SettingsManager.KEY_TOTAL_XP);
+        settingsManager.resetXP();
+        settingsManager.updatePrefValue(SettingsManager.KEY_NICKNAME, nickname);
+        settingsManager.updatePrefValue(SettingsManager.KEY_CREATED, createdOn);
+        settingsManager.addValue(SettingsManager.KEY_TOTAL_XP, totalXp);
+        settingsManager.addValue(SettingsManager.KEY_LEVEL, level);
+
+        Log.d(TAG, "Backup restore completed successfully!");
     }
 
     private static File lastFileModified(File directory) {

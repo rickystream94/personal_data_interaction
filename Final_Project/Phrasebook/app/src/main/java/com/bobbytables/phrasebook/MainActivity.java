@@ -47,13 +47,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private SettingsManager settingsManager;
     private FileManager fileManager;
     private FloatingActionMenu fabMenu;
-    private com.github.clans.fab.FloatingActionButton fabAddPhrase;
-    private com.github.clans.fab.FloatingActionButton fabCreatePhrasebook;
-    public static Handler killerHandler;
     private DatabaseHelper databaseHelper;
     private DrawerLayout mDrawerLayout;
-    private ListView drawerList;
-    private ActionBarDrawerToggle mDrawerToggle;
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private BottomNavigationView navigation;
@@ -71,21 +66,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         settingsManager = SettingsManager.getInstance(getApplicationContext());
         fileManager = FileManager.getInstance(getApplicationContext());
 
-        //Initialize the killer handler, such that another activity can kill the current one
-        killerHandler = new Handler() {
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case 0:
-                        finish();
-                        break;
-                }
-            }
-        };
-
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity
-        settingsManager.createUserProfile();
+        settingsManager.createUserProfile(this);
 
         //Get fragment manager and add default fragment
         fragmentManager = getSupportFragmentManager();
@@ -100,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         //Initialize drawer
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, toolbar, R
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, toolbar, R
                 .string.navigation_drawer_open, R.string.navigation_drawer_close);
 
         //Initialize bottom navigation
@@ -134,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         String[] names = new String[allPhrasebooks.size()];
         for (PhrasebookModel phrasebook : allPhrasebooks)
             names[allPhrasebooks.indexOf(phrasebook)] = phrasebook.toString();
-        drawerList = (ListView) findViewById(R.id.left_drawer);
+        ListView drawerList = (ListView) findViewById(R.id.left_drawer);
         drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, R.id
                 .drawer_list_item_id, names));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -240,10 +223,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         importDataFromBackup();
-                        List<PhrasebookModel> phrasebookModels = databaseHelper.getAllPhrasebooks();
-                        switchToPhrasebook(phrasebookModels.get(0));
                         Toast.makeText(MainActivity.this, "All data successfully restored from " +
-                                "backup!", Toast
+                                "latest backup!", Toast
                                 .LENGTH_LONG)
                                 .show();
                     }
@@ -305,9 +286,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
      */
     private void initFloatingActionButtons() {
         fabMenu = (FloatingActionMenu) findViewById(R.id.fab_menu);
-        fabAddPhrase = (com.github.clans.fab.FloatingActionButton) findViewById(R.id
+        com.github.clans.fab.FloatingActionButton fabAddPhrase = (com.github.clans.fab.FloatingActionButton) findViewById(R.id
                 .fab_new_phrase);
-        fabCreatePhrasebook = (com.github.clans.fab.FloatingActionButton) findViewById(R.id
+        com.github.clans.fab.FloatingActionButton fabCreatePhrasebook = (com.github.clans.fab.FloatingActionButton) findViewById(R.id
                 .fab_new_phrasebook);
         fabAddPhrase.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -350,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private boolean hasReadPermission() {
         return ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED;
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -411,6 +392,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
         try {
             fileManager.importDataFromBackup();
+            List<PhrasebookModel> phrasebookModels = databaseHelper.getAllPhrasebooks();
+            switchToPhrasebook(phrasebookModels.get(0));
+            refreshPhrasebooks();
         } catch (Exception ex) {
             alertDialogManager.showAlertDialog(this, "Import Error!", ex.getMessage(), false);
         }
