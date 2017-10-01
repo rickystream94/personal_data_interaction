@@ -6,29 +6,21 @@ import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.bobbytables.phrasebook.EditPhrasebookActivity;
-import com.bobbytables.phrasebook.Phrasebook;
 import com.bobbytables.phrasebook.utils.CSVUtils;
 import com.bobbytables.phrasebook.utils.DateUtil;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,7 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Database info
     private static final String DATABASE_NAME = "phrasebookDatabase";
     private static final int DATABASE_VERSION = 4; //Updated to version 3: multi-language support
-    private static final String TAG = DatabaseHelper.class.getName();
+    private static final String TAG = DatabaseHelper.class.getSimpleName();
     private Context context;
     private CSVUtils csvUtils;
     private static final String BADGES_CSV = "badges.csv";
@@ -52,9 +44,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_LANGUAGES = "languages";
     public static final String TABLE_BOOKS = "books";
 
-    // Phrases Table Columns //TODO: alter table phrases to remove keys lang1/lang2 and use
+    // Phrases Table Columns
+    // TODO: alter table phrases to remove keys lang1/lang2 and use
     // instead Phrasebook ID, as this contains already lang1/lang2 (foreign key).
-    private static final String KEY_PHRASE_ID = "id";
+    public static final String KEY_PHRASE_ID = "id";
     public static final String KEY_LANG1 = "lang1Code";
     public static final String KEY_LANG2 = "lang2Code";
     public static final String KEY_LANG1_VALUE = "lang1Value";
@@ -69,11 +62,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String KEY_CHALLENGE_CORRECT = "correct";
 
     //Languages Table Columns
-    private static final String KEY_LANG_ID = "id";
-    private static final String KEY_LANG_NAME = "languageName";
+    public static final String KEY_LANG_ID = "id";
+    public static final String KEY_LANG_NAME = "languageName";
 
     //Books table columns
-    private static final String KEY_BOOK_ID = "id";
+    public static final String KEY_BOOK_ID = "id";
     public static final String KEY_BOOK_LANG1 = "lang1";
     public static final String KEY_BOOK_LANG2 = "lang2";
 
@@ -88,8 +81,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_PHRASES_TABLE = "CREATE TABLE " + TABLE_PHRASES +
             "(" +
             KEY_PHRASE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
-            KEY_LANG1 + " TEXT, " +
-            KEY_LANG2 + " TEXT, " +
+            KEY_LANG1 + " INTEGER, " +
+            KEY_LANG2 + " INTEGER, " +
             KEY_LANG1_VALUE + " TEXT, " +
             KEY_LANG2_VALUE + " TEXT, " +
             KEY_IS_MASTERED + " INTEGER, " +
@@ -102,19 +95,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             KEY_CHALLENGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
             KEY_CHALLENGE_PHRASE_ID + " INTEGER REFERENCES " + TABLE_PHRASES + ", " + // Define
             // a foreign key
-            KEY_CHALLENGE_CORRECT + " INTEGER T, " +
+            KEY_CHALLENGE_CORRECT + " INTEGER, " +
             KEY_CREATED_ON + " TEXT)";
 
-    private static final String CREATE_LANGUAGES_TABLE = "CREATE TABLE " + TABLE_LANGUAGES +
+    private static final String CREATE_LANGUAGES_TABLE = "CREATE TABLE IF NOT EXISTS " +
+            TABLE_LANGUAGES +
             " (" + KEY_LANG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             KEY_LANG_NAME + " TEXT)";
 
-    private static final String CREATE_BOOKS_TABLE = "CREATE TABLE " + TABLE_BOOKS +
+    private static final String CREATE_BOOKS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BOOKS +
             " (" + KEY_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             KEY_BOOK_LANG1 + " INTEGER, " +
             KEY_BOOK_LANG2 + " INTEGER)";
 
-    private static final String CREATE_BADGES_TABLE = "CREATE TABLE " + TABLE_BADGES +
+    private static final String CREATE_BADGES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BADGES +
             "(" +
             KEY_BADGES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // Define a primary key
             KEY_BADGE_NAME + " TEXT, " +
@@ -201,16 +195,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Names of language preferences have changed, need to update the names and insert the
         // languages in the proper table!
         SettingsManager settingsManager = SettingsManager.getInstance(context);
-        if (newVersion == 3) {
+        if (newVersion >= 3) {
             //Get previous languages
-            String currentLang1 = settingsManager.getPrefStringValue("motherLanguage");
-            String currentLang2 = settingsManager.getPrefStringValue("foreignLanguage");
+            String currentLang1String = settingsManager.getPrefStringValue("motherLanguage");
+            String currentLang2String = settingsManager.getPrefStringValue("foreignLanguage");
 
             //We need to update the columns in the new phrases table with these two values
             ContentValues cv1 = new ContentValues();
             ContentValues cv2 = new ContentValues();
-            cv1.put(KEY_LANG_NAME, currentLang1);
-            cv2.put(KEY_LANG_NAME, currentLang2);
+            cv1.put(KEY_LANG_NAME, currentLang1String);
+            cv2.put(KEY_LANG_NAME, currentLang2String);
             db.insertOrThrow(TABLE_LANGUAGES, null, cv1);
             db.insertOrThrow(TABLE_LANGUAGES, null, cv2);
             ContentValues updateCv = new ContentValues();
@@ -230,9 +224,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //Delete old keys
             settingsManager.updatePrefValue("motherLanguage", null);
             settingsManager.updatePrefValue("foreignLanguage", null);
-        }
-        //We need to insert the current couple lang1-lang2 as the first row in the BOOKS table
-        if (newVersion == 4) {
+
+            //We need to insert the current couple lang1-lang2 as the first row in the BOOKS table
             int currentLang1 = settingsManager.getPrefIntValue(SettingsManager
                     .KEY_CURRENT_LANG1);
             int currentLang2 = settingsManager.getPrefIntValue(SettingsManager
@@ -309,13 +302,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param dataObject either a new phrase or challenge data row
      * @throws Exception if the data row already exists in the DB
      */
-    public void insertRecord(DatabaseModel dataObject) throws Exception {
-        if (dataObject.getTableName().equals(TABLE_PHRASES))
+    public void insertRow(DatabaseModel dataObject) throws Exception {
+        SQLiteDatabase database = this.getWritableDatabase();
+        if (dataObject.getTableName().equals(TABLE_PHRASES)) {
             if (phraseAlreadyExists(dataObject))
                 throw new Exception("Error! Record already existing!");
-        SQLiteDatabase database = this.getWritableDatabase();
+        }
+        if (dataObject.getTableName().equals(TABLE_BADGES)) {
+            database.update(TABLE_BADGES, dataObject.getContentValues(),
+                    KEY_BADGES_ID + "=" + ((BadgeModel) dataObject).getBadgeId(), null);
+            Log.d(TAG, "Updated existing record in table " + dataObject.getTableName());
+            return;
+        }
         long id = database.insertOrThrow(dataObject.getTableName(), null, dataObject.getContentValues());
-        Log.d("DB", String.format("Saved new record in table " + dataObject.getTableName() + " with ID: %d", id));
+        Log.d(TAG, String.format("Saved new record in table " + dataObject.getTableName() + " " +
+                "with ID: %d", id));
     }
 
     /**
@@ -532,75 +533,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PHRASES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BADGES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHALLENGES);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKS);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_LANGUAGES);
         onCreate(db);
     }
 
-    public void exportToJSON(Context context) {
-        String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date());
-        JSONObject obj = createJsonDump();
-
-        File savePath;
-        String fileName = String.format("PhrasebookDump_%s.json", currentTimeString);
-        savePath = new File(Environment.getExternalStoragePublicDirectory(Environment
-                .DIRECTORY_DOWNLOADS), "Phrasebook_Exports");
-
-        if (!savePath.exists()) {
-            if (!savePath.mkdirs()) {
-                Log.d("EXPORT ERROR", "Could not create directory!");
-            }
-        }
-
-        File file = new File(savePath, fileName);
-        if (file.exists()) {
-            Log.d("EXPORT", "File already exists!");
-        }
-
-        Log.d("SAVING", savePath.getAbsolutePath() + "/" + fileName);
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            out.write(obj.toString().getBytes());
-            out.flush();
-            out.close();
-            Log.i("EXPORT", "File saved!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void deleteFromTable(String table) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + table);
     }
 
-    public JSONObject createJsonDump() {
-        JSONObject obj = new JSONObject();
-        try {
-            JSONArray json_phrases = getAllDataFromTable(TABLE_PHRASES);
-            JSONArray json_challenges = getAllDataFromTable(TABLE_CHALLENGES);
-            JSONArray json_badges = getAllDataFromTable(TABLE_BADGES);
-            JSONArray json_phrasebooks = getAllDataFromTable(TABLE_BOOKS);
-            JSONArray json_languages = getAllDataFromTable(TABLE_LANGUAGES);
-            JSONArray json_user = getUserData(context);
-            obj.put("phrases", json_phrases);
-            obj.put("phrasebooks", json_phrasebooks);
-            obj.put("languages", json_languages);
-            obj.put("challenges", json_challenges);
-            obj.put("badges", json_badges);
-            obj.put("user", json_user);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return obj;
-    }
-
-    private JSONArray getUserData(Context context) throws JSONException {
-        JSONArray resultSet = new JSONArray();
-        SettingsManager settingsManager = SettingsManager.getInstance(context);
-        JSONObject rowObject = settingsManager.getUserData();
-        resultSet.put(rowObject);
-        Log.d("USER DATA DUMP:", resultSet.toString());
-        return resultSet;
-    }
-
-    private JSONArray getAllDataFromTable(String tablename) {
+    public JSONArray getAllDataFromTable(String tableName) {
 
         SQLiteDatabase database = this.getWritableDatabase();
-        String searchQuery = "SELECT  * FROM " + tablename;
+        String searchQuery = "SELECT  * FROM " + tableName;
         Cursor cursor = database.rawQuery(searchQuery, null);
 
         JSONArray resultSet = new JSONArray();
@@ -623,9 +569,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 rowObject.put(cursor.getColumnName(i), cursor.getString(i));
                                 break;
                             case Cursor.FIELD_TYPE_NULL:
-                                throw new Exception("Unhandled data type stored in the DB!");
+                                throw new Exception("Unhandled data type stored in the DB for " +
+                                        "column " + cursor.getColumnName(i) + " in table " +
+                                        "" + tableName + "!");
                             default:
-                                throw new Exception("Unhandled data type stored in the DB!");
+                                throw new Exception("Unhandled data type stored in the DB for " +
+                                        "column " + cursor.getColumnName(i) + " in table " +
+                                        "" + tableName + "!");
                         }
                     } catch (Exception e) {
                         Log.e("Column export error!", e.getMessage());
@@ -636,7 +586,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
         cursor.close();
-        Log.d(String.format("DB DUMP: %s", tablename), resultSet.toString());
+        Log.d(String.format("DB DUMP: %s", tableName), resultSet.toString());
         return resultSet;
     }
 
@@ -896,15 +846,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @return
      */
-    public List<Phrasebook> getAllPhrasebooks() {
+    public List<PhrasebookModel> getAllPhrasebooks() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKS, null);
-        List<Phrasebook> allPhrasebooks = new ArrayList<>();
+        List<PhrasebookModel> allPhrasebooks = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 int langId1 = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BOOK_LANG1));
                 int langId2 = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BOOK_LANG2));
-                allPhrasebooks.add(new Phrasebook(langId1, langId2, context));
+                allPhrasebooks.add(new PhrasebookModel(langId1, langId2, context));
             } while (cursor.moveToNext());
         }
         cursor.close();

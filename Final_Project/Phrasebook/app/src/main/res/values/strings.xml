@@ -60,4 +60,11 @@
     <string name="edit_phrase_activity_text">Do you want to update/correct/delete this phrase/word in your phrasebook?</string>
     <string name="edit_phrasebook_mother_language">Mother Language:</string>
     <string name="edit_phrasebook_foreign_language">Foreign Language:</string>
+    <string name="main_menu_profile">Profile</string>
+    <string name="main_menu_edit_phrasebook">Edit Phrasebook</string>
+    <string name="main_menu_export_data">Export Data</string>
+    <string name="main_menu_import_data">Import Data</string>
+    <string name="main_menu_delete_data">Delete Data</string>
+    <string name="main_menu_reset_xp">Reset XP</string>
+    <string name="main_menu_about">About</string>
 </resources>
