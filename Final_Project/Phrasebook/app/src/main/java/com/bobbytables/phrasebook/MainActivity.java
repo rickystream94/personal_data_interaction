@@ -33,7 +33,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.bobbytables.phrasebook.database.PhrasebookModel;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
+import com.bobbytables.phrasebook.utils.FileManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private AlertDialogManager alertDialogManager = new AlertDialogManager();
     private SettingsManager settingsManager;
+    private FileManager fileManager;
     private FloatingActionMenu fabMenu;
     private com.github.clans.fab.FloatingActionButton fabAddPhrase;
     private com.github.clans.fab.FloatingActionButton fabCreatePhrasebook;
@@ -54,7 +57,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private BottomNavigationView navigation;
-    private List<Phrasebook> allPhrasebooks;
+    private List<PhrasebookModel> allPhrasebooks;
+    private static final int WRITE_PERMISSION_REQUEST_CODE = 1;
+    private static final int READ_PERMISSION_REQUEST_CODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //Get helper classes
         databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         settingsManager = SettingsManager.getInstance(getApplicationContext());
+        fileManager = FileManager.getInstance(getApplicationContext());
 
         //Initialize the killer handler, such that another activity can kill the current one
         killerHandler = new Handler() {
@@ -126,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private void refreshPhrasebooks() {
         allPhrasebooks = databaseHelper.getAllPhrasebooks();
         String[] names = new String[allPhrasebooks.size()];
-        for (Phrasebook phrasebook : allPhrasebooks)
+        for (PhrasebookModel phrasebook : allPhrasebooks)
             names[allPhrasebooks.indexOf(phrasebook)] = phrasebook.toString();
         drawerList = (ListView) findViewById(R.id.left_drawer);
         drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, R.id
@@ -134,13 +140,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Phrasebook phrasebook = allPhrasebooks.get(position);
+                PhrasebookModel phrasebook = allPhrasebooks.get(position);
                 switchToPhrasebook(phrasebook);
             }
         });
     }
 
-    private void switchToPhrasebook(Phrasebook phrasebook) {
+    private void switchToPhrasebook(PhrasebookModel phrasebook) {
         settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG1, phrasebook.getLang1Code());
         settingsManager.updatePrefValue(SettingsManager.KEY_CURRENT_LANG2, phrasebook.getLang2Code
                 ());
@@ -166,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     case RESULT_CANCELED:
                         //The current phrasebook has just been cancelled, therefore we need to
                         // switch to another phrasebook
-                        Phrasebook firstPhrasebook = databaseHelper.getAllPhrasebooks().get(0);
+                        PhrasebookModel firstPhrasebook = databaseHelper.getAllPhrasebooks().get(0);
                         switchToPhrasebook(firstPhrasebook);
                         Toast.makeText(this, "Switched to " + firstPhrasebook.toString() + " " +
                                 "phrasebook", Toast.LENGTH_SHORT).show();
@@ -199,9 +205,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         Intent i;
+        final AlertDialog.Builder alertDialog;
         switch (id) {
             case R.id.delete_data:
-                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                alertDialog = new AlertDialog.Builder(MainActivity.this);
                 alertDialog.setTitle("Are you sure?");
                 alertDialog.setMessage("All the data will be permanently deleted and cannot be " +
                         "recovered!");
@@ -223,7 +230,30 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 alertDialog.show();
                 break;
             case R.id.export_data:
-                checkWritePermissions();
+                exportData();
+                break;
+            case R.id.import_data:
+                alertDialog = new AlertDialog.Builder(MainActivity.this);
+                alertDialog.setTitle("Are you sure?");
+                alertDialog.setMessage("All the current data will be overwritten!");
+                alertDialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        importDataFromBackup();
+                        List<PhrasebookModel> phrasebookModels = databaseHelper.getAllPhrasebooks();
+                        switchToPhrasebook(phrasebookModels.get(0));
+                        Toast.makeText(MainActivity.this, "All data successfully restored from " +
+                                "backup!", Toast
+                                .LENGTH_LONG)
+                                .show();
+                    }
+                });
+                alertDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                alertDialog.show();
                 break;
             case R.id.reset_xp:
                 final AlertDialog.Builder resetAlertDialog = new AlertDialog.Builder(MainActivity
@@ -312,36 +342,22 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         fabMenu.hideMenu(false); //by default
     }
 
-    private void checkWritePermissions() {
+    private boolean hasWritePermissions() {
+        return ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
 
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
-                // We request the permission.
-                Log.e("requesting", "write external permissions");
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-            }
-        } else
-            exportData();
+    private boolean hasReadPermission() {
+        return ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
-            case 1: {
+            case WRITE_PERMISSION_REQUEST_CODE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -352,14 +368,52 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 }
                 break;
             }
+            case READ_PERMISSION_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    importDataFromBackup();
+                } else {
+                    Toast.makeText(this, "Error, permission not granted!", Toast
+                            .LENGTH_LONG).show();
+                }
+                break;
+            }
+
         }
     }
 
-    public void exportData() {
-        databaseHelper.exportToJSON(MainActivity.this);
-        Toast.makeText(this, "Exported in Downloads/Phrasebook_Exports as JSON file", Toast
-                .LENGTH_SHORT)
-                .show();
+    /**
+     * Exports all data to JSON. First checks for permission.
+     */
+    private void exportData() {
+        if (!hasWritePermissions()) {
+            // We request the permission.
+            Log.e("requesting", "write external permissions");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST_CODE);
+            return;
+        }
+        try {
+            fileManager.exportDataToJSON();
+        } catch (Exception ex) {
+            alertDialogManager.showAlertDialog(this, "Export error!", ex.getMessage(), false);
+        }
+    }
+
+    private void importDataFromBackup() {
+        if (!hasReadPermission()) {
+            // We request the permission.
+            Log.e("requesting", "read external permission");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_PERMISSION_REQUEST_CODE);
+            return;
+        }
+        try {
+            fileManager.importDataFromBackup();
+        } catch (Exception ex) {
+            alertDialogManager.showAlertDialog(this, "Import Error!", ex.getMessage(), false);
+        }
     }
 
     /**

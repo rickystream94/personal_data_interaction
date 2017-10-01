@@ -11,6 +11,9 @@ import android.content.ContentValues;
  * this interface represent a single record in a Database table.
  */
 public interface DatabaseModel {
-    public ContentValues getContentValues();
-    public String getTableName();
+    int UNSPECIFIED_ID_VALUE = -1;
+
+    ContentValues getContentValues();
+
+    String getTableName();
 }

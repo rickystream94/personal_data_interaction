@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bobbytables.phrasebook.database.DatabaseHelper;
+import com.bobbytables.phrasebook.database.PhrasebookModel;
 import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 
@@ -96,7 +96,7 @@ public class EditPhrasebookActivity extends AppCompatActivity {
      * first phrasebook in the list
      */
     private void deletePhrasebook() {
-        List<Phrasebook> phrasebookList = databaseHelper.getAllPhrasebooks();
+        List<PhrasebookModel> phrasebookList = databaseHelper.getAllPhrasebooks();
         if (phrasebookList.size() == 1) {
             //It means that the current phrasebook is the only one and can't be deleted
             alertDialogManager.showAlertDialog(EditPhrasebookActivity.this, "Error!", "You need " +
