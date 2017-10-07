@@ -7,9 +7,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +38,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
     private XPManager xpManager;
     private DatabaseHelper databaseHelper;
     private AlertDialogManager alertDialogManager = new AlertDialogManager();
+    private static final String DEFAULT_PIC = "DEFAULT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         profileImage = (CircleImageView) findViewById(R.id.profileImage);
         String path = settingsManager.getPrefStringValue(SettingsManager
                 .KEY_PROFILE_PIC);
-        if (!path.equals("DEFAULT")) {
+        if (!path.equals(DEFAULT_PIC)) {
             loadProfilePic(path);
         } else
             profileImage.setImageResource(R.drawable.camera);
@@ -130,8 +133,10 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri uri = data.getData();
-            String path = getRealPathFromURI(uri);
+            Uri originalUri = data.getData();
+            String path = getRealPathFromURI(originalUri);
+            if (path.equals(DEFAULT_PIC))
+                return; //Don't update if can't find correct pic path
             settingsManager.updatePrefValue(SettingsManager.KEY_PROFILE_PIC, path);
             Log.d("Profile Pic", "Correctly updated! " + path);
             loadProfilePic(path);
@@ -142,28 +147,43 @@ public class ProfileActivity extends AppCompatActivity implements AdapterView.On
      * Extracts full path from URI, extremely important since it's impossible to get resources
      * with URI
      *
-     * @param contentUri
+     * @param originalUri
      * @return
      */
-    public String getRealPathFromURI(Uri contentUri) {
-        String wholeID = DocumentsContract.getDocumentId(contentUri);
+    public String getRealPathFromURI(Uri originalUri) {
+        //String wholeID = DocumentsContract.getDocumentId(uri);
         // Split at colon, use second item in the array
-        String id = wholeID.split(":")[1];
+        //String id = wholeID.split(":")[1];
+        String id = originalUri.getLastPathSegment().split(":")[1];
         // where id is equal to
-        String sel = MediaStore.Images.Media._ID + "=?";
-        Cursor cursor = null;
+        String selection = MediaStore.Images.Media._ID + "=?";
+        Cursor imageCursor = null;
         try {
+            Uri uri = getUri();
             String[] column = {MediaStore.Images.Media.DATA};
-            cursor = getContentResolver().
-                    query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            column, sel, new String[]{id}, null);
-            cursor.moveToFirst();
-            return cursor.getString(0);
+            CursorLoader cursorLoader = new CursorLoader(this, uri, column, selection, new String[]{id},
+                    null);
+            imageCursor = cursorLoader.loadInBackground();
+            if (imageCursor.moveToFirst())
+                return imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            else return DEFAULT_PIC;
         } finally {
-            if (cursor != null) {
-                cursor.close();
+            if (imageCursor != null) {
+                imageCursor.close();
             }
         }
+    }
+
+    /**
+     * By using this method get the Uri of Internal/External Storage for Media
+     *
+     * @return
+     */
+    private Uri getUri() {
+        String state = Environment.getExternalStorageState();
+        if (!state.equalsIgnoreCase(Environment.MEDIA_MOUNTED))
+            return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
+        return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
     }
 
     /**
