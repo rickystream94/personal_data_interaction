@@ -164,7 +164,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
                 ().toString(), correctTranslation);
         String currentTimeString = DateUtil.getCurrentTimestamp();
         try {
-            databaseHelper.insertRecord(new ChallengeModel(phraseId, currentTimeString,
+            databaseHelper.insertRow(new ChallengeModel(phraseId, currentTimeString,
                     DatabaseHelper.TABLE_CHALLENGES, correct));
         } catch (Exception e) {
             alertDialogManager.showAlertDialog(context, "Error!", e.getMessage(), false);

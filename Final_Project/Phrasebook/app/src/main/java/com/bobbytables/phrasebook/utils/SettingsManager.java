@@ -1,15 +1,19 @@
 package com.bobbytables.phrasebook.utils;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.bobbytables.phrasebook.MainActivity;
 import com.bobbytables.phrasebook.NewUserActivity;
 import com.bobbytables.phrasebook.database.DatabaseHelper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,7 +62,7 @@ public class SettingsManager {
         return instance;
     }
 
-    public void createUserProfile() {
+    public void createUserProfile(Context parentContext) {
         boolean userProfileExists = preferences.getBoolean(KEY_USER_EXISTS, false);
         if (userProfileExists)
             return;
@@ -69,7 +73,8 @@ public class SettingsManager {
         // Starting Login Activity
         context.startActivity(i);
         //Kill main activity
-        MainActivity.killerHandler.sendEmptyMessage(0);
+        ((AppCompatActivity)parentContext).finish();
+        //MainActivity.killerHandler.sendEmptyMessage(0);
     }
 
     public void createUser(String nickname, int lang1Code, int lang2Code) {
@@ -186,15 +191,16 @@ public class SettingsManager {
      *
      * @return
      */
-    public JSONObject getUserData() throws JSONException {
-        JSONObject userData = new JSONObject();
-        userData.put(KEY_NICKNAME, getPrefStringValue(KEY_NICKNAME));
-        userData.put(KEY_CREATED, getPrefStringValue(KEY_CREATED));
-        userData.put(KEY_CURRENT_LANG1, getPrefIntValue(KEY_CURRENT_LANG1));
-        userData.put(KEY_CURRENT_LANG2, getPrefIntValue(KEY_CURRENT_LANG2));
-        userData.put(KEY_LEVEL, getPrefIntValue(KEY_LEVEL));
-        userData.put(KEY_TOTAL_XP, getPrefIntValue(KEY_TOTAL_XP));
-        return userData;
+    public JSONArray getUserData() throws JSONException {
+        JSONArray resultSet = new JSONArray();
+        JSONObject rowObject = new JSONObject();
+        rowObject.put(KEY_NICKNAME, getPrefStringValue(KEY_NICKNAME));
+        rowObject.put(KEY_CREATED, getPrefStringValue(KEY_CREATED));
+        rowObject.put(KEY_LEVEL, getPrefIntValue(KEY_LEVEL));
+        rowObject.put(KEY_TOTAL_XP, getPrefIntValue(KEY_TOTAL_XP));
+        resultSet.put(rowObject);
+        Log.d("USER DATA DUMP:", resultSet.toString());
+        return resultSet;
     }
 
     public void resetXP() {

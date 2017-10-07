@@ -125,7 +125,7 @@ public class NewPhraseActivity extends AppCompatActivity {
         }
         String currentTimeString = DateUtil.getCurrentTimestamp();
         try {
-            databaseHelper.insertRecord(new PhraseModel(addNewMotherLangPhrase.getText().toString
+            databaseHelper.insertRow(new PhraseModel(addNewMotherLangPhrase.getText().toString
                     ().trim().toLowerCase(),
                     addNewForeignLangPhrase.getText().toString().trim().toLowerCase(),
                     lang1Code, lang2Code, currentTimeString,

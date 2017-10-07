@@ -4,25 +4,28 @@
     <item
         android:id="@+id/profile"
         android:icon="@drawable/ic_person_white_24dp"
-        android:title="Profile"
+        android:title="@string/main_menu_profile"
         android2:showAsAction="always"/>
     <item
         android:id="@+id/edit_phrasebook"
         android:icon="@drawable/ic_mode_edit_white_24dp"
-        android:title="Edit Phrasebook"
+        android:title="@string/main_menu_edit_phrasebook"
         android2:showAsAction="always">
 
     </item>
     <item
         android:id="@+id/export_data"
-        android:title="Export Data"/>
+        android:title="@string/main_menu_export_data"/>
+    <item
+        android:id="@+id/import_data"
+        android:title="@string/main_menu_import_data"/>
     <item
         android:id="@+id/delete_data"
-        android:title="Delete Data"/>
+        android:title="@string/main_menu_delete_data"/>
     <item
         android:id="@+id/reset_xp"
-        android:title="Reset XP"/>
+        android:title="@string/main_menu_reset_xp"/>
     <item
         android:id="@+id/about"
-        android:title="About"/>
+        android:title="@string/main_menu_about"/>
 </menu>
