@@ -36,6 +36,9 @@ import com.bobbytables.phrasebook.utils.AlertDialogManager;
 import com.bobbytables.phrasebook.utils.FileManager;
 import com.bobbytables.phrasebook.utils.SettingsManager;
 import com.github.clans.fab.FloatingActionMenu;
+import com.crashlytics.android.Crashlytics;
+
+import io.fabric.sdk.android.Fabric;
 
 import java.util.List;
 
@@ -57,11 +60,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
         //Get helper classes
         databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
+        Crashlytics.setInt("Database Version", databaseHelper.getDatabaseVersion());
         settingsManager = SettingsManager.getInstance(getApplicationContext());
+        Crashlytics.setString(SettingsManager.KEY_NICKNAME, settingsManager.getPrefStringValue
+                (SettingsManager.KEY_NICKNAME));
         fileManager = FileManager.getInstance(getApplicationContext());
 
         //Check always if it's the first time
