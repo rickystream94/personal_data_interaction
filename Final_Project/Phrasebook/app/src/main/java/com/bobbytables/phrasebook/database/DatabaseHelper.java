@@ -31,7 +31,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
     //Database info
     private static final String DATABASE_NAME = "phrasebookDatabase";
-    private static final int DATABASE_VERSION = 4; //Updated to version 3: multi-language support
+    private static final int DATABASE_VERSION = 4;
     private static final String TAG = DatabaseHelper.class.getSimpleName();
     private Context context;
     private CSVUtils csvUtils;
@@ -195,7 +195,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Names of language preferences have changed, need to update the names and insert the
         // languages in the proper table!
         SettingsManager settingsManager = SettingsManager.getInstance(context);
-        if (newVersion >= 3) {
+        if (newVersion >= 3 && newVersion <= 4) {
             //Get previous languages
             String currentLang1String = settingsManager.getPrefStringValue("motherLanguage");
             String currentLang2String = settingsManager.getPrefStringValue("foreignLanguage");
@@ -950,5 +950,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction(); //Closes the transaction
         }
+    }
+
+    public int getDatabaseVersion() {
+        return getReadableDatabase().getVersion();
     }
 }
