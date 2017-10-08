@@ -140,8 +140,22 @@ public class FileManager {
         JSONArray json_phrases = jsonBackup.getJSONArray(DatabaseHelper.TABLE_PHRASES);
         JSONArray json_challenges = jsonBackup.getJSONArray(DatabaseHelper.TABLE_CHALLENGES);
         JSONArray json_badges = jsonBackup.getJSONArray(DatabaseHelper.TABLE_BADGES);
-        JSONArray json_languages = jsonBackup.getJSONArray(DatabaseHelper.TABLE_LANGUAGES);
-        JSONArray json_phrasebooks = jsonBackup.getJSONArray(DatabaseHelper.TABLE_BOOKS);
+        JSONArray json_languages, json_phrasebooks;
+        try {
+            json_languages = jsonBackup.getJSONArray(DatabaseHelper.TABLE_LANGUAGES);
+            json_phrasebooks = jsonBackup.getJSONArray(DatabaseHelper.TABLE_BOOKS);
+        } catch (JSONException jex) {
+            //If languages and books are not found, the backup comes from an older app version:
+            // need to manually insert data in the corresponding tables
+            json_languages = new JSONArray(); //Create empty JSON arrays that won't create any
+            // new lines in the DB
+            json_phrasebooks = new JSONArray();
+            //Insert default data
+            databaseHelper.insertRow(new LanguageModel(1, "LANGUAGE 1", DatabaseHelper.TABLE_LANGUAGES));
+            databaseHelper.insertRow(new LanguageModel(2, "LANGUAGE 2", DatabaseHelper
+                    .TABLE_LANGUAGES));
+            databaseHelper.insertRow(new PhrasebookModel(1, 1, 2, DatabaseHelper.TABLE_BOOKS));
+        }
         JSONArray json_user = jsonBackup.getJSONArray("user");
 
         //Restore Phrases
@@ -150,8 +164,16 @@ public class FileManager {
             JSONObject obj = json_phrases.getJSONObject(i);
             String lang1Value = obj.getString(DatabaseHelper.KEY_LANG1_VALUE);
             String lang2Value = obj.getString(DatabaseHelper.KEY_LANG2_VALUE);
-            int lang1Code = obj.getInt(DatabaseHelper.KEY_LANG1);
-            int lang2Code = obj.getInt(DatabaseHelper.KEY_LANG2);
+            int lang1Code, lang2Code;
+            try {
+                lang1Code = obj.getInt(DatabaseHelper.KEY_LANG1);
+                lang2Code = obj.getInt(DatabaseHelper.KEY_LANG2);
+            } catch (JSONException ex) {
+                //If the backup comes from an older app version, there's no lang code in the backup
+                //and there was only one single phrasebook
+                lang1Code = 1;
+                lang2Code = 2;
+            }
             String createdOn = obj.getString(DatabaseHelper.KEY_CREATED_ON);
             int phraseId = obj.getInt(DatabaseHelper.KEY_PHRASE_ID);
             int isMastered = obj.getInt(DatabaseHelper.KEY_IS_MASTERED);
