@@ -228,10 +228,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         importDataFromBackup();
-                        Toast.makeText(MainActivity.this, "All data successfully restored from " +
-                                "latest backup!", Toast
-                                .LENGTH_LONG)
-                                .show();
                     }
                 });
                 alertDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -400,8 +396,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             List<PhrasebookModel> phrasebookModels = databaseHelper.getAllPhrasebooks();
             switchToPhrasebook(phrasebookModels.get(0));
             refreshPhrasebooks();
+            Toast.makeText(MainActivity.this, "All data successfully restored from " +
+                    "latest backup!", Toast
+                    .LENGTH_LONG)
+                    .show();
         } catch (Exception ex) {
             alertDialogManager.showAlertDialog(this, "Import Error!", ex.getMessage(), false);
+            ex.printStackTrace();
         }
     }
 
@@ -437,7 +438,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in,
                 android.R.anim.fade_out);
-        transaction.replace(R.id.frame_layout, fragment).commit();
+        transaction.replace(R.id.frame_layout, fragment).commitAllowingStateLoss();
         return true;
     }
 

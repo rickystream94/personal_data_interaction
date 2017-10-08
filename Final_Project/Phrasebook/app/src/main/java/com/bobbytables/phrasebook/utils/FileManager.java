@@ -150,11 +150,6 @@ public class FileManager {
             json_languages = new JSONArray(); //Create empty JSON arrays that won't create any
             // new lines in the DB
             json_phrasebooks = new JSONArray();
-            //Insert default data
-            databaseHelper.insertRow(new LanguageModel(1, "LANGUAGE 1", DatabaseHelper.TABLE_LANGUAGES));
-            databaseHelper.insertRow(new LanguageModel(2, "LANGUAGE 2", DatabaseHelper
-                    .TABLE_LANGUAGES));
-            databaseHelper.insertRow(new PhrasebookModel(1, 1, 2, DatabaseHelper.TABLE_BOOKS));
         }
         JSONArray json_user = jsonBackup.getJSONArray("user");
 
@@ -212,7 +207,8 @@ public class FileManager {
 
         //Restore languages
         Log.d(TAG, "Restoring languages...");
-        if (json_languages.length() > 0)
+        if (json_languages.length() > 0) //length might be 0 only if backup comes from older
+            // version
             databaseHelper.deleteFromTable(DatabaseHelper.TABLE_LANGUAGES);
         for (int i = 0; i < json_languages.length(); i++) {
             JSONObject obj = json_languages.getJSONObject(i);
@@ -225,7 +221,8 @@ public class FileManager {
 
         //Restore phrasebooks
         Log.d(TAG, "Restoring phrasebooks...");
-        if (json_phrasebooks.length() > 0)
+        if (json_phrasebooks.length() > 0) //length might be 0 only if backup comes from older
+            // version
             databaseHelper.deleteFromTable(DatabaseHelper.TABLE_BOOKS);
         for (int i = 0; i < json_phrasebooks.length(); i++) {
             JSONObject obj = json_phrasebooks.getJSONObject(i);
