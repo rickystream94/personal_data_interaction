@@ -212,7 +212,8 @@ public class FileManager {
 
         //Restore languages
         Log.d(TAG, "Restoring languages...");
-        databaseHelper.deleteFromTable(DatabaseHelper.TABLE_LANGUAGES);
+        if (json_languages.length() > 0)
+            databaseHelper.deleteFromTable(DatabaseHelper.TABLE_LANGUAGES);
         for (int i = 0; i < json_languages.length(); i++) {
             JSONObject obj = json_languages.getJSONObject(i);
             int langId = obj.getInt(DatabaseHelper.KEY_LANG_ID);
@@ -224,7 +225,8 @@ public class FileManager {
 
         //Restore phrasebooks
         Log.d(TAG, "Restoring phrasebooks...");
-        databaseHelper.deleteFromTable(DatabaseHelper.TABLE_BOOKS);
+        if (json_phrasebooks.length() > 0)
+            databaseHelper.deleteFromTable(DatabaseHelper.TABLE_BOOKS);
         for (int i = 0; i < json_phrasebooks.length(); i++) {
             JSONObject obj = json_phrasebooks.getJSONObject(i);
             int bookId = obj.getInt(DatabaseHelper.KEY_BOOK_ID);
