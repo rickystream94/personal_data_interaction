@@ -2,12 +2,14 @@ package com.bobbytables.phrasebook;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -40,6 +42,7 @@ import com.crashlytics.android.Crashlytics;
 
 import io.fabric.sdk.android.Fabric;
 
+import java.io.IOException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -376,11 +379,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST_CODE);
             return;
         }
-        try {
-            fileManager.exportDataToJSON();
-        } catch (Exception ex) {
-            alertDialogManager.showAlertDialog(this, "Export error!", ex.getMessage(), false);
-        }
+        new ExportDataAsyncTask().execute();
     }
 
     private void importDataFromBackup() {
@@ -391,19 +390,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_PERMISSION_REQUEST_CODE);
             return;
         }
-        try {
-            fileManager.importDataFromBackup();
-            List<PhrasebookModel> phrasebookModels = databaseHelper.getAllPhrasebooks();
-            switchToPhrasebook(phrasebookModels.get(0));
-            refreshPhrasebooks();
-            Toast.makeText(MainActivity.this, "All data successfully restored from " +
-                    "latest backup!", Toast
-                    .LENGTH_LONG)
-                    .show();
-        } catch (Exception ex) {
-            alertDialogManager.showAlertDialog(this, "Import Error!", ex.getMessage(), false);
-            ex.printStackTrace();
-        }
+        new ImportDataAsyncTask().execute();
+    }
+
+    private void importDataSuccess() {
+        List<PhrasebookModel> phrasebookModels = databaseHelper.getAllPhrasebooks();
+        switchToPhrasebook(phrasebookModels.get(0));
+        refreshPhrasebooks();
+        Toast.makeText(MainActivity.this, "All data successfully restored from " +
+                "latest backup!", Toast
+                .LENGTH_LONG)
+                .show();
     }
 
     /**
@@ -444,5 +441,80 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     public void closeDrawer(View view) {
         mDrawerLayout.closeDrawers();
+    }
+
+    private class ExportDataAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private String occurredError;
+        private String outputMessage;
+        private ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setCancelable(false);
+            progressDialog.setMessage("Exporting data, please wait...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                outputMessage = fileManager.exportDataToJSON();
+            } catch (IOException e) {
+                occurredError = e.getMessage();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+            if (outputMessage != null)
+                Toast.makeText(MainActivity.this, outputMessage, Toast.LENGTH_LONG).show();
+            if (occurredError != null)
+                alertDialogManager.showAlertDialog(MainActivity.this, "Export error!", occurredError, false);
+        }
+    }
+
+    private class ImportDataAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private String occurredError;
+        private ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setCancelable(false);
+            progressDialog.setMessage("Importing data from latest backup, please wait...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                fileManager.importDataFromBackup();
+            } catch (Exception e) {
+                occurredError = e.getMessage();
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+            if (occurredError != null)
+                alertDialogManager.showAlertDialog(MainActivity.this, "Import Error!", occurredError,
+                        false);
+            else
+                MainActivity.this.importDataSuccess();
+        }
     }
 }

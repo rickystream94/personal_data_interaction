@@ -2,9 +2,7 @@ package com.bobbytables.phrasebook.utils;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.JsonReader;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.bobbytables.phrasebook.database.BadgeModel;
 import com.bobbytables.phrasebook.database.ChallengeModel;
@@ -23,10 +21,8 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * Created by ricky on 01/10/2017.
@@ -34,7 +30,6 @@ import java.util.HashMap;
 
 public class FileManager {
     private static FileManager instance;
-    private Context context;
     private DatabaseHelper databaseHelper;
     private SettingsManager settingsManager;
     private static final String TAG = FileManager.class.getSimpleName();
@@ -44,7 +39,6 @@ public class FileManager {
     private static final String CHARSET = "UTF-8";
 
     private FileManager(Context context) {
-        this.context = context;
         databaseHelper = DatabaseHelper.getInstance(context);
         settingsManager = SettingsManager.getInstance(context);
     }
@@ -56,7 +50,13 @@ public class FileManager {
         return instance;
     }
 
-    public void exportDataToJSON() throws IOException {
+    /**
+     * Exports data to JSON format
+     *
+     * @return output message to be shown to user
+     * @throws IOException
+     */
+    public String exportDataToJSON() throws IOException {
         String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date());
         JSONObject obj = createJsonDump();
 
@@ -83,8 +83,8 @@ public class FileManager {
         out.flush();
         out.close();
         Log.i(TAG, "File saved!");
-        Toast.makeText(context, "Data exported in " + EXPORT_PATH + "/" + EXPORT_FOLDER_NAME + "/" +
-                fileName + " as " + "JSON file", Toast.LENGTH_LONG).show();
+        return "Data exported in " + EXPORT_PATH + "/" + EXPORT_FOLDER_NAME + "/" +
+                fileName + " as " + "JSON file";
     }
 
     private JSONObject createJsonDump() {
