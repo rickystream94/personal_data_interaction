@@ -31,7 +31,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
     //Database info
     private static final String DATABASE_NAME = "phrasebookDatabase";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String TAG = DatabaseHelper.class.getSimpleName();
     private Context context;
     private CSVUtils csvUtils;
@@ -45,8 +45,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_BOOKS = "books";
 
     // Phrases Table Columns
-    // TODO: alter table phrases to remove keys lang1/lang2 and use
-    // instead Phrasebook ID, as this contains already lang1/lang2 (foreign key).
     public static final String KEY_PHRASE_ID = "id";
     public static final String KEY_LANG1 = "lang1Code";
     public static final String KEY_LANG2 = "lang2Code";
@@ -349,11 +347,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @param lang1Value
      * @param lang2Value
-     * @param correctTranslation
      * @return true if found (at least one!), false otherwise
      */
     public boolean checkIfCorrect(int lang1Code, int lang2Code, String lang1Value, String
-            lang2Value, String correctTranslation) {
+            lang2Value) {
         String languageWhereCondition = KEY_LANG1 + "=" + lang1Code + " AND " +
                 "" + KEY_LANG2 + "=" + lang2Code;
         SQLiteDatabase database = this.getReadableDatabase();
@@ -439,6 +436,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int affectedRows = database.update(TABLE_PHRASES, contentValues, KEY_LANG1_VALUE + "=?" +
                 " AND " + KEY_LANG2_VALUE + "=?", new String[]{lang1Value,
                 lang2Value});
+        Log.d(TAG, "New value for phrase's correct count: " + newValue + ". Updated value in DB!");
 
         //Check if correct count has reached the minimum to be archived
         Cursor cursor = database.rawQuery("SELECT " + KEY_CORRECT_COUNT + " FROM " +
@@ -453,7 +451,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 //Mark as archived if correct count reaches the threshold
                 if (currentCorrectCount == CORRECT_COUNT_FOR_ARCHIVE && currentCorrectCount > previousCorrectCount) {
                     updateArchived(database, lang1Code, lang2Code, lang1Value, lang2Value, true);
-                    Log.d("DEBUG ARCHIVED", "Current correct:" + currentCorrectCount + " Previous " +
+                    Log.d(TAG, "Current correct:" + currentCorrectCount + " Previous " +
                             "correct: " + previousCorrectCount);
                     isArchived = true;
                 }
