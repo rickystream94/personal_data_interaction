@@ -43,6 +43,7 @@ import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -379,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST_CODE);
             return;
         }
-        new ExportDataAsyncTask().execute();
+        new ExportDataAsyncTask(this).execute();
     }
 
     private void importDataFromBackup() {
@@ -390,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_PERMISSION_REQUEST_CODE);
             return;
         }
-        new ImportDataAsyncTask().execute();
+        new ImportDataAsyncTask(this).execute();
     }
 
     private void importDataSuccess() {
@@ -443,16 +444,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         mDrawerLayout.closeDrawers();
     }
 
-    private class ExportDataAsyncTask extends AsyncTask<Void, Void, Void> {
+    private static class ExportDataAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private String occurredError;
         private String outputMessage;
         private ProgressDialog progressDialog;
+        private WeakReference<MainActivity> activityWeakReference;
+        private FileManager fileManager;
+
+        ExportDataAsyncTask(MainActivity context) {
+            activityWeakReference = new WeakReference<>(context);
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(MainActivity.this);
+            MainActivity activity = activityWeakReference.get();
+            if (activity == null)
+                return;
+            fileManager = FileManager.getInstance(activity);
+            progressDialog = new ProgressDialog(activity);
             progressDialog.setCancelable(false);
             progressDialog.setMessage("Exporting data, please wait...");
             progressDialog.show();
@@ -471,24 +482,38 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            MainActivity activity = activityWeakReference.get();
+            AlertDialogManager alertDialogManager = new AlertDialogManager();
+            if (activity == null)
+                return;
             if (progressDialog.isShowing())
                 progressDialog.dismiss();
             if (outputMessage != null)
-                Toast.makeText(MainActivity.this, outputMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, outputMessage, Toast.LENGTH_LONG).show();
             if (occurredError != null)
-                alertDialogManager.showAlertDialog(MainActivity.this, "Export error!", occurredError, false);
+                alertDialogManager.showAlertDialog(activity, "Export error!", occurredError, false);
         }
     }
 
-    private class ImportDataAsyncTask extends AsyncTask<Void, Void, Void> {
+    private static class ImportDataAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private String occurredError;
         private ProgressDialog progressDialog;
+        private WeakReference<MainActivity> activityWeakReference;
+        private FileManager fileManager;
+
+        ImportDataAsyncTask(MainActivity context) {
+            activityWeakReference = new WeakReference<>(context);
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(MainActivity.this);
+            MainActivity activity = activityWeakReference.get();
+            if (activity == null)
+                return;
+            fileManager = FileManager.getInstance(activity);
+            progressDialog = new ProgressDialog(activity);
             progressDialog.setCancelable(false);
             progressDialog.setMessage("Importing data from latest backup, please wait...");
             progressDialog.show();
@@ -508,13 +533,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            MainActivity activity = activityWeakReference.get();
+            AlertDialogManager alertDialogManager = new AlertDialogManager();
+            if (activity == null)
+                return;
             if (progressDialog.isShowing())
                 progressDialog.dismiss();
             if (occurredError != null)
-                alertDialogManager.showAlertDialog(MainActivity.this, "Import Error!", occurredError,
+                alertDialogManager.showAlertDialog(activity, "Import Error!", occurredError,
                         false);
             else
-                MainActivity.this.importDataSuccess();
+                activity.importDataSuccess();
         }
     }
 }
