@@ -43,6 +43,9 @@
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="60dp"
             android:layout_marginEnd="@dimen/fab_margin"
+            app:menu_colorNormal="@color/colorAccent"
+            app:menu_colorPressed="@color/colorAccent"
+            app:menu_colorRipple="@color/colorAccent"
             app:menu_icon="@drawable/ic_add_white_24dp"
             app:menu_labels_hideAnimation="@anim/fab_scale_down"
             app:menu_labels_showAnimation="@anim/fab_scale_up">
@@ -53,7 +56,10 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_note_add_white_24dp"
                 app:borderWidth="0dp"
-                app:fab_label="Add Phrase"/>
+                app:fab_colorNormal="@color/colorAccent"
+                app:fab_label="Add Phrase"
+                app:menu_colorPressed="@color/colorAccent"
+                app:menu_colorRipple="@color/colorAccent"/>
 
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/fab_new_phrasebook"
@@ -61,7 +67,10 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_library_add_white_24dp"
                 app:borderWidth="0dp"
-                app:fab_label="Create New Phrasebook"/>
+                app:fab_colorNormal="@color/colorAccent"
+                app:fab_label="Create New Phrasebook"
+                app:menu_colorPressed="@color/colorAccent"
+                app:menu_colorRipple="@color/colorAccent"/>
         </com.github.clans.fab.FloatingActionMenu>
 
     </android.support.design.widget.CoordinatorLayout>

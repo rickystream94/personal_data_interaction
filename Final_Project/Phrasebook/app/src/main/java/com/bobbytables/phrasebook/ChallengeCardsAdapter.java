@@ -206,7 +206,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
 
         //Update UI user feedback
         int editTextBackgroundColor = result ? ContextCompat.getColor(context, R.color
-                .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnser);
+                .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnswer);
         if (!result) {
             holder.correctTranslation.setVisibility(View.VISIBLE);
         }
