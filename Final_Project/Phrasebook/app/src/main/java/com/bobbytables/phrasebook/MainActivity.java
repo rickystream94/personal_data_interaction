@@ -48,9 +48,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
-    private AlertDialogManager alertDialogManager = new AlertDialogManager();
     private SettingsManager settingsManager;
-    private FileManager fileManager;
     private FloatingActionMenu fabMenu;
     private DatabaseHelper databaseHelper;
     private DrawerLayout mDrawerLayout;
@@ -73,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         settingsManager = SettingsManager.getInstance(getApplicationContext());
         Crashlytics.setString(SettingsManager.KEY_NICKNAME, settingsManager.getPrefStringValue
                 (SettingsManager.KEY_NICKNAME));
-        fileManager = FileManager.getInstance(getApplicationContext());
 
         //Check always if it's the first time
         //Will invoke automatically NewUserActivity

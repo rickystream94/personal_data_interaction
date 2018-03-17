@@ -67,7 +67,7 @@
             android:layout_below="@id/translation"
             android:layout_marginTop="10dp"
             android:padding="3dp"
-            android:textColor="@color/wrongAnser"
+            android:textColor="@color/wrongAnswer"
             android:textSize="24sp"
             android:visibility="invisible"/>
 
