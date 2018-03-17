@@ -2,15 +2,15 @@
 <resources>
     <color name="colorChallengeCard">#ffe5cc</color>
     <color name="correctAnswer">#4dff4d</color>
-    <color name="wrongAnser">#ff3333</color>
+    <color name="wrongAnswer">#ff3333</color>
     <color name="pieChartLost">#ff3333</color>
     <color name="pieChartWon">#53ff1a</color>
     <color name="pieChartArchived">#33adff</color>
     <color name="pieChartToStudy">#ffbf80</color>
-    <color name="colorPrimary">#8BC34A</color>
-    <color name="colorPrimaryDark">#689F38</color>
-    <color name="primary_light">#DCEDC8</color>
-    <color name="colorAccent">#FF5722</color>
+    <color name="colorPrimary">#03A9F4</color>
+    <color name="colorPrimaryDark">#0288D1</color>
+    <color name="primary_light">#B3E5FC</color>
+    <color name="colorAccent">#FF9800</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
     <color name="icons">#212121</color>
@@ -19,6 +19,6 @@
     <color name="ratioLine">#00b300</color>
     <color name="ratioCircle">#009933</color>
     <color name="levelBarBg">#E64A19</color>
-    <color name="xpBarProgressBg">#8BC34A</color>
+    <color name="xpBarProgressBg">#B3E5FC</color>
     <color name="levelBarProgressBg">#ff8533</color>
 </resources>

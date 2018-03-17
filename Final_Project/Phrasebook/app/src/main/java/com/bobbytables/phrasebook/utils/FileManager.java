@@ -2,9 +2,7 @@ package com.bobbytables.phrasebook.utils;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.JsonReader;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.bobbytables.phrasebook.database.BadgeModel;
 import com.bobbytables.phrasebook.database.ChallengeModel;
@@ -23,10 +21,8 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * Created by ricky on 01/10/2017.
@@ -34,7 +30,6 @@ import java.util.HashMap;
 
 public class FileManager {
     private static FileManager instance;
-    private Context context;
     private DatabaseHelper databaseHelper;
     private SettingsManager settingsManager;
     private static final String TAG = FileManager.class.getSimpleName();
@@ -44,7 +39,6 @@ public class FileManager {
     private static final String CHARSET = "UTF-8";
 
     private FileManager(Context context) {
-        this.context = context;
         databaseHelper = DatabaseHelper.getInstance(context);
         settingsManager = SettingsManager.getInstance(context);
     }
@@ -56,7 +50,13 @@ public class FileManager {
         return instance;
     }
 
-    public void exportDataToJSON() throws IOException {
+    /**
+     * Exports data to JSON format
+     *
+     * @return output message to be shown to user
+     * @throws IOException
+     */
+    public String exportDataToJSON() throws IOException {
         String currentTimeString = new SimpleDateFormat("yMMddHHmmss").format(new Date());
         JSONObject obj = createJsonDump();
 
@@ -83,8 +83,8 @@ public class FileManager {
         out.flush();
         out.close();
         Log.i(TAG, "File saved!");
-        Toast.makeText(context, "Data exported in " + EXPORT_PATH + "/" + EXPORT_FOLDER_NAME + "/" +
-                fileName + " as " + "JSON file", Toast.LENGTH_LONG).show();
+        return "Data exported in " + EXPORT_PATH + "/" + EXPORT_FOLDER_NAME + "/" +
+                fileName + " as " + "JSON file";
     }
 
     private JSONObject createJsonDump() {
@@ -140,8 +140,17 @@ public class FileManager {
         JSONArray json_phrases = jsonBackup.getJSONArray(DatabaseHelper.TABLE_PHRASES);
         JSONArray json_challenges = jsonBackup.getJSONArray(DatabaseHelper.TABLE_CHALLENGES);
         JSONArray json_badges = jsonBackup.getJSONArray(DatabaseHelper.TABLE_BADGES);
-        JSONArray json_languages = jsonBackup.getJSONArray(DatabaseHelper.TABLE_LANGUAGES);
-        JSONArray json_phrasebooks = jsonBackup.getJSONArray(DatabaseHelper.TABLE_BOOKS);
+        JSONArray json_languages, json_phrasebooks;
+        try {
+            json_languages = jsonBackup.getJSONArray(DatabaseHelper.TABLE_LANGUAGES);
+            json_phrasebooks = jsonBackup.getJSONArray(DatabaseHelper.TABLE_BOOKS);
+        } catch (JSONException jex) {
+            //If languages and books are not found, the backup comes from an older app version:
+            // need to manually insert data in the corresponding tables
+            json_languages = new JSONArray(); //Create empty JSON arrays that won't create any
+            // new lines in the DB
+            json_phrasebooks = new JSONArray();
+        }
         JSONArray json_user = jsonBackup.getJSONArray("user");
 
         //Restore Phrases
@@ -150,8 +159,16 @@ public class FileManager {
             JSONObject obj = json_phrases.getJSONObject(i);
             String lang1Value = obj.getString(DatabaseHelper.KEY_LANG1_VALUE);
             String lang2Value = obj.getString(DatabaseHelper.KEY_LANG2_VALUE);
-            int lang1Code = obj.getInt(DatabaseHelper.KEY_LANG1);
-            int lang2Code = obj.getInt(DatabaseHelper.KEY_LANG2);
+            int lang1Code, lang2Code;
+            try {
+                lang1Code = obj.getInt(DatabaseHelper.KEY_LANG1);
+                lang2Code = obj.getInt(DatabaseHelper.KEY_LANG2);
+            } catch (JSONException ex) {
+                //If the backup comes from an older app version, there's no lang code in the backup
+                //and there was only one single phrasebook
+                lang1Code = 1;
+                lang2Code = 2;
+            }
             String createdOn = obj.getString(DatabaseHelper.KEY_CREATED_ON);
             int phraseId = obj.getInt(DatabaseHelper.KEY_PHRASE_ID);
             int isMastered = obj.getInt(DatabaseHelper.KEY_IS_MASTERED);
@@ -190,7 +207,9 @@ public class FileManager {
 
         //Restore languages
         Log.d(TAG, "Restoring languages...");
-        databaseHelper.deleteFromTable(DatabaseHelper.TABLE_LANGUAGES);
+        if (json_languages.length() > 0) //length might be 0 only if backup comes from older
+            // version
+            databaseHelper.deleteFromTable(DatabaseHelper.TABLE_LANGUAGES);
         for (int i = 0; i < json_languages.length(); i++) {
             JSONObject obj = json_languages.getJSONObject(i);
             int langId = obj.getInt(DatabaseHelper.KEY_LANG_ID);
@@ -202,7 +221,9 @@ public class FileManager {
 
         //Restore phrasebooks
         Log.d(TAG, "Restoring phrasebooks...");
-        databaseHelper.deleteFromTable(DatabaseHelper.TABLE_BOOKS);
+        if (json_phrasebooks.length() > 0) //length might be 0 only if backup comes from older
+            // version
+            databaseHelper.deleteFromTable(DatabaseHelper.TABLE_BOOKS);
         for (int i = 0; i < json_phrasebooks.length(); i++) {
             JSONObject obj = json_phrasebooks.getJSONObject(i);
             int bookId = obj.getInt(DatabaseHelper.KEY_BOOK_ID);

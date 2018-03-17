@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -28,6 +29,7 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
     private String lang2Value;
     private DataRowCursorAdapter rowCursorAdapter;
     private View rootView;
+    private ScrollView scrollView;
     private Button nextPageButton;
     private Button previousPageButton;
     private int currentOffset = 0;
@@ -60,6 +62,7 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
         TextView lang2 = (TextView) rootView.findViewById(R.id.phrases_lang2);
         lang1.setText(this.lang1Value);
         lang2.setText(this.lang2Value);
+        scrollView = (ScrollView) rootView.findViewById(R.id.phrases_scroll_view);
 
         // Get the SearchView and set it properly
         SearchView searchView = (SearchView) rootView.findViewById(R.id.search_phrase);
@@ -145,6 +148,7 @@ public class PhrasesFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onClick(View view) {
+        scrollView.fullScroll(ScrollView.FOCUS_UP);
         switch (view.getId()) {
             case R.id.nextPage:
                 Cursor cursor = databaseHelper.performRawQuery("SELECT COUNT(*) FROM " + DatabaseHelper

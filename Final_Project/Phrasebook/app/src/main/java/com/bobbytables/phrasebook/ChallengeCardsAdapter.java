@@ -44,6 +44,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
     private BadgeManager badgeManager;
     private ViewHolder holder;
     private SettingsManager settingsManager;
+    private static final String TAG = ChallengeCardsAdapter.class.getSimpleName();
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -152,11 +153,14 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
         holder.correctTranslation.setText(correctTranslation);
         boolean result = databaseHelper.checkIfCorrect(lang1Code, lang2Code, holder.lang1PhraseTextView
                         .getText().toString(),
-                translation, correctTranslation);
-        boolean isArchived = databaseHelper.updateCorrectCount(lang1Code, lang2Code, holder
+                translation);
+        boolean isAlreadyArchived = databaseHelper.getArchivedStatus(lang1Code, lang2Code, holder
                 .lang1PhraseTextView
-                .getText
-                        ().toString(), correctTranslation, result);
+                .getText().toString(), correctTranslation);
+        Log.d(TAG, "Phrase is already archived: " + isAlreadyArchived);
+        //Skip the increment if the phrase was already archived and the challenge was correct
+        boolean isArchived = !(isAlreadyArchived && result) && databaseHelper.updateCorrectCount
+                (lang1Code, lang2Code, holder.lang1PhraseTextView.getText().toString(), correctTranslation, result);
 
         //Insert new record in DB
         int correct = result ? 1 : 0;
@@ -202,7 +206,7 @@ class ChallengeCardsAdapter extends RecyclerView.Adapter<ChallengeCardsAdapter.V
 
         //Update UI user feedback
         int editTextBackgroundColor = result ? ContextCompat.getColor(context, R.color
-                .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnser);
+                .correctAnswer) : ContextCompat.getColor(context, R.color.wrongAnswer);
         if (!result) {
             holder.correctTranslation.setVisibility(View.VISIBLE);
         }
